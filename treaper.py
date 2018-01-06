@@ -15,11 +15,10 @@ class TrTimerWidget(QWidget):
         self.time_val = time_val
 
         self.lcd = QLCDNumber(self)
-        self.lcd.setSizePolicy(
-            QSizePolicy.Minimum, QSizePolicy.Minimum
-        )
 
         self.layout = QHBoxLayout(self)
+
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         self.layout.addWidget(self.lcd)
 
@@ -56,8 +55,8 @@ class TrMainControlsWidget(QWidget):
 
         self.layout = QHBoxLayout(self)
 
-        self.layout.addWidget(self.task_ldt, 75)
-        self.layout.addWidget(self.task_lcd, 20)
+        self.layout.addWidget(self.task_ldt, 85)
+        self.layout.addWidget(self.task_lcd, 10)
         self.layout.addWidget(self.start_btn, 5)
 
         self.setLayout(self.layout)
@@ -73,11 +72,12 @@ class TrMainControlsWidget(QWidget):
         pass
 
 
-class TrMainResultsWidget(QWidget):
+class TrMainResultsWidget(QTableView):
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
+
 
 class TrCentralWidget(QWidget):
 
@@ -86,10 +86,12 @@ class TrCentralWidget(QWidget):
         super().__init__(parent)
 
         self.main_controls = TrMainControlsWidget(self)
+        self.main_results = TrMainResultsWidget(self)
 
         self.layout = QVBoxLayout(self)
 
         self.layout.addWidget(self.main_controls)
+        self.layout.addWidget(self.main_results)
 
         self.setLayout(self.layout)
 

@@ -5,6 +5,8 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from timetable import TrTimeTableModel
+from timetable import TrTimeTableView
 
 class TrTimerWidget(QWidget):
 
@@ -130,13 +132,6 @@ class TrMainControlsWidget(QWidget):
         self.stopped.emit()
 
 
-class TrMainResultsWidget(QTableView):
-
-    def __init__(self, parent: QObject=None):
-
-        super().__init__(parent)
-
-
 class TrCentralWidget(QWidget):
 
     def __init__(self, parent: QObject=None):
@@ -144,12 +139,15 @@ class TrCentralWidget(QWidget):
         super().__init__(parent)
 
         self.main_controls = TrMainControlsWidget(self)
-        self.main_results = TrMainResultsWidget(self)
+        self.time_table_view = TrTimeTableView(self)
+        self.time_table_model = TrTimeTableModel()
+
+        self.time_table_view.setModel(self.time_table_model)
 
         self.layout = QVBoxLayout(self)
 
         self.layout.addWidget(self.main_controls)
-        self.layout.addWidget(self.main_results)
+        self.layout.addWidget(self.time_table_view)
 
         self.setLayout(self.layout)
 

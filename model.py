@@ -27,6 +27,9 @@ class Tag(Base):
         'Task', secondary=tags_and_tasks, back_populates='tags'
     )
 
+    def __repr__(self):
+        return 'Tag(name={})'.format(self.name)
+
 class Task(Base):
 
     __tablename__ = 'task'
@@ -40,6 +43,9 @@ class Task(Base):
 
     slots = relationship('Slot', back_populates='task')
 
+    def __repr__(self):
+        return 'Task(name={})'.format(self.name)
+
 class Slot(Base):
 
     __tablename__ = 'slot'
@@ -52,3 +58,6 @@ class Slot(Base):
     task_id = Column(Integer, ForeignKey('task.id'))
 
     task = relationship('Task', back_populates='slots')
+
+    def __repr__(self):
+        return 'Slot(fst={}, lst={})'.format(self.fst, self.lst)

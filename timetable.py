@@ -16,14 +16,8 @@ class TrTimeTableModel(QAbstractTableModel):
             self
             , section: int
             , orientation: Qt.Orientation
-            , role: Qt.DisplayRole
+            , role=Qt.DisplayRole
     ):
-
-        print('''
-        Section: {}
-        Orientation: {}
-        Role: {}
-        '''.format(section, orientation, role))
 
         if role != Qt.DisplayRole:
             return QVariant()
@@ -42,6 +36,17 @@ class TrTimeTableModel(QAbstractTableModel):
 
     def columnCount(self, parent: QModelIndex=QModelIndex()):
         return 4
+
+    def data(
+        self
+        , index: QModelIndex=QModelIndex()
+        , role=Qt.DisplayRole
+    ):
+        if role != Qt.DisplayRole:
+            return QVariant()
+
+        row, column = index.row(), index.column()
+
 
 class TrTimeTableView(QTableView):
 

@@ -5,6 +5,8 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from broker import DataBroker
+
 from timetable import TrTimeTableModel
 from timetable import TrTimeTableView
 
@@ -161,6 +163,12 @@ class TrMainWindow(QMainWindow):
         self.central_widget = TrCentralWidget(self)
 
         self.setCentralWidget(self.central_widget)
+
+        self.broker = DataBroker(self)
+
+        self.broker.load_slots(
+            lambda: print('started'), lambda: print('stopped')
+        )
 
 
 if __name__ == '__main__':

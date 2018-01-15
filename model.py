@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 
+
 Base = declarative_base()
 
 tags_and_tasks = Table(
@@ -15,6 +16,7 @@ tags_and_tasks = Table(
     , Column('tag_id', Integer, ForeignKey('tag.id'))
     , Column('task_id', Integer, ForeignKey('task.id'))
 )
+
 
 class Tag(Base):
 
@@ -29,6 +31,7 @@ class Tag(Base):
 
     def __repr__(self):
         return 'Tag(name={})'.format(self.name)
+
 
 class Task(Base):
 
@@ -45,6 +48,7 @@ class Task(Base):
 
     def __repr__(self):
         return 'Task(name={})'.format(self.name)
+
 
 class Slot(Base):
 

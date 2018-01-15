@@ -4,11 +4,13 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 
-class TrTimeTableModel(QAbstractTableModel):
+class TSlotTableModel(QAbstractTableModel):
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
 
         self.entries = []
 
@@ -47,8 +49,24 @@ class TrTimeTableModel(QAbstractTableModel):
 
         row, column = index.row(), index.column()
 
+    @pyqtSlot(list)
+    def fn_loaded(self, slots):
+        self.logger.debug(
+            'There are {} loaded slots'.format(len(slots))
+        )
 
-class TrTimeTableView(QTableView):
+        for slot in slots:
+            self.logger.debug(slot)
+
+    @pyqtSlot()
+    def fn_started(self):
+        self.logger.debug('handle_started')
+
+    @pyqtSlot()
+    def fn_stopped(self):
+        self.logger.debug('handle_stopped')
+
+class TSlotTableView(QTableView):
 
     def __init__(self, parent: QObject=None):
 

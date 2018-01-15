@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 
+import logging
 import sys
+
+from logging.config import dictConfig
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from broker import DataBroker
+from slot import TSlotTableModel, TSlotTableView
 
-from timetable import TrTimeTableModel
-from timetable import TrTimeTableView
 
-class TrTimerWidget(QWidget):
+class TTimerWidget(QWidget):
 
     def __init__(
             self
@@ -69,7 +71,7 @@ class TrTimerWidget(QWidget):
         )
 
 
-class TrMainControlsWidget(QWidget):
+class TMainControlsWidget(QWidget):
 
     started = pyqtSignal()
     stopped = pyqtSignal()
@@ -81,7 +83,7 @@ class TrMainControlsWidget(QWidget):
         self.ticking = False
 
         self.task_ldt = QLineEdit(self)
-        self.timer_wdgt = TrTimerWidget(self)
+        self.timer_wdgt = TTimerWidget(self)
         self.push_btn = QPushButton(self)
 
         self.layout = QHBoxLayout(self)
@@ -134,47 +136,77 @@ class TrMainControlsWidget(QWidget):
         self.stopped.emit()
 
 
-class TrCentralWidget(QWidget):
+class TCentralWidget(QWidget):
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
-        self.main_controls = TrMainControlsWidget(self)
-        self.time_table_view = TrTimeTableView(self)
-        self.time_table_model = TrTimeTableModel()
+        self.main_controls = TMainControlsWidget(self)
+        self.tslot_table_view = TSlotTableView(self)
+        self.tslot_table_model = TSlotTableModel(self)
 
-        self.time_table_view.setModel(self.time_table_model)
+        self.tslot_table_view.setModel(self.tslot_table_model)
 
         self.layout = QVBoxLayout(self)
 
         self.layout.addWidget(self.main_controls)
-        self.layout.addWidget(self.time_table_view)
+        self.layout.addWidget(self.tslot_table_view)
 
         self.setLayout(self.layout)
 
+        self.broker = DataBroker(parent=self)
 
-class TrMainWindow(QMainWindow):
+        self.broker.load_slots(
+            self.tslot_table_model.fn_loaded
+            , self.tslot_table_model.fn_started
+            , self.tslot_table_model.fn_stopped
+        )
+
+
+class TMainWindow(QMainWindow):
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
-        self.central_widget = TrCentralWidget(self)
+        self.central_widget = TCentralWidget(self)
 
         self.setCentralWidget(self.central_widget)
 
-        self.broker = DataBroker(self)
-
-        self.broker.load_slots(
-            lambda: print('started'), lambda: print('stopped')
-        )
-
 
 if __name__ == '__main__':
+    dictConfig({
+        'version': 1,
+        'formatters': {
+            'verbose': {
+                'format': '%(asctime)22s %(levelname)7s %(module)10s %(process)6d %(thread)15d %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            }
+        },
+        'handlers': {
+            'console':{
+                'level':'DEBUG',
+                'class':'logging.StreamHandler',
+                'formatter': 'verbose'
+            }
+        },
+        'loggers': {
+            'tslot': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            }
+        }
+    })
+
+    logger = logging.getLogger('tslot')
+    logger.debug('Logger tslot is configured and ready')
+
     app = QApplication(sys.argv)
 
-    main_window = TrMainWindow()
+    main_window = TMainWindow()
     main_window.show()
 
     sys.exit(app.exec())

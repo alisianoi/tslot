@@ -51,6 +51,11 @@ class Task(Base):
 
 
 class Slot(Base):
+    '''
+    Store first and last date and time of the recorded time segment
+
+    Note: comparison operations assume that slots are disjoint
+    '''
 
     __tablename__ = 'slot'
 
@@ -65,3 +70,45 @@ class Slot(Base):
 
     def __repr__(self):
         return 'Slot(fst={}, lst={})'.format(self.fst, self.lst)
+
+    def __eq__(self, other):
+        if self is other:
+            return True
+
+        if self.fst != other.fst:
+            return False
+
+        if self.lst != other.lst:
+            return False
+
+        return True
+
+    def __lt__(self, other):
+        if self.lst < other.fst:
+            return True
+
+        return False
+
+    def __le__(self, other):
+        if self.lst <= other.fst:
+            return True
+
+        return False
+
+    def __gt__(self, other):
+        if self.fst > other.lst:
+            return True
+
+        return False
+
+    def __ge__(self, other):
+        if self.fst >= other.lst:
+            return True
+
+        return False
+
+    def __contains__(self, other):
+        if self.fst <= other.fst and other.lst <= self.lst:
+            return True
+
+        return False

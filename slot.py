@@ -74,12 +74,39 @@ class TSlotTableModel(QAbstractTableModel):
             self
             , index: QModelIndex
             , value: QVariant
-            , role:int=Qt.EditRole
+            , role : Qt.ItemDataRole=Qt.EditRole
     ):
-        pass
+        self.logger.debug('enter .setData:')
+        self.logger.debug('index: {}'.format(index))
+        self.logger.debug('value: {}'.format(value))
+        self.logger.debug('role : {}'.format(role))
+
+        return (False, self.logger.debug('leave (False)'))[0]
 
     def insertRow(self, row: int, parent: QModelIndex=QModelIndex()):
-        return false
+        self.logger.debug('enter .insertRow')
+        self.logger.debug('row   : {}'.format(row))
+        self.logger.debug('parent: {}'.format(parent))
+
+        return (False, self.logger.debug('leave (False)'))[0]
+
+    def insertRows(
+            self
+            , row   : int
+            , count : int
+            , parent: QModelIndex=QModelIndex()
+    ):
+        self.logger.debug('enter .insertRows')
+        self.logger.debug('row   : {}'.format(row))
+        self.logger.debug('count : {}'.format(count))
+        self.logger.debug('parent: {}'.format(parent))
+
+        if 0 <= row <= self.rowCount():
+            self.beginInsertRows(parent, row, row + count)
+
+            return True, self.logger.debug('leave (True)')
+
+        return False, self.logger.debug('leave (False)')
 
     def find_lft_index(self, entry, entries, key=itemgetter(2)):
         '''
@@ -99,6 +126,11 @@ class TSlotTableModel(QAbstractTableModel):
         [1] https://docs.python.org/3/howto/sorting.html#key-functions
         '''
 
+        self.logger.debug('enter .find_lft_index')
+        self.logger.debug('entry  : {}'.format(entry))
+        self.logger.debug('entries: {}'.format(entries))
+        self.logger.debug('key    : {}'.format(key))
+
         slot0 = key(entry)
         lo, hi = 0, len(entries) - 1
 
@@ -112,26 +144,41 @@ class TSlotTableModel(QAbstractTableModel):
             else:
                 lo = mid + 1
 
+        self.logger.debug('leave {}'.format(lo))
+
         return lo
 
     @pyqtSlot(list)
     def fn_loaded(self, entries):
+        '''
+        Responds to the loaded signal of the DataBroker.
+
+        Should traverse the list of entries and add them to the ones
+        already stored in memory by this model.
+
+        Args:
+            entries: a list of (tag, task, slot) from the database
+        '''
 
         for entry in entries:
-            i = self.find_lft_index(entry, self.entries)
+            row = self.find_lft_index(entry, self.entries)
 
-            if i != len(self.entries) and entry == self.entries[i]:
+            if row != len(self.entries) and entry == self.entries[row]:
                 self.logger.debug('There are two identical entries:')
                 self.logger.debug('{}, {}, {}'.format(*entry))
-                self.logger.debug('{}, {}, {}'.format(*self.entries[i]))
-                self.logger.debug('Will not change entry ' + str(i))
+                self.logger.debug('{}, {}, {}'.format(*self.entries[row]))
+                self.logger.debug('Will not change entry ' + str(row))
 
                 continue
 
-            self.logger.debug('About to add entry at index ' + str(i))
+            self.logger.debug('About to add entry at index ' + str(row))
             self.logger.debug('{}, {}, {}'.format(*entry))
 
-            self.entries.insert(i, entry)
+            self.beginInsertRows(QModelIndex(), row, row)
+
+            self.entries.insert(row, entry)
+
+            self.endInsertRows()
 
     @pyqtSlot()
     def fn_started(self):

@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from broker import DataBroker
-from slot import TSlotTableModel, TSlotTableView
+from slot import TSlotTableModel, TSlotTableView, TSlotHorizontalHeaderView
 
 
 class TTimerWidget(QWidget):
@@ -144,9 +144,12 @@ class TCentralWidget(QWidget):
 
         self.main_controls = TMainControlsWidget(self)
         self.tslot_table_view = TSlotTableView(self)
-        self.tslot_table_model = TSlotTableModel(self)
+        self.tslot_horizontal_header_view = TSlotHorizontalHeaderView(parent=self)
 
+        self.tslot_table_model = TSlotTableModel(self)
+        self.tslot_horizontal_header_view.setModel(self.tslot_table_model)
         self.tslot_table_view.setModel(self.tslot_table_model)
+        self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)
 
         self.layout = QVBoxLayout(self)
 

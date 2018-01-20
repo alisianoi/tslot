@@ -148,6 +148,7 @@ class TCentralWidget(QWidget):
 
         self.tslot_table_model = TSlotTableModel(self)
         self.tslot_horizontal_header_view.setModel(self.tslot_table_model)
+
         self.tslot_table_view.setModel(self.tslot_table_model)
         self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)
 
@@ -190,15 +191,23 @@ if __name__ == '__main__':
             }
         },
         'handlers': {
-            'console':{
-                'level':'DEBUG',
-                'class':'logging.StreamHandler',
+            'file': {
+                'level': 'DEBUG'
+                , 'class': 'logging.handlers.RotatingFileHandler'
+                , 'formatter': 'verbose'
+                , 'filename': 'tslot.log'
+                , 'maxBytes': 10485760 # 10 MiB
+                , 'backupCount': 3
+            },
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
                 'formatter': 'verbose'
             }
         },
         'loggers': {
             'tslot': {
-                'handlers': ['console'],
+                'handlers': ['console', 'file'],
                 'level': 'DEBUG',
             }
         }

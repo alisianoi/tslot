@@ -7,51 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from model import Tag, Task, Slot
-
-
-def orient2str(orientation: Qt.Orientation):
-    if orientation == 0x1 and orientation == Qt.Horizontal:
-        return 'Qt.Horizontal'
-    elif orientation == 0x2 and orientation == Qt.Vertical:
-        return 'Qt.Vertical'
-
-    return 'Unknown Orientation (Orientation Number Change?): ' + str(orientation)
-
-def role2str(role: Qt.ItemDataRole):
-    if role == 0 and role == Qt.DisplayRole:
-        return 'Qt.DisplayRole'
-    elif role == 1 and role == Qt.DecorationRole:
-        return 'Qt.DecorationRole'
-    elif role == 2 and role == Qt.EditRole:
-        return 'Qt.EditRole'
-    elif role == 3 and role == Qt.ToolTipRole:
-        return 'Qt.ToolTipRole'
-    elif role == 4 and role == Qt.StatusTipRole:
-        return 'Qt.StatusTipRole'
-    elif role == 5 and role == Qt.WhatsThisRole:
-        return 'Qt.WhatsThisRole'
-    elif role == 6 and role == Qt.FontRole:
-        return 'Qt.FontRole'
-    elif role == 7 and role == Qt.TextAlignmentRole:
-        return 'Qt.TextAlignmentRole'
-    elif role == 8 and role == Qt.BackgroundRole:
-        return 'Qt.BackgroundRole'
-    elif role == 9 and role == Qt.ForegroundRole:
-        return 'Qt.ForegroundRole'
-    elif role == 10 and role == Qt.CheckStateRole:
-        return 'Qt.CheckStateRole'
-    elif role == 11 and role == Qt.AccessibleTextRole:
-        return 'Qt.AccessibleTextRole'
-    elif role == 12 and role == Qt.AccessibleDescriptionRole:
-        return 'Qt.AccessibleDescriptionRole'
-    elif role == 13 and role == Qt.SizeHintRole:
-        return 'Qt.SizeHintRole'
-    elif role == 14 and role == Qt.InitialSortOrderRole:
-        return 'Qt.InitialSortOrderRole'
-    elif role == 32 and role == Qt.UserRole:
-        return 'Qt.UserRole'
-
-    return 'Unknown Role (Role Number Change?): ' + str(role)
+from utils import orient2str, role2str, logged
 
 
 class TSlotTableModel(QAbstractTableModel):
@@ -69,29 +25,25 @@ class TSlotTableModel(QAbstractTableModel):
             , Slot(fst=datetime.utcnow(), lst=datetime.utcnow())   
         )]
 
+    @logged
     def headerData(
         self
         , section    : int
         , orientation: Qt.Orientation
         , role       : Qt.ItemDataRole=Qt.DisplayRole
     ):
-        self.logger.debug('enter .headerData')
         self.logger.debug('section    : {}'.format(section))
         self.logger.debug('orientation: {}'.format(orient2str(orientation)))
         self.logger.debug('role       : {}'.format(role2str(role)))
 
         if orientation == Qt.Vertical:
-            self.logger.debug('leave (Qt.Vertical, ask parent)')
-
             return super().headerData(section, orientation, role)
         if role == Qt.DisplayRole:
-            self.logger.debug('leave (Qt.DisplayRole)')
-
             return self.headerDataDisplayRole(section)
 
-        self.logger.debug('leave (Fallthrough, ask parent)')
         return super().headerData(section, orientation, role)
 
+    @logged
     def headerDataDisplayRole(self, section: int):
         if section == 0:
             return 'Task'
@@ -149,6 +101,7 @@ class TSlotTableModel(QAbstractTableModel):
         if column == 4:
             return str(slot.lst - slot.fst)
 
+    @logged
     def setData(
             self
             , index: QModelIndex
@@ -158,24 +111,24 @@ class TSlotTableModel(QAbstractTableModel):
         self.logger.debug('enter .setData:')
         self.logger.debug('index: {}'.format(index))
         self.logger.debug('value: {}'.format(value))
-        self.logger.debug('role : {}'.format(role))
+        self.logger.debug('role : {}'.format(role2str(role)))
 
-        return (False, self.logger.debug('leave (False)'))[0]
+        return False
 
+    @logged
     def insertRow(self, row: int, parent: QModelIndex=QModelIndex()):
-        self.logger.debug('enter .insertRow')
         self.logger.debug('row   : {}'.format(row))
         self.logger.debug('parent: {}'.format(parent))
 
-        return (False, self.logger.debug('leave (False)'))[0]
+        return False
 
+    @logged
     def insertRows(
             self
             , row   : int
             , count : int
             , parent: QModelIndex=QModelIndex()
     ):
-        self.logger.debug('enter .insertRows')
         self.logger.debug('row   : {}'.format(row))
         self.logger.debug('count : {}'.format(count))
         self.logger.debug('parent: {}'.format(parent))
@@ -183,10 +136,11 @@ class TSlotTableModel(QAbstractTableModel):
         if 0 <= row <= self.rowCount():
             self.beginInsertRows(parent, row, row + count)
 
-            return (True, self.logger.debug('leave (True)'))[0]
+            return True
 
-        return (False, self.logger.debug('leave (False)'))[0]
+        return False
 
+    @logged
     def find_lft_index(self, entry, entries, key=itemgetter(2)):
         '''
         Find the *very first* entry which is >= the given entry.
@@ -205,11 +159,6 @@ class TSlotTableModel(QAbstractTableModel):
         [1] https://docs.python.org/3/howto/sorting.html#key-functions
         '''
 
-        self.logger.debug('enter .find_lft_index')
-        self.logger.debug('entry  : {}'.format(entry))
-        self.logger.debug('entries: {}'.format(entries))
-        self.logger.debug('key    : {}'.format(key))
-
         slot0 = key(entry)
         lo, hi = 0, len(entries) - 1
 
@@ -222,8 +171,6 @@ class TSlotTableModel(QAbstractTableModel):
                 hi = mid - 1
             else:
                 lo = mid + 1
-
-        self.logger.debug('leave {}'.format(lo))
 
         return lo
 
@@ -259,15 +206,15 @@ class TSlotTableModel(QAbstractTableModel):
 
             self.endInsertRows()
 
+    @logged
     @pyqtSlot()
     def fn_started(self):
-        self.logger.debug('enter .fn_started')
-        self.logger.debug('leave .fn_started')
+        pass
 
+    @logged
     @pyqtSlot()
     def fn_stopped(self):
-        self.logger.debug('enter .fn_stopped')
-        self.logger.debug('leave .fn_stopped')
+        pass
 
 
 class TSlotHorizontalHeaderView(QHeaderView):
@@ -280,52 +227,34 @@ class TSlotHorizontalHeaderView(QHeaderView):
         super().__init__(orientation, parent)
 
         self.logger = logging.getLogger('tslot')
-
-    def sizeHint(self):
-        self.logger.debug('enter .sizeHint')
-        self.logger.debug('leave ({})'.format(super().sizeHint()))
-        return super().sizeHint()
-
-    def sectionSizeHint(self, logicalIndex: int):
-        self.logger.debug('enter .sectionSizeHint')
-        self.logger.debug('leave (400)')
-        return 400
-
-    def sectionSize(self, logicalIndex: int):
-        self.logger.debug('enter .sectionSize')
-        self.logger.debug('leave (400)')
-        return 400
-
-    def defaultSectionSize(self, logicalIndex: int):
-        self.logger.debug('enter .defaultSectionSize')
-        self.logger.debug('leave (400)')
-        return 400
-
-    def minimumSectionSize(self):
-        self.logger.debug('enter .minimumSectionSize')
-        self.logger.debug('leave ({})'.format(super().minimumSectionSize()))
-        return super().minimumSectionSize()
-
-    def resizeMode(self, logicalIndex: int):
-        self.logger.debug('enter .resizeMode')
-        self.logger.debug('leave (QHeaderView.Fixed)')
-        return QHeaderView.Fixed
-
-
-class TSlotHorizontalHeaderView(QHeaderView):
-
-    def __init__(
-        self
-        , orientation: Qt.Orientation=Qt.Horizontal
-        , parent     : QWidget=None
-    ):
-        super().__init__(orientation, parent)
-
-        self.logger = logging.getLogger('tslot')
         self.logger.debug('TSlotHorizontalHeaderView has a logger')
 
+    @logged
+    def sizeHint(self):
+        return super().sizeHint()
+
+    @logged
+    def sectionSizeHint(self, logicalIndex: int):
+        return 400
+
+    @logged
+    def sectionSize(self, logicalIndex: int):
+        return 400
+
+    @logged
+    def defaultSectionSize(self, logicalIndex: int):
+        return 400
+
+    @logged
+    def minimumSectionSize(self):
+        return super().minimumSectionSize()
+
+    @logged
+    def resizeMode(self, logicalIndex: int):
+        return QHeaderView.Fixed
+
+    @logged
     def sectionResizeMode(logicalIndex: int) -> QHeaderView.ResizeMode:
-        self.logger.debug('enter .sectionResizeMode')
         if logicalIndex == 0:
             return QHeaderView.Stretch
         if logicalIndex == 1:

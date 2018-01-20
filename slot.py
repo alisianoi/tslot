@@ -229,6 +229,52 @@ class TSlotHorizontalHeaderView(QHeaderView):
         self.logger = logging.getLogger('tslot')
         self.logger.debug('TSlotHorizontalHeaderView has a logger')
 
+        Stretch, Fixed = QHeaderView.Stretch, QHeaderView.Fixed
+
+        self.section_resize_modes = [
+            Stretch, Stretch, Fixed, Fixed, Fixed
+        ]
+
+    @logged
+    def setModel(self, model: QAbstractItemModel=None):
+        '''
+        Set the underlying data model
+
+        Fine-grained resizing of individual sections requires calling
+        setSectionResizeMode which works only when you've set the model.
+        '''
+        if model is None:
+            raise RuntimeError('model must be not None')
+
+        if model.columnCount() != self.count():
+            raise RuntimeError('model.columnCount() != self.count()')
+
+        super().setModel(model)
+
+        # The loop below is the only reason why this method exists
+        for i, mode in enumerate(self.section_resize_modes):
+            self.setSectionResizeMode(i, mode)
+
+    @logged
+    def count(self):
+        return len(self.section_resize_modes)
+
+    @logged
+    def offset(self):
+        return super().offset()
+
+    @logged
+    def horizontalOffset(self):
+        return super().horizontalOffset()
+
+    @logged
+    def verticalOffset(self):
+        return super().verticalOffset()
+
+    @logged
+    def length(self):
+        return super().length()
+
     @logged
     def sizeHint(self):
         return super().sizeHint()
@@ -267,6 +313,14 @@ class TSlotHorizontalHeaderView(QHeaderView):
             return QHeaderView.Fixed
 
         return QHeaderView.Fixed
+
+    @logged
+    def resizeSection(self, logicalIndex: int, size: int):
+        return super().resizeSection(logicalIndex, size)
+
+    @logged
+    def stretchSectionCount(self) -> int:
+        return super().stretchSectionCount()
 
 
 class TSlotTableView(QTableView):

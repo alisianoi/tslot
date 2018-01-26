@@ -6,8 +6,8 @@ from operator import itemgetter
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from model import Tag, Task, Slot
-from utils import orient2str, role2str, logged
+from src.model import Tag, Task, Slot
+from src.utils import orient2str, role2str, logged
 
 
 class TSlotTableModel(QAbstractTableModel):

@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThreadPool, QRunnable
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from model import Base, Tag, Task, Slot
+from src.model import Base, Tag, Task, Slot
 
 
 class SlotWorker(QObject):

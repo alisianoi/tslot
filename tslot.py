@@ -8,8 +8,8 @@ from logging.config import dictConfig
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from broker import DataBroker
-from slot import TSlotTableModel, TSlotTableView, TSlotHorizontalHeaderView
+from src.broker import DataBroker
+from src.slot import TSlotTableModel, TSlotTableView, TSlotHorizontalHeaderView
 
 
 class TTimerWidget(QWidget):

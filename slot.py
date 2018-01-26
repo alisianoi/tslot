@@ -19,11 +19,7 @@ class TSlotTableModel(QAbstractTableModel):
         self.logger = logging.getLogger('tslot')
         self.logger.debug('TSlotTableModel has a logger')
 
-        self.entries = [(
-            Tag(name='whatever')
-            , Task(name='what what?')
-            , Slot(fst=datetime.utcnow(), lst=datetime.utcnow())   
-        )]
+        self.entries = []
 
     @logged
     def headerData(

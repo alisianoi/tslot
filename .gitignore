@@ -1,4 +1,4 @@
 __*__
+*.db
+*.log*
 .python-version
-tslot.log*
-timereaper.db

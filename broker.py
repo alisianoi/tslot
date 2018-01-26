@@ -62,7 +62,7 @@ class DataBroker(QObject):
         self.logger = logging.getLogger('tslot')
 
         if path is None:
-            path = Path(Path.cwd(), Path('timereaper.db'))
+            path = Path(Path.cwd(), Path('tslot.db'))
 
         self.logger.debug('About to create_engine({})'.format(path))
         self.engine = create_engine('sqlite:///{}'.format(path))

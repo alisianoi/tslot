@@ -54,6 +54,15 @@ class SlotRunnable(QRunnable):
 
 
 class DataBroker(QObject):
+    '''
+    Reads and writes to the underlying database
+
+    The actual reading and writing is dispatched to separate threads.
+    This allows to use DataBroker inside GUI code and avoid freezes.
+
+    Note:
+        See Stylist as somewhat similar class
+    '''
 
     def __init__(self, path: Path=None, parent: QObject=None):
 

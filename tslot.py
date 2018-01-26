@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import *
 
 from src.broker import DataBroker
 from src.slot import TSlotTableModel, TSlotTableView, TSlotHorizontalHeaderView
+from src.stylist import Stylist
 
 
 class TTimerWidget(QWidget):
@@ -142,6 +143,9 @@ class TCentralWidget(QWidget):
 
         super().__init__(parent)
 
+        self.logger = logging.getLogger('tslot')
+        self.logger.debug('TCentralWidget has a logger')
+
         self.main_controls = TMainControlsWidget(self)
         self.tslot_table_view = TSlotTableView(self)
         self.tslot_horizontal_header_view = TSlotHorizontalHeaderView(parent=self)
@@ -158,6 +162,11 @@ class TCentralWidget(QWidget):
         self.layout.addWidget(self.tslot_table_view)
 
         self.setLayout(self.layout)
+
+        self.stylist = Stylist(parent=self)
+
+        for style in self.stylist.styles:
+            self.setStyleSheet(self.stylist.styles[style])
 
         self.broker = DataBroker(parent=self)
 

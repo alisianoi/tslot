@@ -1,3 +1,7 @@
-TSlotTableView {
-    background: red;
+QHeaderView::section::last {
+    background-color: blue;
+}
+
+QTableView::item::hover {
+    background-color: red;
 }

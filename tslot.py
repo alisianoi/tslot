@@ -166,6 +166,7 @@ class TCentralWidget(QWidget):
         self.stylist = Stylist(parent=self)
 
         for style in self.stylist.styles:
+            self.logger.debug('TCentralWidget.setStyleSheet for' + str(style))
             self.setStyleSheet(self.stylist.styles[style])
 
         self.broker = DataBroker(parent=self)

@@ -65,20 +65,35 @@ class TSlotTableModel(QAbstractTableModel):
     def columnCount(self, parent: QModelIndex=QModelIndex()):
         return 5
 
+    @logged
     def data(
         self
         , index: QModelIndex=QModelIndex()
         , role : Qt.ItemDataRole=Qt.DisplayRole
     ):
-        if role != Qt.DisplayRole:
+        if not index.isValid():
+            self.logger.debug('Requested index is not valid')
             return QVariant()
+
+        if not 0 <= index.row() < self.rowCount():
+            self.logger.debug('Requested row is outside range')
+            return QVariant()
+
+        if not 0 <= index.column() <= self.columnCount():
+            self.logger.debug('Requested column is outside range')
+            return QVariant()
+
+        if role == Qt.DisplayRole:
+            return self.dataDisplayRole(index)
+        if role == Qt.TextAlignmentRole:
+            return self.dataTextAlignmentRole(index)
+
+        self.logger.debug('Defaulting to QVariant')
+        return QVariant()
+
+    def dataDisplayRole(self, index: QModelIndex=QModelIndex()):
 
         row, column = index.row(), index.column()
-
-        if not 0 <= row < self.rowCount():
-            self.logger.debug('Requested row is outside range')
-
-            return QVariant()
 
         tag, task, slot = self.entries[row]
 
@@ -96,6 +111,17 @@ class TSlotTableModel(QAbstractTableModel):
 
         if column == 4:
             return str(slot.lst - slot.fst)
+
+        self.logger.debug('Defaulting to QVariant')
+        return QVariant()
+
+    def dataTextAlignmentRole(self, index: QModelIndex=QModelIndex()):
+
+        if index.column() == 4:
+            return Qt.AlignVCenter | Qt.AlignRight
+
+        self.logger.debug('Defaulting to QVariant')
+        return QVariant()
 
     @logged
     def setData(
@@ -214,6 +240,12 @@ class TSlotTableModel(QAbstractTableModel):
 
 
 class TSlotHorizontalHeaderView(QHeaderView):
+    '''
+    Control size/resize of headers for the SlotTableView
+
+    Note:
+        https://stackoverflow.com/q/48361795/1269892
+    '''
 
     def __init__(
             self
@@ -308,6 +340,7 @@ class TSlotHorizontalHeaderView(QHeaderView):
         if logicalIndex == 4:
             return QHeaderView.Fixed
 
+        self.logger.debug('Defaulting to:')
         return QHeaderView.Fixed
 
     @logged

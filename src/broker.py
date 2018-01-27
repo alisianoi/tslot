@@ -25,18 +25,20 @@ class SlotWorker(QObject):
 
         self.session = session
 
+        self.logger = logging.getLogger('tslot')
+        self.logger.debug('SlotWorker has a logger')
+
     @pyqtSlot()
     def work(self):
-        logger = logging.getLogger('tslot')
-        logger.debug('About to emit .started')
+        self.logger.debug('About to emit .started')
         self.started.emit()
 
-        logger.debug('About to emit .loaded')
+        self.logger.debug('About to emit .loaded')
         self.loaded.emit(
             [(tag, task, slot) for tag, task, slot in self.session.query(Tag, Task, Slot).filter(Tag.tasks, Task.slots).order_by(Slot.fst)]
         )
 
-        logger.debug('About to emit .stopped')
+        self.logger.debug('About to emit .stopped')
         self.stopped.emit()
 
 
@@ -57,14 +59,24 @@ class DataBroker(QObject):
     '''
     Reads and writes to the underlying database
 
-    The actual reading and writing is dispatched to separate threads.
-    This allows to use DataBroker inside GUI code and avoid freezes.
+    The database communication is dispatched to separate threads. This
+    allows to use DataBroker inside GUI code without GUI freezing.
 
     Note:
         See Stylist as somewhat similar class
     '''
 
     def __init__(self, path: Path=None, parent: QObject=None):
+        '''
+        Create a (unique) database session and a (unique) threadpool
+
+        This class is supposed to be a singleton: provide one database
+        connection and one threadpool for parallel database queries.
+
+        Args:
+            path  : full path to the database; If None, use default
+            parent: if Qt ownership is required, provides parent object
+        '''
 
         super().__init__(parent)
 

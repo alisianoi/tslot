@@ -1,16 +1,20 @@
 import logging
 
+from datetime import datetime
 from pathlib import Path
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QThreadPool, QRunnable
+from PyQt5.QtCore import *
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 from src.model import Base, Tag, Task, Slot
 
 
 class SlotWorker(QObject):
+    '''
+    Make database query in background, use Qt signals to return results
+    '''
 
     stored = pyqtSignal()
     loaded = pyqtSignal(list)
@@ -19,11 +23,32 @@ class SlotWorker(QObject):
     stopped = pyqtSignal()
     errored = pyqtSignal()
 
-    def __init__(self, session, parent: QObject=None):
+    def __init__(
+        self
+        , session: Session
+        , fst    : datetime=None
+        , lst    : datetime=None
+        , parent : QObject=None
+    ):
+        '''
+        Args:
+            session: SQLAlchemy database session instance
+            fst    : datetime after which the slots should start
+            lst    : datetime before which the slots should stop
+            parent : parent object if Qt ownership is required
+
+        Raises:
+            RuntimeError: if fst > lst
+        '''
 
         super().__init__(parent)
 
+        if fst is not None and lst is not None:
+            if fst > lst:
+                raise RuntimeError('SlotWorker expects fst <= lst')
+
         self.session = session
+        self.fst, self.lst = fst, lst
 
         self.logger = logging.getLogger('tslot')
         self.logger.debug('SlotWorker has a logger')
@@ -34,9 +59,25 @@ class SlotWorker(QObject):
         self.started.emit()
 
         self.logger.debug('About to emit .loaded')
-        self.loaded.emit(
-            [(tag, task, slot) for tag, task, slot in self.session.query(Tag, Task, Slot).filter(Tag.tasks, Task.slots).order_by(Slot.fst)]
-        )
+        if self.fst is not None and self.lst is not None:
+            self.loaded.emit([
+                (tag, task, slot)
+                for tag, task, slot in self.session.query(
+                    Tag, Task, Slot
+                ).filter(
+                    Tag.tasks
+                    , Task.slots
+                    , self.fst <= Slot.fst
+                    , Slot.lst <  self.lst
+                ).order_by(Slot.fst)
+            ])
+        else:
+            self.loaded.emit([
+                (tag, task, slot)
+                for tag, task, slot in self.session.query(
+                    Tag, Task, Slot
+                ).filter(Tag.tasks, Task.slots).order_by(Slot.fst)
+            ])
 
         self.logger.debug('About to emit .stopped')
         self.stopped.emit()

@@ -54,7 +54,8 @@ class Slot(Base):
     '''
     Store first and last date and time of the recorded time segment
 
-    Note: comparison operations assume that slots are disjoint
+    Note:
+        Comparison operations assume that slots are disjoint
     '''
 
     __tablename__ = 'slot'

@@ -102,8 +102,7 @@ class TScrollArea(QScrollArea):
 
         super().__init__(parent=parent)
 
-        self.setWidgetResizable(True)
-
         self.main_widget = TScrollWidget(self)
 
         self.setWidget(self.main_widget)
+        self.setWidgetResizable(True)

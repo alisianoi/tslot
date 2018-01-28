@@ -239,7 +239,7 @@ class TTableModel(QAbstractTableModel):
         pass
 
 
-class TSlotHorizontalHeaderView(QHeaderView):
+class THeaderView(QHeaderView):
     '''
     Control size/resize of headers for the SlotTableView
 
@@ -360,3 +360,17 @@ class TTableView(QTableView):
 
         # Remove little blank space
         self.verticalHeader().hide()
+
+    def setModel(self, model: QAbstractItemModel):
+
+        super().setModel(model)
+
+        # The code below is the reason why this method is overwritten
+        # It creates a brand new header view, installs and triggers it
+        self.header_view = THeaderView(
+            orientation=Qt.Horizontal, parent=self
+        )
+
+        self.setHorizontalHeader(self.header_view)
+
+        self.header_view.setModel(model)

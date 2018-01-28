@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from model import Base, Tag, Task, Slot
+from src.model import Base, Tag, Task, Slot
 
 
 def utc_to_local(utc_dt):
@@ -17,7 +17,7 @@ def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tzinfo=None)
 
 
-def create_a_day(session, day_offset):
+def create_a_day(session, delta):
     '''
     Create a single smiple day of tasks
 
@@ -45,8 +45,7 @@ def create_a_day(session, day_offset):
     workout_tag.tasks = [aerobic_task, anaerobic_task]
     freetime_tag.tasks = [movies_task, internet_task]
 
-    base = datetime.utcnow()
-    base = base.replace(day=base.day - day_offset)
+    base = datetime.utcnow() - delta
 
     aerobic_slot0 = Slot(
         task=aerobic_task
@@ -129,5 +128,5 @@ if __name__ == '__main__':
 
     session = Session()
 
-    for day in range(0, -3, -1):
-        create_a_day(session, day)
+    for days in range(0, 25):
+        create_a_day(session, timedelta(days=days))

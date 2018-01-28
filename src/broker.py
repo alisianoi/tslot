@@ -14,6 +14,21 @@ from src.model import Base, Tag, Task, Slot
 class SlotWorker(QObject):
     '''
     Make database query in background, use Qt signals to return results
+
+    Args:
+        session  : SQLAlchemy database session instance
+        date_fst : datetime after which the slots should start
+        date_lst : datetime before which the slots should stop
+        slice_fst: first element to be returned [1]
+        slice_lst: first element to *not* be returned [1]
+        parent   : parent object if Qt ownership is required
+
+    Raises:
+        RuntimeError: if date_fst > date_list
+
+    Note:
+        [1]: See http://docs.sqlalchemy.org/en/latest/orm/query.html
+             to learn more about SQLAlchemy batch processing
     '''
 
     stored = pyqtSignal()
@@ -25,39 +40,23 @@ class SlotWorker(QObject):
 
     def __init__(
         self
-        , session: Session
-        , fst    : datetime=None
-        , lst    : datetime=None
-        , offset : int=0
-        , limit  : int=100
-        , parent : QObject=None
+        , session  : Session
+        , date_fst : datetime=None
+        , date_lst : datetime=None
+        , slice_fst: int=0
+        , slice_lst: int=100
+        , parent   : QObject=None
     ):
-        '''
-        Args:
-            session: SQLAlchemy database session instance
-            fst    : datetime after which the slots should start
-            lst    : datetime before which the slots should stop
-            offset : SQLAlchemy offset, for batch processing queries [1]
-            limit  : SQLALchemy limit, for batch processing queries [1]
-            parent : parent object if Qt ownership is required
-
-        Raises:
-            RuntimeError: if fst > lst
-
-        Note:
-            [1]: See http://docs.sqlalchemy.org/en/latest/orm/query.html
-                 to learn more about SQLAlchemy batch processing
-        '''
 
         super().__init__(parent)
 
-        if fst is not None and lst is not None:
-            if fst > lst:
-                raise RuntimeError('SlotWorker expects fst <= lst')
+        if date_fst is not None and date_lst is not None:
+            if date_fst > date_lst:
+                raise RuntimeError('Must be date_fst <= date_lst')
 
         self.session = session
-        self.fst, self.lst = fst, lst
-        self.offset, self.limit = offset, limit
+        self.date_fst, self.date_lst = date_fst, date_lst
+        self.slice_fst, self.slice_lst = slice_fst, slice_lst
 
         self.logger = logging.getLogger('tslot')
         self.logger.debug('SlotWorker has a logger')
@@ -68,7 +67,7 @@ class SlotWorker(QObject):
         self.started.emit()
 
         self.logger.debug('About to emit .loaded')
-        if self.fst is not None and self.lst is not None:
+        if self.date_fst is not None and self.date_lst is not None:
             self.loaded.emit([
                 (tag, task, slot)
                 for tag, task, slot in self.session.query(
@@ -76,9 +75,13 @@ class SlotWorker(QObject):
                 ).filter(
                     Tag.tasks
                     , Task.slots
-                    , self.fst <= Slot.fst
-                    , Slot.lst <  self.lst
-                ).order_by(Slot.fst).slice(self.offset, self.limit)
+                    , self.date_fst <= Slot.fst
+                    , Slot.lst < self.date_lst
+                ).order_by(
+                    Slot.fst
+                ).slice(
+                    self.slice_fst, self.slice_lst
+                )
             ])
         else:
             self.loaded.emit([
@@ -87,7 +90,11 @@ class SlotWorker(QObject):
                     Tag, Task, Slot
                 ).filter(
                     Tag.tasks, Task.slots
-                ).order_by(Slot.fst).slice(self.offset, self.limit)
+                ).order_by(
+                    Slot.fst
+                ).slice(
+                    self.slice_fst, self.slice_lst
+                )
             ])
 
         self.logger.debug('About to emit .stopped')
@@ -155,19 +162,19 @@ class DataBroker(QObject):
             , fn_started=None
             , fn_stopped=None
             , fn_errored=None
-            , offset: int=0
-            , limit : int=100
+            , slice_fst: int=0
+            , slice_lst: int=100
     ):
         '''
         Dispatch a slot loading task to an instance of a SlotWorker
 
         Args:
-            fn_loaded : a callback to process the loaded slots
-            fn_started: a callback to respond to the start of loading
-            fn_stopped: a callback to respond to the stop of loading
-            fn_errored: a callback to respond to an error while loading
-            offset    : the first element to actually return
-            limit     : the total number of elements to actually return
+            fn_loaded : a callback for the loaded signal (success)
+            fn_started: a callback for the started signal
+            fn_stopped: a callback for the stopped signal
+            fn_errored: a callback for the errored signal
+            slice_fst : the first slot to actually return
+            slice_lst : the first slot to *not* actually return
         '''
 
         if fn_started is None:
@@ -179,8 +186,8 @@ class DataBroker(QObject):
 
         worker = SlotWorker(
             session=self.session
-            , offset=offset
-            , limit=limit
+            , slice_fst=slice_fst
+            , slice_lst=slice_lst
             , parent=self
         )
 

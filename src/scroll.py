@@ -4,11 +4,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.broker import DataBroker
-from src.slot import TSlotTableModel, TSlotTableView
+from src.slot import TTableModel, TTableView
 from src.utils import logged
 
 
-class TSlotScrollWidget(QWidget):
+class TScrollWidget(QWidget):
     '''
     Provide the top-level widget for the scroll-enabled area
 
@@ -21,7 +21,7 @@ class TSlotScrollWidget(QWidget):
         super().__init__(parent=parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('TSlotScrollWidget has a logger')
+        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -64,13 +64,13 @@ class TSlotScrollWidget(QWidget):
             # All slots in [lft, rgt) belong to the nsame date, so they
             # must end up in the same model of the same table view
 
-            model = TSlotTableModel()
+            model = TTableModel()
 
             model.beginInsertRows(QModelIndex(), lft, rgt)
             model.entries[lft:rgt] = entries[lft:rgt]
             model.endInsertRows()
 
-            view = TSlotTableView()
+            view = TTableView()
             view.setModel(model)
 
             self.views.append(view)
@@ -93,7 +93,7 @@ class TSlotScrollWidget(QWidget):
         return len(entries)
 
 
-class TSlotScrollArea(QScrollArea):
+class TScrollArea(QScrollArea):
     '''
     Provide the top-level scroll-enabled area
     '''
@@ -104,6 +104,6 @@ class TSlotScrollArea(QScrollArea):
 
         self.setWidgetResizable(True)
 
-        self.main_widget = TSlotScrollWidget(self) 
+        self.main_widget = TScrollWidget(self)
 
         self.setWidget(self.main_widget)

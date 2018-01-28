@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.broker import DataBroker
-from src.scroll import TSlotScrollArea
+from src.scroll import TScrollArea
 from src.stylist import Stylist
 
 
@@ -147,7 +147,7 @@ class TCentralWidget(QWidget):
         self.logger.debug('TCentralWidget has a logger')
 
         self.main_controls = TMainControlsWidget(self)
-        self.main_scroll_area = TSlotScrollArea(self)
+        self.main_scroll_area = TScrollArea(self)
 
         # self.tslot_table_view.setModel(self.tslot_table_model)
         # self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)

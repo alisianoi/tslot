@@ -49,18 +49,18 @@ def role2str(role: Qt.ItemDataRole):
     return 'Unknown Role (Role Number Change?): ' + str(role)
 
 
-def logged(f, logger=logging.getLogger('tslot')):
+def logged(foo, logger=logging.getLogger('tslot')):
     '''
     Decorate a function and surround its call with enter/leave logs
     '''
 
-    @wraps(f)
+    @wraps(foo)
     def wrapper(*args, **kwargs):
-        logger.debug('enter {}'.format(f.__qualname__))
+        logger.debug('enter {}'.format(foo.__qualname__))
 
-        result = f(*args, **kwargs)
+        result = foo(*args, **kwargs)
 
-        logger.debug('leave {} ({})'.format(f.__qualname__, result))
+        logger.debug('leave {} ({})'.format(foo.__qualname__, result))
 
         return result
 

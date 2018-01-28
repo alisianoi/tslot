@@ -10,14 +10,14 @@ from src.model import Tag, Task, Slot
 from src.utils import orient2str, role2str, logged
 
 
-class TSlotTableModel(QAbstractTableModel):
+class TTableModel(QAbstractTableModel):
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('TSlotTableModel has a logger')
+        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         self.entries = []
 
@@ -352,7 +352,7 @@ class TSlotHorizontalHeaderView(QHeaderView):
         return super().stretchSectionCount()
 
 
-class TSlotTableView(QTableView):
+class TTableView(QTableView):
 
     def __init__(self, parent: QObject=None):
 

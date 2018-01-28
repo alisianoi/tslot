@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.broker import DataBroker
-from src.slot import TSlotTableModel, TSlotTableView, TSlotHorizontalHeaderView
+from src.scroll import TSlotScrollArea
 from src.stylist import Stylist
 
 
@@ -147,19 +147,15 @@ class TCentralWidget(QWidget):
         self.logger.debug('TCentralWidget has a logger')
 
         self.main_controls = TMainControlsWidget(self)
-        self.tslot_table_view = TSlotTableView(self)
-        self.tslot_horizontal_header_view = TSlotHorizontalHeaderView(parent=self)
+        self.main_scroll_area = TSlotScrollArea(self)
 
-        self.tslot_table_model = TSlotTableModel(self)
-        self.tslot_horizontal_header_view.setModel(self.tslot_table_model)
-
-        self.tslot_table_view.setModel(self.tslot_table_model)
-        self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)
+        # self.tslot_table_view.setModel(self.tslot_table_model)
+        # self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)
 
         self.layout = QVBoxLayout(self)
 
         self.layout.addWidget(self.main_controls)
-        self.layout.addWidget(self.tslot_table_view)
+        self.layout.addWidget(self.main_scroll_area)
 
         self.setLayout(self.layout)
 
@@ -168,14 +164,6 @@ class TCentralWidget(QWidget):
         for style in self.stylist.styles:
             self.logger.debug('TCentralWidget.setStyleSheet for' + str(style))
             self.setStyleSheet(self.stylist.styles[style])
-
-        self.broker = DataBroker(parent=self)
-
-        self.broker.load_slots(
-            self.tslot_table_model.fn_loaded
-            , self.tslot_table_model.fn_started
-            , self.tslot_table_model.fn_stopped
-        )
 
 
 class TMainWindow(QMainWindow):

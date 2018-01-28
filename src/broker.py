@@ -116,7 +116,7 @@ class SlotRunnable(QRunnable):
 
 class DataBroker(QObject):
     '''
-    Reads and writes to the underlying database
+    Read and write to the underlying database
 
     The database communication is dispatched to separate threads. This
     allows to use DataBroker inside GUI code without GUI freezing.

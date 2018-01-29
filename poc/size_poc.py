@@ -120,7 +120,9 @@ class MyVHeaderView(QHeaderView):
         super().__init__(orientation, parent)
 
     def sizeHint(self):
-        print('MyVHeaderView.sizeHint')
+        shint = super().sizeHint()
+
+        print(f'MyVHeaderView.sizeHint {shint}')
 
         return super().sizeHint()
 
@@ -147,9 +149,10 @@ class MyTableView(QTableView):
         super().__init__(parent)
 
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.setVerticalHeader(MyVHeaderView(Qt.Vertical, self))
-        self.setHorizontalHeader(MyHHeaderView(Qt.Horizontal, self))
+        # self.setVerticalHeader(MyVHeaderView(Qt.Vertical, self))
+        # self.setHorizontalHeader(MyHHeaderView(Qt.Horizontal, self))
 
     def sizeHint(self):
         print('MyTableView.sizeHint')
@@ -159,15 +162,20 @@ class MyTableView(QTableView):
         if model is None:
             return super().sizeHint()
 
-        nrows = model.rowCount()
-
-        phint = super().sizeHint()
-
+        parent_shint = super().sizeHint()
         vheader_shint = self.verticalHeader().sizeHint()
+        hheader_shint = self.horizontalHeader().sizeHint()
 
-        shint = QSize(phint.width(), 2 * nrows * vheader_shint.height())
+        height = self.horizontalHeader().height()
+        for i in range(model.rowCount()):
+            print(f'{height}')
+            height += self.rowHeight(i)
 
-        print(f'Will hint {shint} instead of {phint}')
+        shint = QSize(
+            parent_shint.width(), height
+        )
+
+        print(f'Will hint {shint} instead of {parent_shint}')
 
         return shint
 

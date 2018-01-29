@@ -17,7 +17,10 @@ class MyPushButton(QPushButton):
         self.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
 
     def sizeHint(self):
-        return QSize(300, 300)
+        return QSize(300, 100)
+
+    def sizePolicy(self):
+        return QSizePolicy(Policy.Minimum, Policy.Minimum)
 
 
 class MyTableModel(QAbstractTableModel):
@@ -57,7 +60,7 @@ class MyTableModel(QAbstractTableModel):
         , role : Qt.ItemDataRole=Qt.DisplayRole
     ):
         if role == Qt.SizeHintRole:
-            print(f"Asking for size hint on {row};{self.i}")
+            print(f"Asking for size hint on ({row}, {self.i})")
             return super().data(index, role)
 
         if role != Qt.DisplayRole:
@@ -73,6 +76,107 @@ class MyTableModel(QAbstractTableModel):
         return super().data(index, role)
 
 
+class MyHHeaderView(QHeaderView):
+
+    def __init__(
+            self
+            , orientation: Qt.Orientation
+            , parent     : QWidget=None
+    ):
+        super().__init__(orientation, parent)
+
+    def sizeHint(self):
+        print('MyHHeaderView.sizeHint')
+
+        dsize = super().sizeHint()
+        psize = self.parentWidget().size()
+
+        print(f'dsize: {dsize}; psize: {psize}')
+        return QSize(psize.width() / 2, dsize.height())
+
+    def sizePolicy(self):
+        print('MyHHeaderView.sizePolicy')
+
+        return super().sizePolicy()
+
+    def sectionSizeHint(self, logicalIndex: int):
+        print('MyHHeaderView.sectionSizeHint')
+
+        return super().sectionSizeHint(logicalIndex)
+
+    def sectionResizeMode(self, logicalIndex: int):
+        print('MyHHeaderView.sectionResizeMode')
+
+        return super().sectionResizeMode(logicalIndex)
+
+
+class MyVHeaderView(QHeaderView):
+
+    def __init__(
+            self
+            , orientation: Qt.Orientation
+            , parent     : QWidget=None
+    ):
+        super().__init__(orientation, parent)
+
+    def sizeHint(self):
+        print('MyVHeaderView.sizeHint')
+
+        return super().sizeHint()
+
+    def sizePolicy(self):
+        print('MyVHeaderView.sizePolicy')
+
+        return super().sizePolicy()
+
+    def sectionSizeHint(self, logicalIndex: int):
+        print('MyVHeaderView.sectionSizeHint')
+
+        return super().sectionSizeHint(logicalIndex)
+
+    def sectionResizeMode(self, logicalIndex: int):
+        print('MyVHeaderView.sectionResizeMode')
+
+        return super().sectionResizeMode(logicalIndex)
+
+
+class MyTableView(QTableView):
+
+    def __init__(self, parent: QObject=None):
+
+        super().__init__(parent)
+
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+
+        self.setVerticalHeader(MyVHeaderView(Qt.Vertical, self))
+        self.setHorizontalHeader(MyHHeaderView(Qt.Horizontal, self))
+
+    def sizeHint(self):
+        print('MyTableView.sizeHint')
+
+        model = self.model()
+
+        if model is None:
+            return super().sizeHint()
+
+        nrows = model.rowCount()
+
+        phint = super().sizeHint()
+
+        vheader_shint = self.verticalHeader().sizeHint()
+
+        shint = QSize(phint.width(), 2 * nrows * vheader_shint.height())
+
+        print(f'Will hint {shint} instead of {phint}')
+
+        return shint
+
+    def sizePolicy(self):
+        print('MyTableView.sizePolicy')
+
+        return super().sizePolicy()
+
+
 class MyScrollWidget(QWidget):
 
     def __init__(self, parent: QWidget=None):
@@ -81,15 +185,25 @@ class MyScrollWidget(QWidget):
 
         self.layout = QVBoxLayout()
 
-        for i in range(1, 10):
-            self.view = MyTableView(self)
-            self.model = MyTableModel(i=i, parent=self)
+        for i in range(1, 20):
+            view = MyTableView(self)
+            model = MyTableModel(i=i, parent=self)
 
-            self.view.setModel(self.model)
+            view.setModel(model)
 
-            self.layout.addWidget(self.view)
+            self.layout.addWidget(view)
 
         self.setLayout(self.layout)
+
+    def sizeHint(self):
+        print('MyScrollWidget.sizeHint')
+
+        return super().sizeHint()
+
+    def sizePolicy(self):
+        print('MyScrollWidget.sizePolicy')
+
+        return super().sizePolicy()
 
 
 class MyScrollArea(QScrollArea):
@@ -103,37 +217,15 @@ class MyScrollArea(QScrollArea):
         self.setWidget(self.main_widget)
         self.setWidgetResizable(True)
 
-
-class MyTableView(QTableView):
-
-    def __init__(self, parent: QObject=None):
-
-        super().__init__(parent)
-
-        vheader = self.verticalHeader()
-        vheader.setSizePolicy(
-            QSizePolicy.Maximum, QSizePolicy.Maximum
-        )
-
     def sizeHint(self):
-        print('Asking for a size hint')
+        print('MyScrollArea.sizeHint')
 
-        rows = self.model().rowCount()
-        height = self.verticalHeader().height()
+        return super().sizeHint()
 
-        print(f'Will use {height}')
-        print(f'Will compute to {rows * height}')
+    def sizePolicy(self):
+        print('MyScrollArea.sizePolicy')
 
-        return QSize(rows * height, 800)
-
-    def setModel(self, model: QAbstractItemModel):
-
-        super().setModel(model)
-
-        rows = self.model().rowCount()
-        height = self.verticalHeader().height()
-
-        self.setMinimumSize(QSize(300, rows * height))
+        return super().sizePolicy()
 
 
 class MyCentralWidget(QWidget):
@@ -142,10 +234,10 @@ class MyCentralWidget(QWidget):
 
         super().__init__(parent)
 
-        self.scroll_area = MyScrollArea(self)
+        self.widget = MyScrollArea(self)
 
         self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.scroll_area)
+        self.layout.addWidget(self.widget)
 
         self.setLayout(self.layout)
 

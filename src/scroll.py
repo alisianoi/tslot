@@ -102,6 +102,8 @@ class TScrollArea(QScrollArea):
 
         super().__init__(parent=parent)
 
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         self.main_widget = TScrollWidget(self)
 
         self.setWidget(self.main_widget)

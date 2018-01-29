@@ -290,8 +290,28 @@ class TTableView(QTableView):
 
         super().__init__(parent)
 
-        # Remove little blank space
         self.verticalHeader().hide()
+
+        # Horizontal size can grow/shrink as parent widget sees fit
+        # Vertical size must be at least the size of vertical size hint
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        # Since we're demanding that all vertical size be allocated to
+        # the table view, let's disable the vertical scrollbar
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+    def sizeHint(self):
+        print(f'super size hint: {super().sizeHint()}')
+
+        model = self.model()
+
+        if model is None:
+            return super().sizeHint()
+
+        height = self.horizontalHeader().height()
+        for i in range(model.rowCount()):
+            height += self.rowHeight(i)
+
+        return QSize(super().sizeHint().width(), height)
 
     def setModel(self, model: QAbstractItemModel):
 

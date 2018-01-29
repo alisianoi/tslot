@@ -274,82 +274,14 @@ class THeaderView(QHeaderView):
         if model is None:
             raise RuntimeError('model must be not None')
 
+        super().setModel(model)
+
         if model.columnCount() != self.count():
             raise RuntimeError('model.columnCount() != self.count()')
-
-        super().setModel(model)
 
         # The loop below is the only reason why this method exists
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
-
-    @logged
-    def count(self):
-        return len(self.section_resize_modes)
-
-    @logged
-    def offset(self):
-        return super().offset()
-
-    @logged
-    def horizontalOffset(self):
-        return super().horizontalOffset()
-
-    @logged
-    def verticalOffset(self):
-        return super().verticalOffset()
-
-    @logged
-    def length(self):
-        return super().length()
-
-    @logged
-    def sizeHint(self):
-        return super().sizeHint()
-
-    @logged
-    def sectionSizeHint(self, logicalIndex: int):
-        return 400
-
-    @logged
-    def sectionSize(self, logicalIndex: int):
-        return 400
-
-    @logged
-    def defaultSectionSize(self, logicalIndex: int):
-        return 400
-
-    @logged
-    def minimumSectionSize(self):
-        return super().minimumSectionSize()
-
-    @logged
-    def resizeMode(self, logicalIndex: int):
-        return QHeaderView.Fixed
-
-    @logged
-    def sectionResizeMode(logicalIndex: int) -> QHeaderView.ResizeMode:
-        if logicalIndex == 0:
-            return QHeaderView.Stretch
-        if logicalIndex == 1:
-            return QHeaderView.Stretch
-        if logicalIndex == 2:
-            return QHeaderView.Fixed
-        if logicalIndex == 3:
-            return QHeaderView.Fixed
-        if logicalIndex == 4:
-            return QHeaderView.Fixed
-
-        self.logger.debug('Defaulting to:')
-        return QHeaderView.Fixed
-
-    @logged
-    def resizeSection(self, logicalIndex: int, size: int):
-        return super().resizeSection(logicalIndex, size)
-
-    @logged
-    def stretchSectionCount(self) -> int:
-        return super().stretchSectionCount()
 
 
 class TTableView(QTableView):

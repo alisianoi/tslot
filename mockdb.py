@@ -6,7 +6,7 @@ from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.model import Base, Tag, Task, Slot
+from src.db.model import Base, Tag, Task, Slot
 
 
 def utc_to_local(utc_dt):

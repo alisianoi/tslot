@@ -8,7 +8,7 @@ from PyQt5.QtCore import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from src.model import Base, Tag, Task, Slot
+from src.db.model import Base, Tag, Task, Slot
 
 
 class SlotWorker(QObject):

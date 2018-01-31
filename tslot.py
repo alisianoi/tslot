@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.broker import DataBroker
+from src.db.broker import DataBroker
 from src.font import initialize_font_databse
 from src.scroll import TScrollArea
 from src.stylist import Stylist
@@ -20,9 +20,9 @@ class TTickWidget(QWidget):
     Start a QTimer and display its results
 
     Args:
-        timer_value : initial value for the timer
-        timer_sleep : interval value between timer signals
-        parent      :
+        timer_value: initial value for the timer
+        timer_sleep: interval value between timer signals
+        parent     :
     '''
 
     def __init__(

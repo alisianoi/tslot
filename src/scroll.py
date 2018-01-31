@@ -3,7 +3,7 @@ import logging
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.broker import DataBroker
+from src.db.broker import DataBroker
 from src.slot import TTableModel, TTableView
 from src.utils import logged
 

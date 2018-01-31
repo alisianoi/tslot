@@ -29,10 +29,6 @@ class TTableModel(QAbstractTableModel):
         , orientation: Qt.Orientation
         , role       : Qt.ItemDataRole=Qt.DisplayRole
     ):
-        self.logger.debug('section    : {}'.format(section))
-        self.logger.debug('orientation: {}'.format(orient2str(orientation)))
-        self.logger.debug('role       : {}'.format(role2str(role)))
-
         if orientation == Qt.Vertical:
             return super().headerData(section, orientation, role)
         if role == Qt.DisplayRole:
@@ -54,11 +50,6 @@ class TTableModel(QAbstractTableModel):
             return 'Elapsed'
 
         return 'Fix Header'
-
-    # def headerDataSizeHintRole(self, section: int):
-    #     self.logger.debug('enter .headerDataSizeHintRole')
-
-    #     return QSize(200, 30)
 
     def rowCount(self, parent: QModelIndex=QModelIndex()):
         return len(self.entries)
@@ -125,46 +116,7 @@ class TTableModel(QAbstractTableModel):
         return QVariant()
 
     @logged
-    def setData(
-            self
-            , index: QModelIndex
-            , value: QVariant
-            , role : Qt.ItemDataRole=Qt.EditRole
-    ):
-        self.logger.debug('enter .setData:')
-        self.logger.debug('index: {}'.format(index))
-        self.logger.debug('value: {}'.format(value))
-        self.logger.debug('role : {}'.format(role2str(role)))
-
-        return False
-
-    @logged
-    def insertRow(self, row: int, parent: QModelIndex=QModelIndex()):
-        self.logger.debug('row   : {}'.format(row))
-        self.logger.debug('parent: {}'.format(parent))
-
-        return False
-
-    @logged
-    def insertRows(
-            self
-            , row   : int
-            , count : int
-            , parent: QModelIndex=QModelIndex()
-    ):
-        self.logger.debug('row   : {}'.format(row))
-        self.logger.debug('count : {}'.format(count))
-        self.logger.debug('parent: {}'.format(parent))
-
-        if 0 <= row <= self.rowCount():
-            self.beginInsertRows(parent, row, row + count)
-
-            return True
-
-        return False
-
-    @logged
-    def find_lft_index(self, entry, entries, key=itemgetter(2)):
+    def find_lft_index(self, entry, key=itemgetter(2)):
         '''
         Find the *very first* entry which is >= the given entry.
 
@@ -172,23 +124,22 @@ class TTableModel(QAbstractTableModel):
         insert the given entry and maintain the list in sorted order.
 
         Args:
-            entry  : the potentially new entry
-            entries: the list of existing entries
-            key    : the standard key function, see [1]
+            entry: the potentially new entry
+            key  : the standard key function, see [1]
 
         Returns:
-            An index from [0, len(entries)] suitable for insertion
+            An index from [0, len(self.entries)] suitable for insertion
 
         [1] https://docs.python.org/3/howto/sorting.html#key-functions
         '''
 
         slot0 = key(entry)
-        lo, hi = 0, len(entries) - 1
+        lo, hi = 0, len(self.entries) - 1
 
         while lo <= hi:
             mid = lo + (hi - lo) // 2
 
-            slot1 = key(entries[mid])
+            slot1 = key(self.entries[mid])
 
             if slot0 <= slot1:
                 hi = mid - 1
@@ -196,48 +147,6 @@ class TTableModel(QAbstractTableModel):
                 lo = mid + 1
 
         return lo
-
-    @pyqtSlot(list)
-    def fn_loaded(self, entries):
-        '''
-        Responds to the loaded signal of the DataBroker.
-
-        Traverse the received list of entries and add them to the ones
-        already stored in memory by this model.
-
-        Args:
-            entries: a list of (tag, task, slot) from the database
-        '''
-
-        for entry in entries:
-            row = self.find_lft_index(entry, self.entries)
-
-            if row != len(self.entries) and entry == self.entries[row]:
-                self.logger.debug('There are two identical entries:')
-                self.logger.debug('{}, {}, {}'.format(*entry))
-                self.logger.debug('{}, {}, {}'.format(*self.entries[row]))
-                self.logger.debug('Will not change entry ' + str(row))
-
-                continue
-
-            self.logger.debug('About to add entry at index ' + str(row))
-            self.logger.debug('{}, {}, {}'.format(*entry))
-
-            self.beginInsertRows(QModelIndex(), row, row)
-
-            self.entries.insert(row, entry)
-
-            self.endInsertRows()
-
-    @logged
-    @pyqtSlot()
-    def fn_started(self):
-        pass
-
-    @logged
-    @pyqtSlot()
-    def fn_stopped(self):
-        pass
 
 
 class THeaderView(QHeaderView):

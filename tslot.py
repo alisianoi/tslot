@@ -6,21 +6,30 @@ import sys
 from logging.config import dictConfig
 
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.broker import DataBroker
+from src.font import initialize_font_databse
 from src.scroll import TScrollArea
 from src.stylist import Stylist
 
 
-class TTimerWidget(QWidget):
+class TTickWidget(QWidget):
+    '''
+    Start a QTimer and display its results
+
+    Args:
+        timer_value : initial value for the timer
+        timer_sleep : interval value between timer signals
+        parent      :
+    '''
 
     def __init__(
-            self
-            , parent: QObject=None
-            , timer_value: QTime=QTime(0, 0, 0, 0)
-            , timer_sleep: int=1000
-            , timer_format: str='hh:mm:ss'
+        self
+        , timer_value: QTime=QTime(0, 0, 0, 0)
+        , timer_sleep: int=1000
+        , parent     : QWidget=None
     ):
 
         super().__init__(parent)
@@ -28,32 +37,32 @@ class TTimerWidget(QWidget):
         self.timer = QTimer(self)
         self.timer_value = timer_value
         self.timer_sleep = timer_sleep
-        self.timer_format = timer_format
 
-        self.timer_lcd = QLCDNumber(self)
-        self.timer_lcd.setDigitCount(len(timer_format))
-        self.timer_lcd.display(timer_value.toString(timer_format))
+        self.tick_lbl = QLabel()
+        self.tick_lbl.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        self.tick_lbl.setText(timer_value.toString())
 
-        self.layout = QHBoxLayout(self)
-
+        self.layout = QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self.layout.addWidget(self.timer_lcd)
+        self.layout.addWidget(self.tick_lbl)
 
         self.setLayout(self.layout)
 
-        self.implement_ai()
+        self.setup_ui()
+        self.setup_ai()
 
-    def implement_ai(self):
+    def setup_ui(self):
+        pass
+
+    def setup_ai(self):
         self.timer.timeout.connect(self.update_timer)
 
     @pyqtSlot()
     def update_timer(self):
         self.timer_value = self.timer_value.addSecs(1)
 
-        self.timer_lcd.display(
-            self.timer_value.toString(self.timer_format)
-        )
+        self.tick_lbl.setText(self.timer_value.toString())
 
     @pyqtSlot()
     def start_timer(self):
@@ -67,9 +76,10 @@ class TTimerWidget(QWidget):
 
         self.timer_value = QTime(0, 0, 0, 0)
 
-        self.timer_lcd.display(
-            self.timer_value.toString(self.timer_format)
-        )
+        self.tick_lbl.setText(self.timer_value.toString())
+
+    def setFont(self, font: QFont):
+        self.tick_lbl.setFont(font)
 
 
 class TMainControlsWidget(QWidget):
@@ -77,32 +87,39 @@ class TMainControlsWidget(QWidget):
     started = pyqtSignal()
     stopped = pyqtSignal()
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
         self.ticking = False
 
-        self.task_ldt = QLineEdit(self)
-        self.timer_wdgt = TTimerWidget(self)
-        self.push_btn = QPushButton(self)
+        self.task_ldt = QLineEdit()
+        self.tick_wgt = TTickWidget()
+        self.push_btn = QPushButton()
 
-        self.layout = QHBoxLayout(self)
+        self.layout = QHBoxLayout()
 
-        self.layout.addWidget(self.task_ldt, 85)
-        self.layout.addWidget(self.timer_wdgt, 10)
-        self.layout.addWidget(self.push_btn, 5)
+        # The numbers at the end are stretch factors; How to do better?
+        self.layout.addWidget(self.task_ldt, 7)
+        self.layout.addWidget(self.tick_wgt, 1)
+        self.layout.addWidget(self.push_btn, 1)
 
         self.setLayout(self.layout)
 
-        self.translate_ui()
-        self.implement_ai()
+        self.setup_ui()
+        self.setup_ai()
 
-    def translate_ui(self):
+    def setup_ui(self):
+        font = QFont('Quicksand-Medium', 12)
+
+        self.task_ldt.setFont(font)
+        self.tick_wgt.setFont(font)
+        self.push_btn.setFont(font)
+
         self.task_ldt.setPlaceholderText('Type task/project')
         self.push_btn.setText('Start')
 
-    def implement_ai(self):
+    def setup_ai(self):
         self.push_btn.clicked.connect(self.toggle_timer)
 
     @pyqtSlot()
@@ -120,7 +137,7 @@ class TMainControlsWidget(QWidget):
         if self.ticking:
             return
 
-        self.timer_wdgt.start_timer()
+        self.tick_wgt.start_timer()
         self.push_btn.setText('Stop')
         self.ticking = True
 
@@ -130,7 +147,7 @@ class TMainControlsWidget(QWidget):
         if not self.ticking:
             return
 
-        self.timer_wdgt.stop_timer()
+        self.tick_wgt.stop_timer()
         self.push_btn.setText('Start')
         self.ticking = False
 
@@ -139,20 +156,17 @@ class TMainControlsWidget(QWidget):
 
 class TCentralWidget(QWidget):
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
         self.logger.debug('TCentralWidget has a logger')
 
-        self.main_controls = TMainControlsWidget(self)
-        self.main_scroll_area = TScrollArea(self)
+        self.main_controls = TMainControlsWidget()
+        self.main_scroll_area = TScrollArea()
 
-        # self.tslot_table_view.setModel(self.tslot_table_model)
-        # self.tslot_table_view.setHorizontalHeader(self.tslot_horizontal_header_view)
-
-        self.layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.main_controls)
         self.layout.addWidget(self.main_scroll_area)
@@ -165,14 +179,19 @@ class TCentralWidget(QWidget):
             self.logger.debug('TCentralWidget.setStyleSheet for' + str(style))
             self.setStyleSheet(self.stylist.styles[style])
 
+        initialize_font_databse()
+
+        for entry in QFontDatabase().families():
+            logger.info(entry)
+
 
 class TMainWindow(QMainWindow):
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
-        self.central_widget = TCentralWidget(self)
+        self.central_widget = TCentralWidget()
 
         self.setCentralWidget(self.central_widget)
 
@@ -206,7 +225,7 @@ if __name__ == '__main__':
         'loggers': {
             'tslot': {
                 'handlers': ['console', 'file'],
-                'level': 'DEBUG',
+                'level': 'INFO',
             }
         }
     })

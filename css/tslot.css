@@ -1,7 +1,25 @@
-QHeaderView::section::last {
-    background-color: blue;
+TMainControlsWidget {
+    border: 3px solid black;
 }
 
-QTableView::item::hover {
+TTimerWidget {
+    color: red;
     background-color: red;
+}
+
+QLabel {
+    background-color: red;
+}
+
+THeaderView {
+}
+
+THeaderView::section::last {
+}
+
+TTableView {
+}
+
+TTableView::item::hover {
+
 }

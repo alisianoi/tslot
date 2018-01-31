@@ -4,6 +4,7 @@ from datetime import datetime
 from operator import itemgetter
 
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.model import Tag, Task, Slot
@@ -299,8 +300,11 @@ class TTableView(QTableView):
         # the table view, let's disable the vertical scrollbar
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+        self.setFont(QFont('Quicksand-Medium', 12))
+
+        self.setShowGrid(False)
+
     def sizeHint(self):
-        print(f'super size hint: {super().sizeHint()}')
 
         model = self.model()
 

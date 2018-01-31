@@ -17,7 +17,7 @@ class Stylist(QObject):
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('Stylist logging works')
+        self.logger.debug('Stylist has a logger')
 
         self.styles = {}
 
@@ -25,7 +25,7 @@ class Stylist(QObject):
             path = Path(Path.cwd(), Path('css'), Path('tslot.css'))
 
         if not path.exists():
-            self.logger.debug('Could not find {} in {}'.format(path.name(), path))
+            self.logger.debug(f'Could not find {path.name} in {path}')
 
             return
 

@@ -98,6 +98,7 @@ class TMainControlsWidget(QWidget):
         self.push_btn = QPushButton()
 
         self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         # The numbers at the end are stretch factors; How to do better?
         self.layout.addWidget(self.task_ldt, 7)
@@ -179,10 +180,8 @@ class TCentralWidget(QWidget):
             self.logger.debug('TCentralWidget.setStyleSheet for' + str(style))
             self.setStyleSheet(self.stylist.styles[style])
 
+        # TODO: move this into a thread
         initialize_font_databse()
-
-        for entry in QFontDatabase().families():
-            logger.info(entry)
 
 
 class TMainWindow(QMainWindow):

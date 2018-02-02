@@ -57,3 +57,40 @@ Editing a Single Time Slot
    - suggest preceeding lst time as new value for current fst time
    - do not allow new lst to overlap with subsequent fst times
    - suggest subsequent fst time as new value for current lst time
+
+
+Design
+######
+
+Static View
+===========
+
+- tslot.py
+
+  - TTickWidget
+  - TMainControlsWidget
+  - TCentralWidget
+  - TMainWindow
+
+- src/scroll.py
+
+  - TScrollArea
+  - TScrollWidget
+
+- src/slot.py
+
+  - TTableModel
+  - TTableView
+  - THeaderView
+
+- src/db/model.py
+
+  - Tag
+  - Task
+  - Slot
+
+- src/db/broker.py
+
+  - SlotWorker
+  - SlotRunnable
+  - DataBorker

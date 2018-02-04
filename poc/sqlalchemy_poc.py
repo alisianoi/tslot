@@ -1,137 +1,90 @@
 #!/usr/bin/env python
 
+import pprint
+
 import sqlalchemy
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session, relationship
+
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.types import Integer, String, Date, Time
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
 
 
-class Simple(Base):
+class MyDate(Base):
 
-    __tablename__ = 'simple'
+    __tablename__ = 'date'
 
     id = Column(Integer, primary_key=True)
 
-    counter = Column(Integer)
+    date = Column(Date)
 
-    def __eq__(self, other):
-        return self.counter == other.counter
+    slots = relationship('MySlot', back_populates='date')
 
-    def __lt__(self, other):
-        return self.counter < other.counter
-
-    def __le__(self, other):
-        return self.counter <= other.counter
-
-    def __gt__(self, other):
-        return self.counter > other.counter
-
-    def __ge__(self, other):
-        return self.counter >= other.counter
+    def __repr__(self):
+        return f'Date(id={self.id}, date={self.date})'
 
 
-class Slot(Base):
+class MySlot(Base):
 
     __tablename__ = 'slot'
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(String)
+    fst = Column(Time)
+    lst = Column(Time)
 
-    fst = Column(DateTime)
-    lst = Column(DateTime)
+    date_id = Column(Integer, ForeignKey('date.id'))
+    date = relationship('MyDate', back_populates='slots')
 
     def __repr__(self):
-        return 'Slot(name={}, fst={}, lst={})'.format(
-            self.name, self.fst, self.lst
-        )
-
-    def __eq__(self, other):
-
-        assert self.fst <= self.lst
-        assert other.fst <= other.lst
-
-        if self is other:
-            return True
-
-        if self.name != other.name:
-            return False
-
-        if self.fst != other.lst:
-            return False
-
-        if self.lst != other.lst:
-            return False
-
-        return True
-
-    def __lt__(self, other):
-
-        assert self.fst <= self.lst
-        assert other.fst <= other.lst
-
-        if self.lst < other.fst:
-            return True
-
-        return False
-
-    def __le__(self, other):
-
-        assert self.fst <= self.lst
-        assert other.fst <= other.lst
-
-        if self == other:
-            return True
-
-        if self.lst <= other.fst:
-            return True
-
-        return False
-
-    def __gt__(self, other):
-
-        assert self.fst <= self.lst
-        assert other.fst <= other.lst
-
-        if self.fst > other.lst:
-            return True
-
-        return False
-
-    def __ge__(self, other):
-
-        assert self.fst <= self.lst
-        assert other.fst <= other.lst
-
-        if self == other:
-            return True
-
-        if self.fst >= other.lst:
-            return True
-
-        return True
+        return f'MySlot(id={self.id}, fst={self.fst}, lst={self.lst})'
 
 
 if __name__ == '__main__':
 
+    engine = create_engine(
+        'sqlite:///{}'.format(
+            Path(Path.cwd(), Path('sqlalchemy_poc.db'))
+        )
+    )
+    SessionMaker = sessionmaker()
+    SessionMaker.configure(bind=engine)
+
+    session = SessionMaker()
+
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
     base = datetime.utcnow()
 
-    slot0 = Slot(
-        name='hello'
-        , fst=base.replace(hour=10, minute=10, second=10)
-        , lst=base.replace(hour=10, minute=33, second=33)
-    )
+    for i in range(1, 10):
+        date = MyDate(date=base.date() - timedelta(days=i - 1))
 
-    slot1 = Slot(
-        name='aaa'
-        , fst=base.replace(hour=12, minute=12, second=12)
-        , lst=base.replace(hour=12, minute=18, second=18)
-    )
+        for j in range(i):
+            slot = MySlot(fst=base.time(), lst=base.time())
 
-    for slot in sorted([slot0, slot1]):
-        print(slot)
+            date.slots.append(slot)
+
+            session.add(slot)
+        session.add(date)
+    session.commit()
+
+    q0 = session.query(MyDate, MySlot).filter(MyDate.id == MySlot.date_id)
+
+    q1 = session.query(MyDate).order_by(MyDate.date.desc()).slice(5, 10).subquery()
+    q2 = session.query(q1, MySlot).filter(q1.c.id == MySlot.date_id).order_by(q1.c.date.desc(), MySlot.fst.desc())
+
+    q = q2
+
+    pprint.pprint(q.all())
+
+    print(f'Total {q.count()}')
+    print(q)

@@ -8,65 +8,60 @@ from PyQt5.QtWidgets import *
 
 class CacheWorker(QObject):
 
-    responded_more = pyqtSignal()
+    loaded_next = pyqtSignal(dict)
 
     def __init__(self, parent: QObject=None):
 
-        super().__init__(parent)
+        super().__init__(parent=parent)
 
-    def run(self):
-        print('CacheServer.run()')
+        self.data = {'key': 42}
 
     @pyqtSlot()
-    def run_more(self):
-        thread = QThread.currentThread()
+    def load_next(self):
+        print(f'Worker about to send data {self.data}')
+        self.loaded_next.emit(self.data)
 
-        print('CacheServer.run_more()')
-        print(f'CacheServer priority={thread.priority()}')
-        print(f'CacheServer currentThread={thread.currentThread()}')
-        print(f'CacheServer currentThreadId={thread.currentThreadId()}')
-
-        print('above sleep')
-        QThread.sleep(3)
-        print('below sleep')
-        
-
-        self.responded_more.emit()    
+        print('Above wait')
+        QThread.currentThread().sleep(3)
+        print('Below wait')
 
 
 class MCentralWidget(QWidget):
 
-    requested_more = pyqtSignal()
+    requested_next = pyqtSignal()
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
-        self.push_btn = QPushButton('Press to start server')
+        self.push_btn = QPushButton('Press to query server')
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.push_btn)
 
         self.setLayout(self.layout)
 
-        self.push_btn.clicked.connect(self.launch_cache_server)
+        self.push_btn.clicked.connect(self.request_next)
 
         self.worker = CacheWorker()
-        self.requested_more.connect(self.worker.run_more)
+        self.requested_next.connect(self.worker.load_next)
+        self.worker.loaded_next.connect(self.show_next)
 
         self.thread = QThread(parent=self)
         self.worker.moveToThread(self.thread)
 
         self.thread.start()
 
-    @pyqtSlot()
-    def launch_cache_server(self):
-        thread = QApplication.instance().thread()
-        print(f'GUI priority={thread.priority()}')
-        print(f'GUI currentThread={thread.currentThread()}')
-        print(f'GUI currentThreadId={thread.currentThreadId()}')
+    def request_next(self):
+        self.requested_next.emit()
 
-        self.requested_more.emit()
+    @pyqtSlot(dict)
+    def show_next(self, data):
+        print(f'GUI received new data: {data}')
+
+        self.data = data
+
+        self.data['key'] = 13
 
 
 class MMainWindow(QMainWindow):

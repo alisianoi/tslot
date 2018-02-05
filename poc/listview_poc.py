@@ -12,7 +12,7 @@ class MyTableModel(QAbstractTableModel):
 
         super().__init__(parent)
 
-        self.messages = []
+        self.messages = [['hello', 'world']]
 
     def headerData(
         self
@@ -68,11 +68,25 @@ class MyCentralWidget(QWidget):
         self.my_table_view = MyTableView(parent=parent)
         self.my_table_view.setModel(self.my_table_model)
 
+        self.push_btn = QPushButton('Remove model')
+        self.push_btn.clicked.connect(self.remove_model)
+
         self.layout = QVBoxLayout(self)
 
         self.layout.addWidget(self.my_table_view)
+        self.layout.addWidget(self.push_btn)
 
         self.setLayout(self.layout)
+
+    @pyqtSlot()
+    def remove_model(self):
+        print(self.my_table_view)
+        self.my_table_view.deleteLater()
+
+        print('above sleep')
+        QThread.currentThread().sleep(3)
+        print('below sleep')
+        print(self.my_table_view)
 
 
 class MyMainWindow(QMainWindow):

@@ -20,11 +20,8 @@ def initialize_font_databse(path: Path=None):
 
     if path is None:
         path = Path(Path.cwd(), Path('font'))
-        logger.debug(f'Will use default font path {path}')
 
     if not path.exists():
-        logger.debug(f'Path {path} does not exist')
-
         return
 
     must_visit = [path]
@@ -32,12 +29,8 @@ def initialize_font_databse(path: Path=None):
     while must_visit:
         path = must_visit.pop()
 
-        logger.debug(f'Will try {path}')
-
         for entry in path.iterdir():
-
             if entry.name.endswith('.ttf'):
-                logger.debug(f'Add font from {entry}')
                 database.addApplicationFont(str(entry))
             elif entry.is_dir():
                 must_visit.append(entry)

@@ -1,22 +1,36 @@
 import logging
+import operator
 
 from datetime import datetime, timedelta, date
 from pathlib import Path
 
 from PyQt5.QtCore import *
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker, Session
 
-from src.db.model import Base, Tag, Task, Slot
+from src.db.model import Base, TagModel, TaskModel, DateModel, SlotModel
+from src.utils import logged
+
+
+class LoadFailed(Exception):
+
+    def __init__(self, message):
+
+        super().__init__()
+
+        self.message = message
 
 
 class DataLoader(QObject):
     '''
     Abstract class for database queries that happen in the background
 
+    This opens a brand new session every time because the SQLAlchemy
+    session object should be opened and used in the same thread.
+
     Args:
-        session: SQLAlchemy database session instance
+        path   : path to the SQLite database file
         parent : parent object if Qt ownership is required
     '''
 
@@ -30,23 +44,57 @@ class DataLoader(QObject):
     # Emitted after the database query
     stopped = pyqtSignal()
     # Emitted if there is an error at any point
-    errored = pyqtSignal()
+    errored = pyqtSignal(LoadFailed)
 
-    def __init__(self, session: Session, parent: QObject=None):
+    def __init__(self, path: Path, parent: QObject=None):
 
         super().__init__(parent)
 
-        self.session = session
+        if path is None:
+            return self.errored.emit(
+                LoadFailed('Path to database is None :(')
+            )
+
+        self.path, self.query = path, None
+
+    @pyqtSlot()
+    def work(self):
+        self.started.emit()
+
+        return self.errored.emit(
+            LoadFailed('You have called default work method')
+        )
+
+    def create_session(self):
+        '''
+        Create an SQLite/SQLAlchemy database session
+        '''
+
+        if not self.path.exists():
+            return self.errored.emit(
+                LoadFailed(f'Path to database is gone {path}')
+            )
+
+        # TODO: think about making SessionMaker a lot more global
+        # See: http://docs.sqlalchemy.org/en/latest/orm/session_basics.html#when-do-i-make-a-sessionmaker
+        engine = create_engine(f'sqlite:///{self.path}')
+        SessionMaker = sessionmaker(bind=engine)
+
+        return SessionMaker()
 
 
-class SlotLoader(DataLoader):
+class RayDateLoader(DataLoader):
     '''
-    Perform a database query, return a limited amount of results
+    Ask database for all slots beginning from (or up to) specific date
+
+    At maximum slice_lst - slice_fst dates will be loaded
 
     Args:
-        session  : SQLAlchemy database session instance
+        date_offt: return dates either all >= or < this offset
+        direction: go from present into past (next) or in reverse (prev)
         slice_fst: index of the first element to return [1]
         slice_lst: index of the first element to *not* return [1]
+        path     : path to the SQLite database file
         parent   : parent object if Qt ownership is required
 
     Note:
@@ -56,43 +104,75 @@ class SlotLoader(DataLoader):
 
     def __init__(
         self
-        , session  : Session
+        , date_offt: date
+        , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
+        , path     : Path=None
         , parent   : QObject=None
     ):
 
-        super().__init__(session, parent)
+        super().__init__(path, parent)
 
+        self.logger = logging.getLogger('tslot')
+        self.logger.debug(self.__class__.__name__ + ' has a logger')
+
+        self.date_offt = date_offt
+        self.direction = direction
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
 
-    @pyqtSlot()
-    def work(self):
-        self.started.emit()
 
-        self.loaded.emit([
-            (tag, task, slot)
-            for tag, task, slot in self.session.query(
-                Tag, Task, Slot
-            ).filter(
-                Tag.tasks, Task.slots
-            ).order_by(
-                Slot.fst
-            ).slice(
-                self.slice_fst, self.slice_lst
-            )
-        ])
+    def work(self):
+
+        if self.direction not in ['next', 'prev']:
+            return self.errored.emit(LoadFailed('Wrong direction'))
+
+        key = operator.le if self.direction == 'next' else operator.gt
+
+        # SQLite/SQLAlchemy session must be created and used by the
+        # same thread. Since this object is first created in one
+        # thread and then moved to another one, you must create your
+        # session here (not in constructor, nor anywhere else).
+
+        session = self.create_session()
+
+        DateLimitQuery = session.query(
+            DateModel
+        ).filter(
+            DateModel.date < self.date_offt
+        ).order_by(
+            DateModel.date.desc()
+        ).slice(
+            self.slice_fst, self.slice_lst
+        ).subquery()
+
+        self.logger.info(DateLimitQuery)
+
+        # self.query = session.query(
+        #     DateLimitQuery, DateModel, SlotModel, TaskModel, TagModel
+        # ).filter(
+        #     DateModel.id == DateLimitQuery.c.id
+        #     , SlotModel.date_id == DateLimitQuery.c.id
+        #     , SlotModel.task_id == TaskModel.id
+        # ).order_by(
+        #     DateModel.date.desc(), SlotModel.fst.desc()
+        # )
+
+        query = session.query(TaskModel)
+
+        self.logger.info(query)
+
+        self.loaded.emit(query.all())
+
+        session.close()
 
         self.stopped.emit()
 
 
 class DateLoader(DataLoader):
     '''
-    Perform a database query, return a limited amount of results
-
     Args:
-        session : SQLAlchemy database session instance
         date_fst: the first date to return
         date_lst: the first date to *not* return
         parent  : parent object if Qt ownership is required
@@ -100,36 +180,11 @@ class DateLoader(DataLoader):
 
     def __init__(
         self
-        , session : Session
-        , date_fst: datetime=None
-        , date_lst: datetime=None
+        , date_fst: date
+        , date_lst: date=None
         , parent  : QObject=None
     ):
-
-        super().__init__(session, parent)
-
-        self.date_fst = date_fst
-        self.date_lst = date_lst
-
-    @pyqtSlot()
-    def work(self):
-        self.started.emit()
-
-        self.loaded.emit([
-            (tag, task, slot)
-            for tag, task, slot in self.session.query(
-                Tag, Task, Slot
-            ).filter(
-                Tag.tasks
-                , Task.slots
-                , self.date_fst <= Slot.fst
-                , Slot.lst < self.date_lst
-            ).order_by(
-                Slot.fst
-            )
-        ])
-
-        self.stopped.emit()
+        pass
 
 
 class DataRunnable(QRunnable):
@@ -163,7 +218,16 @@ class DataBroker(QObject):
         parent: if Qt ownership is required, provides parent object
     '''
 
-    def __init__(self, path: Path=None, parent: QObject=None):
+    loaded_dates = pyqtSignal(list)
+
+    errored = pyqtSignal(LoadFailed)
+
+    @logged
+    def __init__(
+        self
+        , path: Path=None
+        , parent: QObject=None
+    ):
 
         super().__init__(parent)
 
@@ -173,126 +237,107 @@ class DataBroker(QObject):
         if path is None:
             path = Path(Path.cwd(), Path('tslot.db'))
 
-        self.engine = create_engine('sqlite:///{}'.format(path))
-
-        self.sessionmaker = sessionmaker()
-        self.sessionmaker.configure(bind=self.engine)
-
-        self.session = self.sessionmaker()
+        self.path = path
 
         self.threadpool = QThreadPool()
 
-    def load_slots(
+    @logged
+    @pyqtSlot(date)
+    def load_next(
         self
-        , fn_loaded
-        , fn_started=None
-        , fn_stopped=None
-        , fn_errored=None
+        , date_offt: date=None
+        , slice_fst: int=0
+        , slice_lst: int=100
+    ):
+
+        if date_offt is None:
+            date_offt = datetime.datetime().date()
+
+        self.load_ray_dates(
+            date_offt
+            , direction='next'
+            , slice_fst=slice_fst
+            , slice_lst=slice_lst
+        )
+
+    @pyqtSlot(date)
+    def load_prev(
+        self
+        , date_offt: date=None
+        , slice_fst: int=0
+        , slice_lst: int=100
+    ):
+
+        if date_offt is None:
+            date_offt = datetime.datetime().date()
+
+        self.load_ray_dates(
+            date_offt
+            , direction='prev'
+            , slice_fst=slice_fst
+            , slice_lst=slice_lst
+        )
+
+    def load_ray_dates(
+        self
+        , date_offt: date
+        , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
     ):
         '''
-        Dispatch a slot loading task to an instance of a SlotLoader
-
-        Load not more than (slice_lst - slice_fst) time entries, so it
-        can be used to load rather large chunks to fit in memory.
+        Ask for at most a few dates starting (stopping) at specific date
 
         Args:
-            fn_loaded : a callback for the loaded signal
-            fn_started: a callback for the started signal
-            fn_stopped: a callback for the stopped signal
-            fn_errored: a callback for the errored signal
-            slice_fst : the first slot to return
-            slice_lst : the first slot to *not* return
+            date_offt: the anchor date
+            direction: loading into the future or into the past
+            slice_fst: the first date to return
+            slice_lst: the first date to *not* return
         '''
 
         self.dispatch_worker(
-            SlotLoader(
-                session=self.session
-                , slice_fst=date_fst
-                , slice_lst=date_lst
+            RayDateLoader(
+                date_offt=date_offt
+                , direction=direction
+                , slice_fst=slice_fst
+                , slice_lst=slice_lst
+                , path=self.path
                 , parent=self
             )
-            , fn_loaded
-            , fn_started
-            , fn_stopped
-            , fn_errored
         )
 
-    def load_dates(
-        self
-        , fn_loaded
-        , fn_started=None
-        , fn_stopped=None
-        , fn_errored=None
-        , date_fst: date=datetime.utcnow().date()
-        , date_lst: date=datetime.utcnow().date() + timedelta(days=1)
-    ):
-        '''
-        Dispatch a slot loading task to an instance of a DateLoader
-
-        Load *all* the time entries between the given dates
-
-        Args:
-            fn_loaded : a callback for the loaded signal
-            fn_started: a callback for the started signal
-            fn_stopped: a callback for the stopped signal
-            fn_errored: a callback for the errored signal
-            slice_fst : the first slot to return
-            slice_lst : the first slot to *not* return
-        '''
-
-        self.dispatch_worker(
-            DateLoader(
-                session=self.session
-                , date_fst=date_fst
-                , date_lst=date_lst
-                , parent=self
-            )
-            , fn_loaded
-            , fn_started
-            , fn_stopped
-            , fn_errored
-        )
-
-    def dispatch_worker(
-        self
-        , worker: DataLoader
-        , fn_loaded
-        , fn_started=None
-        , fn_stopped=None
-        , fn_errored=None
-    ):
+    def dispatch_worker(self, worker: RayDateLoader):
         '''
         Connect worker signals to slot callbacks and start its thread
         '''
 
-        if fn_started is None:
-            fn_started = self.fn_started
-        if fn_stopped is None:
-            fn_stopped = self.fn_stopped
-        if fn_errored is None:
-            fn_errored = self.fn_errored
+        worker.loaded.connect(self.fn_loaded)
 
-        worker.started.connect(fn_started)
-        worker.stopped.connect(fn_stopped)
-        worker.errored.connect(fn_errored)
-
-        worker.loaded.connect(fn_loaded)
+        worker.started.connect(self.fn_started)
+        worker.stopped.connect(self.fn_stopped)
+        worker.errored.connect(self.fn_errored)
 
         self.threadpool.start(DataRunnable(worker))
 
     def store_slots(self):
         raise NotImplementedError()
 
+    @logged
+    @pyqtSlot(list)
+    def fn_loaded(self, entries):
+        self.loaded_dates.emit(entries)
+
+    @logged
     @pyqtSlot()
     def fn_started(self):
         self.logger.debug('Default fn_started')
 
+    @logged
     @pyqtSlot()
     def fn_stopped(self):
         self.logger.debug('Default fn_stopped')
 
-    @pyqtSlot()
-    def fn_errored(self):
-        self.logger.debug('Default fn_errored')
+    @logged
+    @pyqtSlot(LoadFailed)
+    def fn_errored(self, excetpion):
+        self.errored.emit(excetpion)

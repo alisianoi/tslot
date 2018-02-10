@@ -1,7 +1,7 @@
 import logging
 import operator
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, date
 from pathlib import Path
 
 from PyQt5.QtCore import *
@@ -50,12 +50,16 @@ class DataLoader(QObject):
 
         super().__init__(parent)
 
+        self.logger = logging.getLogger('tslot')
+        self.logger.debug(self.__class__.__name__ + ' has a logger')
+
         if path is None:
             return self.errored.emit(
                 LoadFailed('Path to database is None :(')
             )
 
-        self.path, self.query = path, None
+        self.path = path
+        self.query = None
 
     @pyqtSlot()
     def work(self):
@@ -70,10 +74,12 @@ class DataLoader(QObject):
         Create an SQLite/SQLAlchemy database session
         '''
 
-        if not self.path.exists():
+        if not isinstance(self.path, Path) or not self.path.exists():
             return self.errored.emit(
                 LoadFailed(f'Path to database is gone {path}')
             )
+
+        self.logger.debug(f'Will create db session to {self.path}')
 
         # TODO: think about making SessionMaker a lot more global
         # See: http://docs.sqlalchemy.org/en/latest/orm/session_basics.html#when-do-i-make-a-sessionmaker
@@ -87,7 +93,10 @@ class RayDateLoader(DataLoader):
     '''
     Ask database for all slots beginning from (or up to) specific date
 
-    At maximum slice_lst - slice_fst dates will be loaded
+    At maximum slice_lst - slice_fst dates will be loaded; Default
+    loading direction is called 'next' but goes into the past, historic
+    data. This makes sense because 'requesting next data from database'
+    by default is asking about tasks recorded in the past.
 
     Args:
         date_offt: return dates either all >= or < this offset
@@ -112,16 +121,12 @@ class RayDateLoader(DataLoader):
         , parent   : QObject=None
     ):
 
-        super().__init__(path, parent)
-
-        self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
+        super().__init__(path=path, parent=parent)
 
         self.date_offt = date_offt
         self.direction = direction
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
-
 
     def work(self):
 
@@ -140,30 +145,26 @@ class RayDateLoader(DataLoader):
         DateLimitQuery = session.query(
             DateModel
         ).filter(
-            DateModel.date < self.date_offt
+            DateModel.date <= self.date_offt
         ).order_by(
             DateModel.date.desc()
         ).slice(
             self.slice_fst, self.slice_lst
-        ).subquery()
+        ).subquery('DateLimitQuery')
 
-        self.logger.info(DateLimitQuery)
+        RayDateQuery = session.query(
+            DateModel, SlotModel, TaskModel
+        ).filter(
+            DateModel.id == DateLimitQuery.c.id
+            , DateModel.id == SlotModel.date_id
+            , SlotModel.task_id == TaskModel.id
+        ).order_by(
+            DateModel.date.desc(), SlotModel.fst.asc()
+        )
 
-        # self.query = session.query(
-        #     DateLimitQuery, DateModel, SlotModel, TaskModel, TagModel
-        # ).filter(
-        #     DateModel.id == DateLimitQuery.c.id
-        #     , SlotModel.date_id == DateLimitQuery.c.id
-        #     , SlotModel.task_id == TaskModel.id
-        # ).order_by(
-        #     DateModel.date.desc(), SlotModel.fst.desc()
-        # )
+        print(RayDateQuery)
 
-        query = session.query(TaskModel)
-
-        self.logger.info(query)
-
-        self.loaded.emit(query.all())
+        self.loaded.emit(RayDateQuery.all())
 
         session.close()
 
@@ -251,7 +252,7 @@ class DataBroker(QObject):
     ):
 
         if date_offt is None:
-            date_offt = datetime.datetime().date()
+            date_offt = datetime.utcnow().date()
 
         self.load_ray_dates(
             date_offt
@@ -269,7 +270,7 @@ class DataBroker(QObject):
     ):
 
         if date_offt is None:
-            date_offt = datetime.datetime().date()
+            date_offt = datetime.utcnow().date()
 
         self.load_ray_dates(
             date_offt

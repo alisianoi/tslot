@@ -34,6 +34,12 @@ class TagModel(Base):
     def __repr__(self):
         return f'TagModel(id={self.id}, name={self.name})'
 
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __hash__(self):
+        return id(self)
+
 
 class TaskModel(Base):
 
@@ -52,6 +58,12 @@ class TaskModel(Base):
     def __repr__(self):
         return f'TaskModel(id={self.id}, name={self.name})'
 
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __hash__(self):
+        return id(self)
+
 
 class DateModel(Base):
 
@@ -65,6 +77,39 @@ class DateModel(Base):
 
     def __repr__(self):
         return f'DateModel(id={self.id}, date={self.date})'
+
+    def __eq__(self, other):
+        if self.date == other.date:
+            return True
+
+        return False
+
+    def __lt__(self, other):
+        if self.date < other.date:
+            return True
+
+        return False
+
+    def __gt__(self, other):
+        if self.date > self.other:
+            return True
+
+        return False
+
+    def __le__(self, other):
+        if self.date <= other.date:
+            return True
+
+        return False
+
+    def __ge__(self, other):
+        if self.date >= other.date:
+            return True
+
+        return False
+
+    def __hash__(self):
+        return id(self)
 
 
 class SlotModel(Base):
@@ -90,3 +135,36 @@ class SlotModel(Base):
 
     def __repr__(self):
         return f'SlotModel(id={self.id}, fst={self.fst}, lst={self.lst})'
+
+    def __eq__(self, other):
+        if self.fst == other.fst and self.lst == other.lst:
+            return True
+
+        return False
+
+    def __lt__(self, other):
+        if self.lst < other.fst:
+            return True
+
+        return False
+
+    def __gt__(self, other):
+        if self.fst > other.lst:
+            return True
+
+        return False
+
+    def __le__(self, other):
+        if self.lst <= other.fst:
+            return True
+
+        return False
+
+    def __ge__(self, other):
+        if self.fst >= other.lst:
+            return True
+
+        return False
+
+    def __hash__(self):
+        return id(self)

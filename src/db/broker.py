@@ -1,4 +1,3 @@
-import copy
 import heapq
 import logging
 import operator
@@ -8,10 +7,10 @@ from pathlib import Path
 
 from PyQt5.QtCore import *
 
-from sqlalchemy import create_engine, asc, desc
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from src.db.model import Base, TagModel, TaskModel, DateModel, SlotModel
+from src.db.model import TaskModel, DateModel, SlotModel
 from src.utils import logged
 
 
@@ -56,9 +55,7 @@ class DataLoader(QObject):
         self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         if path is None:
-            return self.errored.emit(
-                LoadFailed('Path to database is None :(')
-            )
+            raise RuntimeError('Path to database is None :(')
 
         self.path = path
         self.query = None
@@ -78,7 +75,7 @@ class DataLoader(QObject):
 
         if not isinstance(self.path, Path) or not self.path.exists():
             return self.errored.emit(
-                LoadFailed(f'Path to database is gone {path}')
+                LoadFailed(f'Path to database is gone {self.path}')
             )
 
         self.logger.debug(f'Will create db session to {self.path}')
@@ -88,7 +85,7 @@ class DataLoader(QObject):
         engine = create_engine(f'sqlite:///{self.path}')
         SessionMaker = sessionmaker(bind=engine)
 
-        return SessionMaker()
+        return SessionMaker(), engine
 
 
 class RayDateLoader(DataLoader):
@@ -142,7 +139,7 @@ class RayDateLoader(DataLoader):
         # thread and then moved to another one, you must create your
         # session here (not in constructor, nor anywhere else).
 
-        session = self.create_session()
+        session, engine = self.create_session()
 
         DateLimitQuery = session.query(
             DateModel
@@ -169,25 +166,9 @@ class RayDateLoader(DataLoader):
         self.loaded.emit(result)
 
         session.close()
+        engine.dispose()
 
         self.stopped.emit()
-
-
-class DateLoader(DataLoader):
-    '''
-    Args:
-        date_fst: the first date to return
-        date_lst: the first date to *not* return
-        parent  : parent object if Qt ownership is required
-    '''
-
-    def __init__(
-        self
-        , date_fst: date
-        , date_lst: date=None
-        , parent  : QObject=None
-    ):
-        pass
 
 
 class DataRunnable(QRunnable):
@@ -228,7 +209,7 @@ class DataBroker(QObject):
     @logged
     def __init__(
         self
-        , path: Path=None
+        , path  : Path=None
         , parent: QObject=None
     ):
 
@@ -354,5 +335,5 @@ class DataBroker(QObject):
 
     @logged
     @pyqtSlot(LoadFailed)
-    def fn_errored(self, excetpion):
-        self.errored.emit(excetpion)
+    def fn_errored(self, exception):
+        self.errored.emit(exception)

@@ -10,8 +10,9 @@ from sqlalchemy.orm import sessionmaker
 
 from PyQt5.QtCore import *
 
-from src.db.broker import DataBroker
-from src.db.model import Base, TagModel, TaskModel, DateModel, SlotModel
+from src.db.broker import DataBroker, RayDateLoader
+from src.db.model import Base
+from src.db.model import TagModel, TaskModel, DateModel, SlotModel
 
 
 def utc_to_local(utc_dt):
@@ -153,55 +154,94 @@ def db(tmpdir_factory):
             create_a_date(session, base_date - timedelta(days=days))
         )
 
-    session.commit()
+    session.close()
 
-    yield path, dates
-
-    path.unlink()
+    yield path
 
 
-def handle_load_next_errored():
-    assert False
+# class TestRayDateLoader:
+
+#     def handle_loaded(self, dates):
+#         pprint.pprint(dates)
+
+#         assert len(dates) == 9
+
+#     def handle_errored(self):
+#         assert False
+
+#     def test_0(self, db, qtbot):
+#         worker = RayDateLoader(
+#             date_offt = datetime.utcnow().date()
+#             , direction = 'next'
+#             , slice_fst = 0
+#             , slice_lst = 1
+#             , path = db
+#             , parent = None
+#         )
+
+#         with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+#             worker.loaded.connect(self.handle_loaded)
+#             worker.errored.connect(self.handle_errored)
+
+#             worker.work()
 
 
-def handle_load_next_loaded_dates(stored_dates):
+class TestDataBroker:
 
-    def handler(loaded_dates):
-        expected = []
+    def handle_loaded(self, dates):
+        pprint.pprint(dates)
 
-        for sdate in stored_dates:
-            for sslot in sorted(sdate.slots):
-                expected.append((sdate, sslot, sslot.task))
+        assert len(dates) == 9
 
-        assert len(expected) == len(loaded_dates)
+    def handle_errored(self):
+        assert False
 
-        for lft, rgt in zip(expected, loaded_dates):
-            assert lft == rgt
+    def test_load_next_0(self, db, qtbot):
 
-    return handler
+        path = db
+
+        # Sort them most recent date first
+        # stored_dates.sort(reverse=True)
+
+        data_broker = DataBroker(path=path)
+
+        errored = data_broker.errored
+        loaded_dates = data_broker.loaded_dates
+
+        with qtbot.waitSignal(loaded_dates, timeout=20000) as blocker:
+            blocker.connect(errored)
+
+            loaded_dates.connect(
+                self.handle_loaded
+            )
+
+            data_broker.load_next(
+                datetime.utcnow().date()
+                , slice_fst=0
+                , slice_lst=1
+            )
 
 
-def test_load_next_0(db, qtbot):
 
-    path, stored_dates = db
+# def handle_load_next_errored():
+#     print('errored')
+#     assert False
 
-    # Sort them most recent date first
-    stored_dates.sort(reverse=True)
 
-    data_broker = DataBroker(path=path)
+# def handle_load_next_loaded_dates(stored_dates):
 
-    errored = data_broker.errored
-    loaded_dates = data_broker.loaded_dates
+#     def handler(loaded_dates):
+#         expected = []
 
-    with qtbot.waitSignal(loaded_dates, timeout=6000) as blocker:
-        blocker.connect(errored)
+#         assert len(loaded_dates) == 9
 
-        loaded_dates.connect(
-            handle_load_next_loaded_dates([stored_dates[0]])
-        )
+#         # for sdate in stored_dates:
+#         #     for sslot in sorted(sdate.slots):
+#         #         expected.append((sdate, sslot, sslot.task))
 
-        data_broker.load_next(
-            stored_dates[0].date
-            , slice_fst=0
-            , slice_lst=1
-        )
+#         # assert len(expected) == len(loaded_dates)
+
+#         # for lft, rgt in zip(expected, loaded_dates):
+#         #     assert lft == rgt
+
+#     return handler

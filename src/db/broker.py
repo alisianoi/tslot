@@ -1,3 +1,5 @@
+import copy
+import heapq
 import logging
 import operator
 
@@ -162,9 +164,9 @@ class RayDateLoader(DataLoader):
             DateModel.date.desc(), SlotModel.fst.asc()
         )
 
-        print(RayDateQuery)
+        result = RayDateQuery.all()
 
-        self.loaded.emit(RayDateQuery.all())
+        self.loaded.emit(result)
 
         session.close()
 
@@ -240,7 +242,10 @@ class DataBroker(QObject):
 
         self.path = path
 
-        self.threadpool = QThreadPool()
+        self.worker_keys = list(range(32))
+        self.worker_refs = {}
+
+        self.threadpool = QThreadPool(parent)
 
     @logged
     @pyqtSlot(date)
@@ -296,8 +301,16 @@ class DataBroker(QObject):
             slice_lst: the first date to *not* return
         '''
 
-        self.dispatch_worker(
-            RayDateLoader(
+        try:
+            key = heapq.heappop(self.worker_keys)
+        except IndexError:
+            return self.errored.emit(
+                'There are no available worker keys, will not load next'
+            )
+
+        # Keep a reference to the worker; It must survive garbage
+        # collection until the result returns from the other thread.
+        self.worker_refs[key] = RayDateLoader(
                 date_offt=date_offt
                 , direction=direction
                 , slice_fst=slice_fst
@@ -305,7 +318,8 @@ class DataBroker(QObject):
                 , path=self.path
                 , parent=self
             )
-        )
+
+        self.dispatch_worker(self.worker_refs[key])
 
     def dispatch_worker(self, worker: RayDateLoader):
         '''

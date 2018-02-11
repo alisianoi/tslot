@@ -38,7 +38,7 @@ class TagModel(Base):
         return self.name == other.name
 
     def __hash__(self):
-        return id(self)
+        return hash(self.name)
 
 
 class TaskModel(Base):
@@ -62,7 +62,7 @@ class TaskModel(Base):
         return self.name == other.name
 
     def __hash__(self):
-        return id(self)
+        return hash(self.name)
 
 
 class DateModel(Base):
@@ -71,7 +71,7 @@ class DateModel(Base):
 
     id = Column(Integer, primary_key=True)
 
-    date = Column(Date)
+    date = Column(Date, nullable=False)
 
     slots = relationship('SlotModel', back_populates='date')
 
@@ -91,7 +91,7 @@ class DateModel(Base):
         return False
 
     def __gt__(self, other):
-        if self.date > self.other:
+        if self.date > other.date:
             return True
 
         return False
@@ -109,7 +109,7 @@ class DateModel(Base):
         return False
 
     def __hash__(self):
-        return id(self)
+        return hash(self.date)
 
 
 class SlotModel(Base):

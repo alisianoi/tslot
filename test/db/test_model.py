@@ -51,6 +51,7 @@ def test_tag_model_eq_3():
     tag0, tag1 = TagModel(name='tag0'), TagModel(name='tag1')
 
     assert tag0 != tag1
+    assert not tag0 == tag1
 
 def test_tag_model_hash_0():
 
@@ -120,6 +121,7 @@ def test_task_model_eq_3():
     task0, task1 = TaskModel(name='Task0'), TaskModel(name='Task1')
 
     assert task0 != task1
+    assert not task0 == task1
 
 def test_task_model_hash_0():
 
@@ -194,6 +196,7 @@ def test_date_model_eq_3():
     dm0, dm1 = DateModel(date=d0), DateModel(date=d1)
 
     assert dm0 != dm1
+    assert not dm0 == dm1
 
 def test_date_model_lt_0():
 
@@ -437,3 +440,363 @@ def test_date_model_hash_4():
 
     assert dm0 != dm1
     assert hash(dm0) != hash(dm1)
+
+def test_slot_model_0():
+
+    slot = SlotModel()
+
+    assert slot.id is None
+    assert slot.fst is None
+    assert slot.lst is None
+    assert slot.task_id is None
+    assert slot.date_id is None
+    assert slot.task is None
+    assert slot.date is None
+
+def test_slot_model_1():
+
+    fst = datetime.utcnow().date()
+    lst = datetime.utcnow().date() + timedelta(microseconds=1)
+
+    slot = SlotModel(fst=fst, lst=lst)
+
+    assert slot.id is None
+    assert slot.fst == fst
+    assert slot.lst == lst
+    assert slot.task_id is None
+    assert slot.date_id is None
+    assert slot.task is None
+    assert slot.date is None
+
+def test_slot_model_eq_0():
+
+    slot = SlotModel()
+
+    assert slot == slot
+
+def test_slot_model_eq_1():
+
+    fst = datetime.utcnow().date()
+    lst = datetime.utcnow().date() + timedelta(microseconds=1)
+
+    slot = SlotModel(fst=fst, lst=lst)
+
+    assert slot == slot
+
+def test_slot_model_eq_2():
+
+    fst = datetime.utcnow().date()
+    lst = datetime.utcnow().date() + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert slot0 == slot1
+
+def test_slot_model_eq_3():
+
+    fst0 = datetime.utcnow().date()
+    lst0 = datetime.utcnow().date() + timedelta(microseconds=1)
+
+    fst1 = fst0 - timedelta(days=1)
+    lst1 = lst0 - timedelta(days=1)
+
+    slot0 = SlotModel(fst=fst0, lst=lst0)
+    slot1 = SlotModel(fst=fst1, lst=lst1)
+
+    assert slot0 != slot1
+    assert not slot0 == slot1
+
+def test_slot_model_lt_0():
+
+    slot = SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot < slot
+
+def test_slot_model_lt_1():
+
+    slot0, slot1 = SlotModel(), SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot0 < slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 < slot0
+
+def test_slot_model_lt_2():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0, slot1 = SlotModel(fst=fst, lst=lst), SlotModel
+
+    with pytest.raises(TypeError) as e:
+        slot0 < slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 < slot0
+
+def test_slot_model_lt_3():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert not slot0 < slot1
+    assert not slot1 < slot0
+
+def test_slot_model_lt_4():
+
+    fst0 = datetime.utcnow().date()
+    lst0 = fst0 + timedelta(microseconds=1)
+
+    fst1 = fst0 - timedelta(days=1)
+    lst1 = lst0 - timedelta(days=1)
+
+    slot0 = SlotModel(fst=fst0, lst=lst0)
+    slot1 = SlotModel(fst=fst1, lst=lst1)
+
+    assert not slot0 < slot1
+    assert     slot1 < slot0
+
+def test_slot_model_le_0():
+
+    slot = SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot <= slot
+
+def test_slot_model_le_1():
+
+    slot0, slot1 = SlotModel(), SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot0 <= slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 <= slot0
+
+def test_slot_model_le_2():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0, slot1 = SlotModel(fst=fst, lst=lst), SlotModel
+
+    with pytest.raises(TypeError) as e:
+        slot0 <= slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 <= slot0
+
+def test_slot_model_le_3():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert slot0 <= slot1
+    assert slot1 <= slot0
+
+def test_slot_model_le_4():
+
+    fst0 = datetime.utcnow().date()
+    lst0 = fst0 + timedelta(microseconds=1)
+
+    fst1 = fst0 - timedelta(days=1)
+    lst1 = lst0 - timedelta(days=1)
+
+    slot0 = SlotModel(fst=fst0, lst=lst0)
+    slot1 = SlotModel(fst=fst1, lst=lst1)
+
+    assert not slot0 <= slot1
+    assert     slot1 <= slot0
+
+def test_slot_model_gt_0():
+
+    slot = SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot > slot
+
+def test_slot_model_gt_1():
+
+    slot0, slot1 = SlotModel(), SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot0 > slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 > slot0
+
+def test_slot_model_gt_2():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0, slot1 = SlotModel(fst=fst, lst=lst), SlotModel
+
+    with pytest.raises(TypeError) as e:
+        slot0 > slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 > slot0
+
+def test_slot_model_gt_3():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert not slot0 > slot1
+    assert not slot1 > slot0
+
+def test_slot_model_gt_4():
+
+    fst0 = datetime.utcnow().date()
+    lst0 = fst0 + timedelta(microseconds=1)
+
+    fst1 = fst0 - timedelta(days=1)
+    lst1 = lst0 - timedelta(days=1)
+
+    slot0 = SlotModel(fst=fst0, lst=lst0)
+    slot1 = SlotModel(fst=fst1, lst=lst1)
+
+    assert     slot0 > slot1
+    assert not slot1 > slot0
+
+def test_slot_model_ge_0():
+
+    slot = SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot >= slot
+
+def test_slot_model_ge_1():
+
+    slot0, slot1 = SlotModel(), SlotModel()
+
+    with pytest.raises(TypeError) as e:
+        slot0 >= slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 >= slot0
+
+def test_slot_model_ge_2():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0, slot1 = SlotModel(fst=fst, lst=lst), SlotModel
+
+    with pytest.raises(TypeError) as e:
+        slot0 >= slot1
+
+    with pytest.raises(TypeError) as e:
+        slot1 >= slot0
+
+def test_slot_model_ge_3():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert slot0 >= slot1
+    assert slot1 >= slot0
+
+def test_slot_model_ge_4():
+
+    fst0 = datetime.utcnow().date()
+    lst0 = fst0 + timedelta(microseconds=1)
+
+    fst1 = fst0 - timedelta(days=1)
+    lst1 = lst0 - timedelta(days=1)
+
+    slot0 = SlotModel(fst=fst0, lst=lst0)
+    slot1 = SlotModel(fst=fst1, lst=lst1)
+
+    assert     slot0 >= slot1
+    assert not slot1 >= slot0
+
+def test_slot_model_hash_0():
+
+    slot = SlotModel()
+
+    assert slot == slot
+    assert hash(slot) == hash(slot)
+
+def test_slot_model_hash_1():
+
+    fst = datetime.utcnow().date()
+
+    slot = SlotModel(fst=fst)
+
+    assert slot == slot
+    assert hash(slot) == hash(slot)
+
+def test_slot_model_hash_2():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot = SlotModel(fst=fst, lst=lst)
+
+    assert slot == slot
+    assert hash(slot) == hash(slot)
+
+def test_slot_model_hash_3():
+
+    slot0, slot1 = SlotModel(), SlotModel()
+
+    assert slot0 == slot1
+    assert hash(slot0) == hash(slot1)
+
+def test_slot_model_hash_4():
+
+    fst = datetime.utcnow().date()
+
+    slot0, slot1 = SlotModel(fst=fst), SlotModel()
+
+    assert slot0 != slot1
+    assert not slot0 == slot1
+    assert hash(slot0) != hash(slot1)
+
+def test_slot_model_hash_5():
+
+    fst = datetime.utcnow().date()
+
+    slot0, slot1 = SlotModel(fst=fst), SlotModel(fst=fst)
+
+    assert slot0 == slot1
+    assert hash(slot0) == hash(slot1)
+
+def test_slot_model_hash_6():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0, slot1 = SlotModel(fst=fst, lst=lst), SlotModel(fst=fst)
+
+    assert slot0 != slot1
+    assert not slot0 == slot1
+    assert hash(slot0) != hash(slot1)
+
+def test_slot_model_hash_7():
+
+    fst = datetime.utcnow().date()
+    lst = fst + timedelta(microseconds=1)
+
+    slot0 = SlotModel(fst=fst, lst=lst)
+    slot1 = SlotModel(fst=fst, lst=lst)
+
+    assert slot0 == slot1
+    assert hash(slot0) == hash(slot1)

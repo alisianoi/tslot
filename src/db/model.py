@@ -124,8 +124,13 @@ class SlotModel(Base):
 
     id = Column(Integer, primary_key=True)
 
-    fst = Column(Time)
-    lst = Column(Time)
+    # The first point in time when the timer starts is always known
+    fst = Column(Time, nullable=False)
+    # The last point in time when the timer stops can be unknown
+    # If it is not known, the timer is considered to be currently active
+    lst = Column(Time, nullable=True)
+
+    # TODO: add a database constraint that fst < lst
 
     task_id = Column(Integer, ForeignKey('task.id'))
     date_id = Column(Integer, ForeignKey('date.id'))
@@ -167,4 +172,4 @@ class SlotModel(Base):
         return False
 
     def __hash__(self):
-        return id(self)
+        return hash((self.fst, self.lst))

@@ -1,0 +1,30 @@
+sudo: required
+dist: trusty
+language: python
+
+python:
+  - 3.6.4
+
+# matrix:
+#   include:
+#     - os: osx
+#       language: generic
+#       python:
+#       osx_image: xcode 8.2
+
+before_install:
+  - sudo apt-get update
+  # pytest-qt needs this because Qt needs this
+  # let pytest-xvfb do all the actual startup/setup
+  - sudo apt-get install xvfb
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - pytest --cov=src
+
+after_success:
+  - pip install coveralls codecov
+  - coveralls
+  - codecov

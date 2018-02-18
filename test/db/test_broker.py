@@ -1,6 +1,7 @@
 import pytest
 
 import pprint
+import sqlite3
 
 from datetime import datetime, timedelta, date, time
 from pathlib import Path
@@ -135,117 +136,126 @@ def create_a_date(session, date: date):
 
 
 @pytest.fixture(scope="module")
-def db(tmpdir_factory):
+def setup_database():
 
-    path = Path(tmpdir_factory.mktemp('test', 'db'), 'test_broker.db')
+    # path = Path(tmpdir_factory.mktemp('test', 'db'), 'test_broker.db')
+    path = Path('test_broker.db').resolve()
 
+    print(path)
+
+    print("About to create_engine")
     engine = create_engine(f'sqlite:///{path}')
 
+    print("About to drop/create all")
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
+    print("About to create/configure session")
     Session = sessionmaker()
     Session.configure(bind=engine)
 
+    print("About to create a session")
     session = Session()
 
+    print("Base date in place")
     base_date = datetime.utcnow().date()
 
+    print("About to create_a_date several times")
     dates = []
     for days in range(0, 10):
         dates.append(
             create_a_date(session, base_date - timedelta(days=days))
         )
 
+    print("About to close session")
     session.close()
 
-    yield path
+    return path
+
+
+# class TestMyAwesomeFixture():
+
+#     def test_foo(self, setup_database, qtbot):
+
+#         print(setup_database)
+
+#         if Path(setup_database).exists():
+#             assert True
+#         else:
+#             assert False
 
 
 class TestRayDateLoader:
 
-    def handle_errored_fail(self):
-        assert False
+    def test_0(self, setup_database, qtbot):
 
-    def handle_loaded_0(self, dates):
-        assert len(dates) == 9
-        assert len(dates[0]) == 3
+        path = Path(setup_database).resolve()
 
-        date0, slot0, task0 = dates[0]
+        assert path.exists()
 
-    def test_0(self, db, qtbot):
         worker = RayDateLoader(
             date_offt = datetime.utcnow().date()
             , direction = 'next'
             , slice_fst = 0
             , slice_lst = 1
-            , path = db
+            , path = path
             , parent = None
         )
 
-        path = db
-
         with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-            worker.loaded.connect(self.handle_loaded_0)
-            worker.errored.connect(self.handle_errored_fail)
+            print("About to connect to two signals")
+            worker.loaded.connect(
+                lambda dates: len(dates) == 9
+            )
+            worker.errored.connect(
+                lambda: False
+            )
 
+            print("About to work")
             worker.work()
 
-class TestDataBroker:
+        print("TestRayDateLoader.test_0 leave")
 
-    def handle_errored_fail(self):
-        assert False
+        
 
-    def handle_loaded_0(self, dates):
-        pprint.pprint(dates)
+# class TestDataBroker:
 
-        assert len(dates) == 9
+#     def handle_errored_fail(self):
+#         assert False
 
-    def test_load_next_0(self, db, qtbot):
+#     def handle_loaded_0(self, dates):
+#         pprint.pprint(dates)
 
-        path = db
+#         assert len(dates) == 9
 
-        data_broker = DataBroker(path=path)
+#     def test_load_next_0(self, db, qtbot):
+#         print("TestDataBroker.test_load_next_0 enter")
 
-        errored = data_broker.errored
-        loaded_dates = data_broker.loaded_dates
+#         path = Path('test_broker.db').resolve()
 
-        with qtbot.waitSignal(loaded_dates, timeout=1000) as blocker:
-            blocker.connect(errored)
+#         print("About to create data_broker")
+#         data_broker = DataBroker(path=path)
 
-            errored.connect(self.handle_errored_fail)
+#         print("About to fetch couple signals")
+#         errored = data_broker.errored
+#         loaded_dates = data_broker.loaded_dates
 
-            loaded_dates.connect(
-                self.handle_loaded_0
-            )
+#         print("About to wait for signal")
+#         with qtbot.waitSignal(loaded_dates, timeout=1000) as blocker:
+#             print("About to connect three signals")
+#             blocker.connect(errored)
 
-            data_broker.load_next(
-                datetime.utcnow().date()
-                , slice_fst=0
-                , slice_lst=1
-            )
+#             errored.connect(self.handle_errored_fail)
 
+#             loaded_dates.connect(
+#                 self.handle_loaded_0
+#             )
 
+#             print("About to load_next")
+#             data_broker.load_next(
+#                 datetime.utcnow().date()
+#                 , slice_fst=0
+#                 , slice_lst=1
+#             )
 
-# def handle_load_next_errored():
-#     print('errored')
-#     assert False
-
-
-# def handle_load_next_loaded_dates(stored_dates):
-
-#     def handler(loaded_dates):
-#         expected = []
-
-#         assert len(loaded_dates) == 9
-
-#         # for sdate in stored_dates:
-#         #     for sslot in sorted(sdate.slots):
-#         #         expected.append((sdate, sslot, sslot.task))
-
-#         # assert len(expected) == len(loaded_dates)
-
-#         # for lft, rgt in zip(expected, loaded_dates):
-#         #     assert lft == rgt
-
-#     return handler
+#         print("TestDataBroker.test_load_next_0 leave")

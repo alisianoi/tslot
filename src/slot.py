@@ -7,7 +7,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.db.model import Tag, Task, Slot
 from src.utils import orient2str, role2str, logged
 
 

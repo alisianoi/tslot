@@ -47,6 +47,7 @@ class DataLoader(QObject):
     # Emitted if there is an error at any point
     errored = pyqtSignal(LoadFailed)
 
+    @logged
     def __init__(self, path: Path, parent: QObject=None):
 
         super().__init__(parent)
@@ -68,6 +69,7 @@ class DataLoader(QObject):
             LoadFailed('You have called default work method')
         )
 
+    @logged
     def create_session(self):
         '''
         Create an SQLite/SQLAlchemy database session
@@ -85,7 +87,7 @@ class DataLoader(QObject):
         engine = create_engine(f'sqlite:///{self.path}')
         SessionMaker = sessionmaker(bind=engine)
 
-        return SessionMaker(), engine
+        return SessionMaker()
 
 
 class RayDateLoader(DataLoader):
@@ -110,6 +112,7 @@ class RayDateLoader(DataLoader):
              to learn more about SQLAlchemy batch processing
     '''
 
+    @logged
     def __init__(
         self
         , date_offt: date
@@ -127,6 +130,7 @@ class RayDateLoader(DataLoader):
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
 
+    @logged
     def work(self):
 
         if self.direction not in ['next', 'prev']:
@@ -139,7 +143,7 @@ class RayDateLoader(DataLoader):
         # thread and then moved to another one, you must create your
         # session here (not in constructor, nor anywhere else).
 
-        session, engine = self.create_session()
+        session = self.create_session()
 
         DateLimitQuery = session.query(
             DateModel
@@ -166,7 +170,6 @@ class RayDateLoader(DataLoader):
         self.loaded.emit(result)
 
         session.close()
-        engine.dispose()
 
         self.stopped.emit()
 
@@ -176,12 +179,14 @@ class DataRunnable(QRunnable):
     Wrap a subclass of DataLoader and enable its execution in a thread
     '''
 
+    @logged
     def __init__(self, worker: DataLoader):
 
         super().__init__()
 
         self.worker = worker
 
+    @logged
     @pyqtSlot()
     def run(self):
         self.worker.work()
@@ -228,6 +233,11 @@ class DataBroker(QObject):
 
         self.threadpool = QThreadPool(parent)
 
+    def __del__(self):
+        self.threadpool.waitForDone()
+
+        super().__del__()
+
     @logged
     @pyqtSlot(date)
     def load_next(
@@ -265,6 +275,7 @@ class DataBroker(QObject):
             , slice_lst=slice_lst
         )
 
+    @logged
     def load_ray_dates(
         self
         , date_offt: date
@@ -302,6 +313,7 @@ class DataBroker(QObject):
 
         self.dispatch_worker(self.worker_refs[key])
 
+    @logged
     def dispatch_worker(self, worker: RayDateLoader):
         '''
         Connect worker signals to slot callbacks and start its thread

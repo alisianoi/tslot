@@ -4,6 +4,7 @@ import pprint
 
 from datetime import datetime, timedelta, date, time
 from pathlib import Path
+from time import sleep
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -13,7 +14,9 @@ from PyQt5.QtCore import *
 from src.db.broker import DataBroker, RayDateLoader
 from src.db.model import Base
 from src.db.model import TagModel, TaskModel, DateModel, SlotModel
+from src.utils import configure_logging
 
+configure_logging()
 
 def utc_to_local(utc_dt):
     '''
@@ -159,60 +162,61 @@ def db(tmpdir_factory):
     yield path
 
 
-# class TestRayDateLoader:
+class TestRayDateLoader:
 
-#     def handle_loaded(self, dates):
-#         pprint.pprint(dates)
+    def handle_errored_fail(self):
+        assert False
 
-#         assert len(dates) == 9
+    def handle_loaded_0(self, dates):
+        assert len(dates) == 9
+        assert len(dates[0]) == 3
 
-#     def handle_errored(self):
-#         assert False
+        date0, slot0, task0 = dates[0]
 
-#     def test_0(self, db, qtbot):
-#         worker = RayDateLoader(
-#             date_offt = datetime.utcnow().date()
-#             , direction = 'next'
-#             , slice_fst = 0
-#             , slice_lst = 1
-#             , path = db
-#             , parent = None
-#         )
+    def test_0(self, db, qtbot):
+        worker = RayDateLoader(
+            date_offt = datetime.utcnow().date()
+            , direction = 'next'
+            , slice_fst = 0
+            , slice_lst = 1
+            , path = db
+            , parent = None
+        )
 
-#         with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-#             worker.loaded.connect(self.handle_loaded)
-#             worker.errored.connect(self.handle_errored)
+        path = db
 
-#             worker.work()
+        with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+            worker.loaded.connect(self.handle_loaded_0)
+            worker.errored.connect(self.handle_errored_fail)
 
+            worker.work()
 
 class TestDataBroker:
 
-    def handle_loaded(self, dates):
+    def handle_errored_fail(self):
+        assert False
+
+    def handle_loaded_0(self, dates):
         pprint.pprint(dates)
 
         assert len(dates) == 9
 
-    def handle_errored(self):
-        assert False
-
     def test_load_next_0(self, db, qtbot):
 
         path = db
-
-        # Sort them most recent date first
-        # stored_dates.sort(reverse=True)
 
         data_broker = DataBroker(path=path)
 
         errored = data_broker.errored
         loaded_dates = data_broker.loaded_dates
 
-        with qtbot.waitSignal(loaded_dates, timeout=20000) as blocker:
+        with qtbot.waitSignal(loaded_dates, timeout=1000) as blocker:
             blocker.connect(errored)
 
+            errored.connect(self.handle_errored_fail)
+
             loaded_dates.connect(
-                self.handle_loaded
+                self.handle_loaded_0
             )
 
             data_broker.load_next(

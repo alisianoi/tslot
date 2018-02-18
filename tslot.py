@@ -3,8 +3,6 @@
 import logging
 import sys
 
-from logging.config import dictConfig
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -13,6 +11,7 @@ from src.db.broker import DataBroker
 from src.font import initialize_font_databse
 from src.scroll import TScrollArea
 from src.stylist import Stylist
+from src.utils import configure_logging
 
 
 class TTickWidget(QWidget):
@@ -162,7 +161,6 @@ class TCentralWidget(QWidget):
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('TCentralWidget has a logger')
 
         self.main_controls = TMainControlsWidget()
         self.main_scroll_area = TScrollArea()
@@ -177,7 +175,6 @@ class TCentralWidget(QWidget):
         self.stylist = Stylist(parent=self)
 
         for style in self.stylist.styles:
-            self.logger.debug('TCentralWidget.setStyleSheet for' + str(style))
             self.setStyleSheet(self.stylist.styles[style])
 
         # TODO: move this into a thread
@@ -196,41 +193,8 @@ class TMainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
-    dictConfig({
-        'version': 1,
-        'formatters': {
-            'verbose': {
-                'format': '%(asctime)22s %(levelname)7s %(module)10s %(process)6d %(thread)15d %(message)s'
-            },
-            'simple': {
-                'format': '%(levelname)s %(message)s'
-            }
-        },
-        'handlers': {
-            'file': {
-                'level': 'DEBUG'
-                , 'class': 'logging.handlers.RotatingFileHandler'
-                , 'formatter': 'verbose'
-                , 'filename': 'tslot.log'
-                , 'maxBytes': 10485760 # 10 MiB
-                , 'backupCount': 3
-            },
-            'console': {
-                'level': 'DEBUG',
-                'class': 'logging.StreamHandler',
-                'formatter': 'verbose'
-            }
-        },
-        'loggers': {
-            'tslot': {
-                'handlers': ['console', 'file'],
-                'level': 'INFO',
-            }
-        }
-    })
-
-    logger = logging.getLogger('tslot')
-    logger.debug('Logger tslot is configured and ready')
+    # TODO: add parameters to allow log silencing
+    configure_logging()
 
     app = QApplication(sys.argv)
 

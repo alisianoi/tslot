@@ -1,4 +1,4 @@
-import logging
+import logging.config
 
 from functools import wraps
 from PyQt5.QtCore import *
@@ -52,16 +52,63 @@ def role2str(role: Qt.ItemDataRole):
 def logged(foo, logger=logging.getLogger('tslot')):
     '''
     Decorate a function and surround its call with enter/leave logs
+
+    Produces logging output of the form:
+    > enter foo
+      ...
+    > leave foo (returned value)
     '''
 
     @wraps(foo)
     def wrapper(*args, **kwargs):
-        logger.debug('enter {}'.format(foo.__qualname__))
+        logger.debug(f'enter {foo.__qualname__}')
 
         result = foo(*args, **kwargs)
 
-        logger.debug('leave {} ({})'.format(foo.__qualname__, result))
+        logger.debug(f'leave {foo.__qualname__} ({result})')
 
         return result
 
     return wrapper
+
+
+def configure_logging():
+    '''
+    Set up loggers/handlers/formatters as well as their logging levels
+    '''
+
+    logging.config.dictConfig({
+        'version': 1,
+        'formatters': {
+            'verbose': {
+                'format': '%(asctime)22s %(levelname)7s %(module)10s %(process)6d %(thread)15d %(message)s'
+            }
+            , 'simple': {
+                'format': '%(levelname)s %(message)s'
+            }
+        }
+        , 'handlers': {
+            'file': {
+                'level': 'DEBUG'
+                , 'class': 'logging.handlers.RotatingFileHandler'
+                , 'formatter': 'verbose'
+                , 'filename': 'tslot.log'
+                , 'maxBytes': 10485760 # 10 MiB
+                , 'backupCount': 3
+            }
+            , 'console': {
+                'level': 'DEBUG'
+                , 'class': 'logging.StreamHandler'
+                , 'formatter': 'verbose'
+            }
+        },
+        'loggers': {
+            'tslot': {
+                'handlers': ['console', 'file']
+                , 'level': 'DEBUG',
+            }
+        }
+    })
+
+    logger = logging.getLogger('tslot')
+    logger.debug('tslot logger is online')

@@ -1,5 +1,7 @@
 __*__
 *.db
 *.log*
+.idea
+.coverage
 .pytest_cache
 .python-version

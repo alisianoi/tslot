@@ -7,6 +7,10 @@ Introduction
    :target: https://coveralls.io/github/alisianoi/tslot?branch=master
 .. image:: https://img.shields.io/codecov/c/github/alisianoi/tslot/master.svg
    :target: https://codecov.io/gh/alisianoi/tslot
+.. image:: https://requires.io/github/alisianoi/tslot/requirements.svg?branch=master
+   :target: https://requires.io/github/alisianoi/tslot/requirements/?branch=master
+.. image:: https://img.shields.io/github/license/alisianoi/tslot.svg
+   :target: https://choosealicense.com/licenses/agpl-3.0/
 
 TimeSlot is the current placeholder name for a time tracking application
 which can read your mind. Right now it is in such an alpha version that

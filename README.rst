@@ -7,6 +7,8 @@ Introduction
    :target: https://coveralls.io/github/alisianoi/tslot?branch=master
 .. image:: https://img.shields.io/codecov/c/github/alisianoi/tslot/master.svg
    :target: https://codecov.io/gh/alisianoi/tslot
+.. image:: https://pyup.io/repos/github/alisianoi/tslot/shield.svg
+   :target: https://pyup.io/repos/github/alisianoi/tslot/
 .. image:: https://requires.io/github/alisianoi/tslot/requirements.svg?branch=master
    :target: https://requires.io/github/alisianoi/tslot/requirements/?branch=master
 .. image:: https://img.shields.io/github/license/alisianoi/tslot.svg

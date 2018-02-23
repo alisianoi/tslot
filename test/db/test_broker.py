@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from PyQt5.QtCore import *
 
-from src.db.broker import DataBroker, RayDateLoader
+from src.db.broker import TDataBroker, RayDateLoader
 from src.db.model import Base
 from src.db.model import TagModel, TaskModel, DateModel, SlotModel
 from src.utils import configure_logging
@@ -207,7 +207,7 @@ class TestRayDateLoader:
             worker.loaded.connect(
                 lambda dates: len(dates) == 9
             )
-            worker.errored.connect(
+            worker.failed.connect(
                 lambda: False
             )
 

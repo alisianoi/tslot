@@ -1,8 +1,7 @@
-import heapq
+import datetime
 import logging
 import operator
 
-from datetime import datetime, date
 from pathlib import Path
 
 from PyQt5.QtCore import *
@@ -11,16 +10,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.db.model import TaskModel, DateModel, SlotModel
+from src.types import LoadFailed
 from src.utils import logged
-
-
-class LoadFailed(Exception):
-
-    def __init__(self, message):
-
-        super().__init__()
-
-        self.message = message
 
 
 class DataLoader(QObject):
@@ -39,13 +30,15 @@ class DataLoader(QObject):
     stored = pyqtSignal()
     # Emitted once a list of data returns from the database query 
     loaded = pyqtSignal(list)
+    # Emitted if there is an error at any point
+    failed = pyqtSignal(LoadFailed)
+
 
     # Emitted before the database query
     started = pyqtSignal()
     # Emitted after the database query
     stopped = pyqtSignal()
-    # Emitted if there is an error at any point
-    errored = pyqtSignal(LoadFailed)
+
 
     @logged
     def __init__(self, path: Path, parent: QObject=None):
@@ -61,11 +54,8 @@ class DataLoader(QObject):
         self.path = path
         self.query = None
 
-    @pyqtSlot()
     def work(self):
-        self.started.emit()
-
-        return self.errored.emit(
+        return self.failed.emit(
             LoadFailed('You have called default work method')
         )
 
@@ -76,7 +66,7 @@ class DataLoader(QObject):
         '''
 
         if not isinstance(self.path, Path) or not self.path.exists():
-            return self.errored.emit(
+            return self.failed.emit(
                 LoadFailed(f'Path to database is gone {self.path}')
             )
 
@@ -115,7 +105,7 @@ class RayDateLoader(DataLoader):
     @logged
     def __init__(
         self
-        , date_offt: date
+        , date_offt: datetime.date
         , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
@@ -179,20 +169,17 @@ class DataRunnable(QRunnable):
     Wrap a subclass of DataLoader and enable its execution in a thread
     '''
 
-    @logged
     def __init__(self, worker: DataLoader):
 
         super().__init__()
 
         self.worker = worker
 
-    @logged
-    @pyqtSlot()
     def run(self):
         self.worker.work()
 
 
-class DataBroker(QObject):
+class TDataBroker(QObject):
     '''
     Provide (unique) database session and (unique) threadpool
 
@@ -207,9 +194,8 @@ class DataBroker(QObject):
         parent: if Qt ownership is required, provides parent object
     '''
 
-    loaded_dates = pyqtSignal(list)
-
-    errored = pyqtSignal(LoadFailed)
+    loaded = pyqtSignal(list)
+    failed = pyqtSignal(LoadFailed)
 
     @logged
     def __init__(
@@ -228,27 +214,31 @@ class DataBroker(QObject):
 
         self.path = path
 
-        self.worker_keys = list(range(32))
-        self.worker_refs = {}
-
         self.threadpool = QThreadPool(parent)
 
     def __del__(self):
+        '''
+        Wait for all the threads to finish
+        '''
+
+        # This avoids a 1 in 10k deadlock which would sometimes happen.
+        # See: https://github.com/pytest-dev/pytest-qt/issues/199
+
+        # Parent QObject has no __del__, so no super().__del__() here
+
         self.threadpool.waitForDone()
 
-        super().__del__()
-
     @logged
-    @pyqtSlot(date)
+    @pyqtSlot(datetime.date)
     def load_next(
         self
-        , date_offt: date=None
+        , date_offt: datetime.date=None
         , slice_fst: int=0
         , slice_lst: int=100
     ):
 
         if date_offt is None:
-            date_offt = datetime.utcnow().date()
+            date_offt = datetime.datetime.utcnow().date()
 
         self.load_ray_dates(
             date_offt
@@ -257,16 +247,16 @@ class DataBroker(QObject):
             , slice_lst=slice_lst
         )
 
-    @pyqtSlot(date)
+    @pyqtSlot(datetime.date)
     def load_prev(
         self
-        , date_offt: date=None
+        , date_offt: datetime.date=None
         , slice_fst: int=0
         , slice_lst: int=100
     ):
 
         if date_offt is None:
-            date_offt = datetime.utcnow().date()
+            date_offt = datetime.datetime.utcnow().date()
 
         self.load_ray_dates(
             date_offt
@@ -275,10 +265,18 @@ class DataBroker(QObject):
             , slice_lst=slice_lst
         )
 
+    @pyqtSlot(datetime.date)
+    def load_date(self, date: datetime.date):
+        pass
+
+    @pyqtSlot(datetime.date, datetime.date)
+    def load_dates(self, fst: datetime.date, lst: datetime.date):
+        pass
+
     @logged
     def load_ray_dates(
         self
-        , date_offt: date
+        , date_offt: datetime.date
         , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
@@ -293,16 +291,11 @@ class DataBroker(QObject):
             slice_lst: the first date to *not* return
         '''
 
-        try:
-            key = heapq.heappop(self.worker_keys)
-        except IndexError:
-            return self.errored.emit(
-                'There are no available worker keys, will not load next'
-            )
+        if (slice_fst > slice_lst):
+            return self.errored.emit('Expected slice_fst <= slice_lst')
 
-        # Keep a reference to the worker; It must survive garbage
-        # collection until the result returns from the other thread.
-        self.worker_refs[key] = RayDateLoader(
+        self.dispatch_worker(
+            RayDateLoader(
                 date_offt=date_offt
                 , direction=direction
                 , slice_fst=slice_fst
@@ -310,8 +303,7 @@ class DataBroker(QObject):
                 , path=self.path
                 , parent=self
             )
-
-        self.dispatch_worker(self.worker_refs[key])
+        )
 
     @logged
     def dispatch_worker(self, worker: RayDateLoader):
@@ -319,21 +311,16 @@ class DataBroker(QObject):
         Connect worker signals to slot callbacks and start its thread
         '''
 
-        worker.loaded.connect(self.fn_loaded)
+        worker.loaded.connect(self.loaded)
+        worker.failed.connect(self.failed)
 
         worker.started.connect(self.fn_started)
         worker.stopped.connect(self.fn_stopped)
-        worker.errored.connect(self.fn_errored)
 
         self.threadpool.start(DataRunnable(worker))
 
     def store_slots(self):
         raise NotImplementedError()
-
-    @logged
-    @pyqtSlot(list)
-    def fn_loaded(self, entries):
-        self.loaded_dates.emit(entries)
 
     @logged
     @pyqtSlot()
@@ -344,8 +331,3 @@ class DataBroker(QObject):
     @pyqtSlot()
     def fn_stopped(self):
         self.logger.debug('Default fn_stopped')
-
-    @logged
-    @pyqtSlot(LoadFailed)
-    def fn_errored(self, exception):
-        self.errored.emit(exception)

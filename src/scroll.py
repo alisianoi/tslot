@@ -51,14 +51,6 @@ class TScrollWidget(QWidget):
     def fail(self, reason: LoadFailed):
         pass
 
-    def event(self, event: QEvent):
-
-        if isinstance(event, QWheelEvent):
-            self.logger.info(f'ScrollWidget QWheelEvent {event.pixelDelta()}px')
-            self.request_next()
-
-        return super().event(event)
-
 
 class TScrollArea(QScrollArea):
     '''

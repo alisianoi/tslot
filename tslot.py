@@ -193,6 +193,7 @@ class TCentralWidget(QWidget):
         self.scroll.widget.requested_date.connect(self.cache.load_date)
         self.scroll.widget.requested_dates.connect(self.cache.load_dates)
 
+        # TODO: move this into a thread
         self.stylist = Stylist(parent=self)
 
         for style in self.stylist.styles:

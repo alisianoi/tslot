@@ -47,5 +47,24 @@ class TDataCache(QObject):
 
     @pyqtSlot(list)
     def cache(self, entries):
-        for date, slot, task in entries:
-            self.logger.debug(f'{date}, {slot}, {task}')
+        if not entries:
+            return self.loaded.emit([])
+
+        models = []
+        fst, lst, n = 0, 0, len(entries)
+
+        while fst != n:
+
+            model = TTableModel()
+
+            while lst != n and entries[fst][0] == entries[lst][0]:
+
+                model.entries.append(entries[lst])
+
+                lst += 1
+
+            models.append(model)
+
+            fst = lst
+
+        self.loaded.emit(models)

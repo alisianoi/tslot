@@ -86,13 +86,13 @@ class TTableModel(QAbstractTableModel):
 
         row, column = index.row(), index.column()
 
-        tag, task, slot = self.entries[row]
+        date, slot, task = self.entries[row]
 
         if column == 0:
             return task.name
 
         if column == 1:
-            return tag.name
+            return "no tags"
 
         if column == 2:
             return str(slot.fst)
@@ -101,7 +101,10 @@ class TTableModel(QAbstractTableModel):
             return str(slot.lst)
 
         if column == 4:
-            return str(slot.lst - slot.fst)
+            return str(
+                datetime.combine(date.date, slot.lst) - \
+                datetime.combine(date.date, slot.fst)
+            )
 
         self.logger.debug('Defaulting to QVariant')
         return QVariant()
@@ -113,39 +116,6 @@ class TTableModel(QAbstractTableModel):
 
         self.logger.debug('Defaulting to QVariant')
         return QVariant()
-
-    @logged
-    def find_lft_index(self, entry, key=itemgetter(2)):
-        '''
-        Find the *very first* entry which is >= the given entry.
-
-        This gives the leftmost index at which it would be possible to
-        insert the given entry and maintain the list in sorted order.
-
-        Args:
-            entry: the potentially new entry
-            key  : the standard key function, see [1]
-
-        Returns:
-            An index from [0, len(self.entries)] suitable for insertion
-
-        [1] https://docs.python.org/3/howto/sorting.html#key-functions
-        '''
-
-        slot0 = key(entry)
-        lo, hi = 0, len(self.entries) - 1
-
-        while lo <= hi:
-            mid = lo + (hi - lo) // 2
-
-            slot1 = key(self.entries[mid])
-
-            if slot0 <= slot1:
-                hi = mid - 1
-            else:
-                lo = mid + 1
-
-        return lo
 
 
 class THeaderView(QHeaderView):

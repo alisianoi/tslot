@@ -41,7 +41,7 @@ Recorded time slots must not overlap
 Duration of One Day
 ===================
 
-#. Each day lasts a fixed N number of hours (N=24 hours by default)
+#. Each day lasts 24 hours (TODO: learn about leap seconds/etc.)
 #. One table corresponds to one day, holds at most N hours of slots
 #. A slot should be split if:
 
@@ -78,32 +78,41 @@ Design
 Static View
 ===========
 
-- tslot.py
++ tslot.py
 
   - TTickWidget
   - TMainControlsWidget
   - TCentralWidget
   - TMainWindow
 
-- src/scroll.py
+* src
 
-  - TScrollArea
-  - TScrollWidget
+  + cache.py
 
-- src/slot.py
+    - TDataCache
 
-  - TTableModel
-  - TTableView
-  - THeaderView
+  + scroll.py
 
-- src/db/model.py
+    - TScrollWidget
+    - TScrollArea
 
-  - Tag
-  - Task
-  - Slot
+  + slot.py
 
-- src/db/broker.py
+    - TTableModel
+    - TTableView
+    - THeaderView
 
-  - SlotWorker
-  - SlotRunnable
-  - DataBorker
+  * db
+
+    + model.py
+
+      - TagModel
+      - TaskModel
+      - SlotModel
+
+    + broker.py
+
+      - DataLoader
+      - RayDateLoader
+      - DataRunnable
+      - TDataBroker

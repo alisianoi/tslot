@@ -306,7 +306,7 @@ class TDataBroker(QObject):
         )
 
     @logged
-    def dispatch_worker(self, worker: RayDateLoader):
+    def dispatch_worker(self, worker: DataLoader):
         '''
         Connect worker signals to slot callbacks and start its thread
         '''

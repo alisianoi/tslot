@@ -9,6 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
 from src.db.model import TaskModel, DateModel, SlotModel
@@ -43,16 +44,27 @@ class DataLoader(QObject):
 
 
     @logged
-    def __init__(self, path: Path, parent: QObject=None):
+    def __init__(
+        self
+        , session: Session=None
+        , path   : Path=None
+        , parent : QObject=None
+    ):
 
         super().__init__(parent)
+
+        if session is None and path is None:
+            raise RuntimeError('Either session or path must be set')
+
+        if session is not None and path is not None:
+            raise RuntimeError(
+                'Failed to choose between session and path'
+            )
 
         self.logger = logging.getLogger('tslot')
         self.logger.debug(self.__class__.__name__ + ' has a logger')
 
-        if path is None:
-            raise RuntimeError('Path to database is None :(')
-
+        self.session = session
         self.path = path
         self.query = None
 
@@ -111,11 +123,12 @@ class RayDateLoader(DataLoader):
         , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
+        , session  : Session=None
         , path     : Path=None
         , parent   : QObject=None
     ):
 
-        super().__init__(path=path, parent=parent)
+        super().__init__(session=session, path=path, parent=parent)
 
         self.date_offt = date_offt
         self.direction = direction
@@ -135,7 +148,10 @@ class RayDateLoader(DataLoader):
         # thread and then moved to another one, you must create your
         # session here (not in constructor, nor anywhere else).
 
-        session = self.create_session()
+        if self.session is None:
+            session = self.create_session()
+        else:
+            session = self.session
 
         DateLimitQuery = session.query(
             DateModel
@@ -158,6 +174,8 @@ class RayDateLoader(DataLoader):
         )
 
         result = RayDateQuery.all()
+
+        self.logger.debug(result)
 
         self.loaded.emit(result)
 

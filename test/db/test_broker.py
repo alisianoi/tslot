@@ -173,18 +173,6 @@ def setup_database():
     return path
 
 
-# class TestMyAwesomeFixture():
-
-#     def test_foo(self, setup_database, qtbot):
-
-#         print(setup_database)
-
-#         if Path(setup_database).exists():
-#             assert True
-#         else:
-#             assert False
-
-
 class TestRayDateLoader:
 
     def test_0(self, setup_database, qtbot):

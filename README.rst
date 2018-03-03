@@ -41,8 +41,7 @@ Recorded time slots must not overlap
 Duration of One Day
 ===================
 
-#. Each day lasts 24 hours (TODO: learn about leap seconds/etc.)
-#. One table corresponds to one day, holds at most N hours of slots
+#. One table corresponds to one day
 #. A slot should be split if:
 
    - it lasts longer than one day

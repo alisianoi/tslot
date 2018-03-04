@@ -1,7 +1,5 @@
 import logging
 
-from src.db.model import DateModel, TaskModel, SlotModel
-
 
 class LoadFailed(Exception):
 

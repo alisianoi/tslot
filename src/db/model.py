@@ -1,7 +1,7 @@
 import sqlalchemy
 
 from sqlalchemy import Table, Column, ForeignKey
-from sqlalchemy import Integer, String, Date, Time
+from sqlalchemy import Integer, String, Time, DateTime
 
 from sqlalchemy.orm import relationship
 
@@ -65,78 +65,26 @@ class TaskModel(Base):
         return hash(self.name)
 
 
-class DateModel(Base):
-
-    __tablename__ = 'date'
-
-    id = Column(Integer, primary_key=True)
-
-    date = Column(Date, nullable=False)
-
-    slots = relationship('SlotModel', back_populates='date')
-
-    def __repr__(self):
-        return f'DateModel(id={self.id}, date={self.date})'
-
-    def __eq__(self, other):
-        if self.date == other.date:
-            return True
-
-        return False
-
-    def __lt__(self, other):
-        if self.date < other.date:
-            return True
-
-        return False
-
-    def __gt__(self, other):
-        if self.date > other.date:
-            return True
-
-        return False
-
-    def __le__(self, other):
-        if self.date <= other.date:
-            return True
-
-        return False
-
-    def __ge__(self, other):
-        if self.date >= other.date:
-            return True
-
-        return False
-
-    def __hash__(self):
-        return hash(self.date)
-
-
 class SlotModel(Base):
     '''
     Store first and last date and time of the recorded time segment
 
-    Note:
-        Comparison operations assume that slots are disjoint
+    The date and time are UTC+00:00 with DST adjustment removed
     '''
 
     __tablename__ = 'slot'
 
     id = Column(Integer, primary_key=True)
 
-    # The first point in time when the timer starts is always known
-    fst = Column(Time, nullable=False)
-    # The last point in time when the timer stops can be unknown
-    # If it is not known, the timer is considered to be currently active
-    lst = Column(Time, nullable=True)
-
-    # TODO: add a database constraint that fst < lst
+    # First point in time (when the timer was started)
+    fst = Column(DateTime, nullable=False)
+    # Last point in time (when the timer was stopped)
+    # If this is unknown, then the timer is still running
+    lst = Column(DateTime, nullable=True)
 
     task_id = Column(Integer, ForeignKey('task.id'))
-    date_id = Column(Integer, ForeignKey('date.id'))
 
     task = relationship('TaskModel', back_populates='slots')
-    date = relationship('DateModel', back_populates='slots')
 
     def __repr__(self):
         return f'SlotModel(id={self.id}, fst={self.fst}, lst={self.lst})'

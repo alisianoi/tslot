@@ -1,18 +1,19 @@
+import datetime
 import logging
 import operator
 
-from datetime import datetime
 from pathlib import Path
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from sqlalchemy import func
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-from src.db.model import TaskModel, DateModel, SlotModel
+from src.db.model import TaskModel, SlotModel
 from src.types import LoadFailed
 from src.utils import logged
 
@@ -54,11 +55,13 @@ class DataLoader(QObject):
         super().__init__(parent)
 
         if session is None and path is None:
-            raise RuntimeError('Either session or path must be set')
+            return self.failed.emit(
+                LoadFailed('Either session or path must be set')
+            )
 
         if session is not None and path is not None:
-            raise RuntimeError(
-                'Failed to choose between session and path'
+            return self.failed.emit(
+                LoadFailed('Failed to choose between session and path')
             )
 
         self.logger = logging.getLogger('tslot')
@@ -70,7 +73,7 @@ class DataLoader(QObject):
 
     def work(self):
         return self.failed.emit(
-            LoadFailed('You have called default work method')
+            LoadFailed('Failed to load anything: default work method')
         )
 
     @logged
@@ -98,14 +101,13 @@ class RayDateLoader(DataLoader):
     '''
     Ask database for all slots beginning from (or up to) specific date
 
-    At maximum slice_lst - slice_fst dates will be loaded; Default
-    loading direction is called 'next' but goes into the past, historic
-    data. This makes sense because 'requesting next data from database'
-    by default is asking about tasks recorded in the past.
+    At maximum slice_lst - slice_fst dates will be loaded.
 
     Args:
-        date_offt: return dates either all >= or < this offset
-        direction: go from present into past (next) or in reverse (prev)
+        dt_offset: point in time which is the origin of the ray query
+        direction: general direction of the ray (into past or future)
+        dates_dir: sort order of the returned dates
+        times_dir: sort order of the times inside each returned date
         slice_fst: index of the first element to return [1]
         slice_lst: index of the first element to *not* return [1]
         path     : path to the SQLite database file
@@ -119,8 +121,10 @@ class RayDateLoader(DataLoader):
     @logged
     def __init__(
         self
-        , date_offt: datetime.date
-        , direction: str='next'
+        , dt_offset: datetime.datetime
+        , direction: str='future_to_past'
+        , dates_dir: str='future_to_past'
+        , times_dir: str='past_to_future'
         , slice_fst: int=0
         , slice_lst: int=100
         , session  : Session=None
@@ -130,18 +134,47 @@ class RayDateLoader(DataLoader):
 
         super().__init__(session=session, path=path, parent=parent)
 
-        self.date_offt = date_offt
+        self.dt_offset = dt_offset
         self.direction = direction
+        self.dates_dir = dates_dir
+        self.times_dir = times_dir
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
 
     @logged
     def work(self):
 
-        if self.direction not in ['next', 'prev']:
-            return self.errored.emit(LoadFailed('Wrong direction'))
+        known_directions = ['past_to_future', 'future_to_past']
 
-        key = operator.le if self.direction == 'next' else operator.gt
+        if self.direction not in known_directions:
+            return self.failed.emit(
+                LoadFailed(f'General order unknown: {self.direction}')
+            )
+
+        if self.dates_dir not in known_directions:
+            return self.failed.emit(
+                LoadFailed(f'Dates order unknown: {self.dates_dir}')
+            )
+
+        if self.times_dir not in known_directions:
+            return self.failed.emit(
+                LoadFailed(f'Times order unknown: {self.times_dir}')
+            )
+
+        if self.direction == 'past_to_future':
+            key = operator.ge
+        else:
+            key = operator.le
+
+        if self.dates_dir == 'past_to_future':
+            dates_order = func.DATE(SlotModel.fst).asc()
+        else:
+            dates_order = func.DATE(SlotModel.fst).desc()
+
+        if self.times_dir == 'past_to_future':
+            times_order = func.TIME(SlotModel.fst).asc()
+        else:
+            times_order = func.TIME(SlotModel.fst).desc()
 
         # SQLite/SQLAlchemy session must be created and used by the
         # same thread. Since this object is first created in one
@@ -154,27 +187,25 @@ class RayDateLoader(DataLoader):
             session = self.session
 
         DateLimitQuery = session.query(
-            DateModel
+            SlotModel.fst
         ).filter(
-            DateModel.date <= self.date_offt
+            key(SlotModel.fst, self.dt_offset)
         ).order_by(
-            DateModel.date.desc()
-        ).slice(
+            dates_order
+        ).distinct().slice(
             self.slice_fst, self.slice_lst
         ).subquery('DateLimitQuery')
 
         RayDateQuery = session.query(
-            DateModel, SlotModel, TaskModel
+            SlotModel, TaskModel
         ).filter(
-            DateModel.id == DateLimitQuery.c.id
-            , DateModel.id == SlotModel.date_id
+            SlotModel.fst == DateLimitQuery.c.fst
             , SlotModel.task_id == TaskModel.id
-        ).order_by(
-            DateModel.date.desc(), SlotModel.fst.asc()
-        )
+        ).order_by(dates_order).order_by(times_order)
 
         result = RayDateQuery.all()
 
+        self.logger.debug(RayDateQuery)
         self.logger.debug(result)
 
         self.loaded.emit(result)

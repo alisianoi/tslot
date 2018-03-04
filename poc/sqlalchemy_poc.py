@@ -7,29 +7,17 @@ import sqlalchemy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from sqlalchemy import cast, func, asc, desc
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, relationship
 
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Date, Time
+from sqlalchemy.types import DATE, TIME
+from sqlalchemy.types import Integer, String, Date, Time, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
-
-
-class MyDate(Base):
-
-    __tablename__ = 'date'
-
-    id = Column(Integer, primary_key=True)
-
-    date = Column(Date)
-
-    slots = relationship('MySlot', back_populates='date')
-
-    def __repr__(self):
-        return f'Date(id={self.id}, date={self.date})'
 
 
 class MySlot(Base):
@@ -38,11 +26,8 @@ class MySlot(Base):
 
     id = Column(Integer, primary_key=True)
 
-    fst = Column(Time)
-    lst = Column(Time)
-
-    date_id = Column(Integer, ForeignKey('date.id'))
-    date = relationship('MyDate', back_populates='slots')
+    fst = Column(DateTime)
+    lst = Column(DateTime)
 
     def __repr__(self):
         return f'MySlot(id={self.id}, fst={self.fst}, lst={self.lst})'
@@ -63,28 +48,31 @@ if __name__ == '__main__':
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    base = datetime.utcnow()
+    dt = datetime(year=2010, month=6, day=15, tzinfo=timezone.utc)
 
-    for i in range(1, 10):
-        date = MyDate(date=base.date() - timedelta(days=i - 1))
+    fst0 = dt.replace(hour=5)
+    lst0 = dt.replace(hour=6)
 
-        for j in range(i):
-            slot = MySlot(fst=base.time(), lst=base.time())
+    fst1 = dt.replace(hour=19)
+    lst1 = dt.replace(hour=20)
 
-            date.slots.append(slot)
+    slot0 = MySlot(fst=fst0, lst=lst0)
+    slot1 = MySlot(fst=fst1, lst=lst1)
 
-            session.add(slot)
-        session.add(date)
-    session.commit()
+    session.add_all([slot0, slot1])
 
-    q0 = session.query(MyDate, MySlot).filter(MyDate.id == MySlot.date_id)
+    query = session.query(MySlot).order_by(
+        cast(MySlot.fst, DATE).asc(), cast(MySlot.fst, TIME).desc()
+    )
 
-    q1 = session.query(MyDate).order_by(MyDate.date.desc()).slice(5, 10).subquery()
-    q2 = session.query(q1, MySlot).filter(q1.c.id == MySlot.date_id).order_by(q1.c.date.desc(), MySlot.fst.desc())
+    print(query)
+    print(query.all())
 
-    q = q2
+    query = session.query(MySlot).order_by(
+        func.DATE(MySlot.fst).asc(), func.TIME(MySlot.fst).desc()
+    )
 
-    pprint.pprint(q.all())
+    print(query)
+    print(query.all())
 
-    print(f'Total {q.count()}')
-    print(q)
+

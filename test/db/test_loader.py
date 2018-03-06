@@ -159,8 +159,9 @@ def test_ray_date_loader_0(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].add(days=1).start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 1
@@ -178,8 +179,9 @@ def test_ray_date_loader_1(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 1
@@ -197,8 +199,9 @@ def test_ray_date_loader_2(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].subtract(days=1).start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 0
@@ -216,8 +219,9 @@ def test_ray_date_loader_3(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].add(days=1).start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 1
@@ -235,8 +239,9 @@ def test_ray_date_loader_4(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 0
@@ -254,8 +259,9 @@ def test_ray_date_loader_5(session, qtbot):
     worker = RayDateLoader(
         dt_offset=slots[0][0].subtract(days=1).start_of('day')
         , direction='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == 0
@@ -274,8 +280,9 @@ def test_ray_date_loader_order_0(session, qtbot):
         dt_offset=slots[-1][-1].add(days=1).start_of('day')
         , direction='future_to_past'
         , times_dir='past_to_future'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == len(slots)
@@ -298,8 +305,9 @@ def test_ray_date_loader_order_1(session, qtbot):
         dt_offset=slots[-1][-1].add(days=1).start_of('day')
         , direction='future_to_past'
         , times_dir='future_to_past'
-        , session=session
     )
+
+    worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == len(slots)

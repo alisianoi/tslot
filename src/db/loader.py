@@ -47,29 +47,18 @@ class DataLoader(QObject):
     @logged
     def __init__(
         self
-        , session: Session=None
         , path   : Path=None
         , parent : QObject=None
     ):
 
         super().__init__(parent)
 
-        if session is None and path is None:
-            return self.failed.emit(
-                LoadFailed('Either session or path must be set')
-            )
-
-        if session is not None and path is not None:
-            return self.failed.emit(
-                LoadFailed('Failed to choose between session and path')
-            )
-
         self.logger = logging.getLogger('tslot')
         self.logger.debug(self.__class__.__name__ + ' has a logger')
 
-        self.session = session
         self.path = path
         self.query = None
+        self.session = None
 
     def work(self):
         return self.failed.emit(
@@ -127,12 +116,11 @@ class RayDateLoader(DataLoader):
         , times_dir: str='past_to_future'
         , slice_fst: int=0
         , slice_lst: int=100
-        , session  : Session=None
         , path     : Path=None
         , parent   : QObject=None
     ):
 
-        super().__init__(session=session, path=path, parent=parent)
+        super().__init__(path=path, parent=parent)
 
         self.dt_offset = dt_offset
         self.direction = direction
@@ -182,11 +170,9 @@ class RayDateLoader(DataLoader):
         # session here (not in constructor, nor anywhere else).
 
         if self.session is None:
-            session = self.create_session()
-        else:
-            session = self.session
+            self.session = self.create_session()
 
-        DateLimitQuery = session.query(
+        DateLimitQuery = self.session.query(
             SlotModel.fst
         ).filter(
             key(SlotModel.fst, self.dt_offset)
@@ -196,7 +182,7 @@ class RayDateLoader(DataLoader):
             self.slice_fst, self.slice_lst
         ).subquery('DateLimitQuery')
 
-        RayDateQuery = session.query(
+        RayDateQuery = self.session.query(
             SlotModel, TaskModel
         ).filter(
             SlotModel.fst == DateLimitQuery.c.fst
@@ -205,11 +191,10 @@ class RayDateLoader(DataLoader):
 
         result = RayDateQuery.all()
 
-        self.logger.debug(RayDateQuery)
         self.logger.debug(result)
 
         self.loaded.emit(result)
 
-        session.close()
+        self.session.close()
 
         self.stopped.emit()

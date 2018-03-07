@@ -152,19 +152,22 @@ def setup_four_slots_two_dates(session, dt=None):
     return slots
 
 
-def test_ray_date_loader_0(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 0), ('future_to_past', 1)
+])
+def test_ray_date_loader_0(session, qtbot, direction, total):
 
     slots = setup_one_slot_whole_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].add(days=1).start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 1
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 
@@ -172,19 +175,22 @@ def test_ray_date_loader_0(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_1(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 1), ('future_to_past', 1)
+])
+def test_ray_date_loader_1(session, qtbot, direction, total):
 
     slots = setup_one_slot_whole_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 1
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 
@@ -192,19 +198,22 @@ def test_ray_date_loader_1(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_2(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 1), ('future_to_past', 0)
+])
+def test_ray_date_loader_2(session, qtbot, direction, total):
 
     slots = setup_one_slot_whole_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].subtract(days=1).start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 0
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 
@@ -212,19 +221,22 @@ def test_ray_date_loader_2(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_3(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 0), ('future_to_past', 1)
+])
+def test_ray_date_loader_3(session, qtbot, direction, total):
 
     slots = setup_one_slot_one_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].add(days=1).start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 1
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 
@@ -232,19 +244,22 @@ def test_ray_date_loader_3(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_4(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 1), ('future_to_past', 0)
+])
+def test_ray_date_loader_4(session, qtbot, direction, total):
 
     slots = setup_one_slot_one_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 0
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 
@@ -252,19 +267,22 @@ def test_ray_date_loader_4(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_5(session, qtbot):
+@pytest.mark.parametrize('direction, total', [
+    ('past_to_future', 1), ('future_to_past', 0)
+])
+def test_ray_date_loader_5(session, qtbot, direction, total):
 
     slots = setup_one_slot_one_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[0][0].subtract(days=1).start_of('day')
-        , direction='future_to_past'
+        , direction=direction
     )
 
     worker.session = session
 
     def handle_loaded(entries):
-        assert len(entries) == 0
+        assert len(entries) == total
 
     worker.loaded.connect(handle_loaded)
 

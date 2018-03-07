@@ -290,20 +290,28 @@ def test_ray_date_loader_5(session, qtbot, direction, total):
         worker.work()
 
 
-def test_ray_date_loader_order_0(session, qtbot):
+@pytest.mark.parametrize('times_dir, other_dir', [
+    ('past_to_future', False), ('future_to_past', True)
+])
+def test_ray_date_loader_times_dir_0(
+    session, qtbot, times_dir, other_dir
+):
 
     slots = setup_two_slots_one_date(session)
 
     worker = RayDateLoader(
         dt_offset=slots[-1][-1].add(days=1).start_of('day')
         , direction='future_to_past'
-        , times_dir='past_to_future'
+        , times_dir=times_dir
     )
 
     worker.session = session
 
     def handle_loaded(entries):
         assert len(entries) == len(slots)
+
+        if other_dir:
+            slots.reverse()
 
         for entry, slot in zip(entries, slots):
             assert entry[0].fst == slot[0]
@@ -315,14 +323,19 @@ def test_ray_date_loader_order_0(session, qtbot):
         worker.work()
 
 
-def test_ray_date_loader_order_1(session, qtbot):
+@pytest.mark.parametrize('times_dir, other_dir', [
+    ('past_to_future', False), ('future_to_past', True)
+])
+def test_ray_date_loader_times_dir_1(
+    session, qtbot, times_dir, other_dir
+):
 
     slots = setup_two_slots_one_date(session)
 
     worker = RayDateLoader(
-        dt_offset=slots[-1][-1].add(days=1).start_of('day')
-        , direction='future_to_past'
-        , times_dir='future_to_past'
+        dt_offset=slots[-1][-1].subtract(days=1).start_of('day')
+        , direction='past_to_future'
+        , times_dir=times_dir
     )
 
     worker.session = session
@@ -330,10 +343,10 @@ def test_ray_date_loader_order_1(session, qtbot):
     def handle_loaded(entries):
         assert len(entries) == len(slots)
 
-        print("Here are the reversed slots:")
-        print(list(reversed(slots)))
+        if other_dir:
+            slots.reverse()
 
-        for entry, slot in zip(entries, reversed(slots)):
+        for entry, slot in zip(entries, slots):
             assert entry[0].fst == slot[0]
             assert entry[0].lst == slot[1]
 
@@ -343,86 +356,67 @@ def test_ray_date_loader_order_1(session, qtbot):
         worker.work()
 
 
-# def test_ray_date_loader_past_to_future_0(session, qtbot):
+@pytest.mark.parametrize('dates_dir, other_dir', [
+    ('past_to_future', False), ('future_to_past', True)
+])
+def test_ray_date_loader_dates_dir_0(
+        session, qtbot, dates_dir, other_dir
+):
 
-#     dt0, fst0, lst0, dt1, fst1, lst1 = setup_two_slots_two_dates(session)
+    slots = setup_two_slots_two_dates(session)
 
-#     worker = RayDateLoader(
-#         now=dt0.subtract(days=1)
-#         , direction='past_to_future'
-#         , session=session
-#     )
+    worker = RayDateLoader(
+        dt_offset=slots[-1][-1].add(days=1).start_of('day')
+        , direction='future_to_past'
+        , dates_dir=dates_dir
+    )
 
-#     def handle_loaded(entries):
-#         assert len(entries) == 2
+    worker.session = session
 
-#         assert entries[0][0].fst == fst0
-#         assert entries[0][0].lst == lst0
-#         assert entries[1][0].fst == fst1
-#         assert entries[1][0].lst == lst1
+    def handle_loaded(entries):
+        assert len(entries) == len(slots)
 
-#     worker.loaded.connect(handle_loaded)
+        if other_dir:
+            slots.reverse()
 
-#     with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-#         worker.work()
+        for entry, slot in zip(entries, slots):
+            assert entry[0].fst == slot[0]
+            assert entry[0].lst == slot[1]
+
+    worker.loaded.connect(handle_loaded)
+
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()
 
 
+@pytest.mark.parametrize('dates_dir, other_dir', [
+    ('past_to_future', False), ('future_to_past', True)
+])
+def test_ray_date_loader_dates_dir_1(
+        session, qtbot, dates_dir, other_dir
+):
 
-# @pytest.mark.parametrize('date', [
-#     date(year=2000, month=1, day=1)
-#     , date(year=2000, month=1, day=2)
-#     , date(year=2000, month=1, day=3)
-#     , date(year=2000, month=1, day=10)
-#     , date(year=2000, month=1, day=29)
-#     , date(year=2000, month=1, day=30)
-#     , date(year=2000, month=2, day=1)
-#     , date(year=2000, month=2, day=15)
-#     , date(year=2000, month=2, day=29)
-#     , date(year=2000, month=6, day=15)
-#     , date(year=2000, month=12, day=1)
-#     , date(year=2000, month=12, day=31)
-# ])
-# def test_ray_date_loader_several_dates(session, qtbot, date):
+    slots = setup_two_slots_two_dates(session)
 
-#     fst = datetime(
-#         year=date.year, month=date.month, day=date.day
-#         , hour=0, minute=0, second=0, microsecond=0
-#     )
-#     lst = datetime(
-#         year=date.year, month=date.month, day=date.day
-#         , hour=23, minute=59, second=59, microsecond=999999
-#     )
+    worker = RayDateLoader(
+        dt_offset=slots[0][0].subtract(days=1).start_of('day')
+        , direction='past_to_future'
+        , dates_dir=dates_dir
+    )
 
-#     put_one_date(session, fst=fst, lst=lst)
+    worker.session = session
 
-#     def handle_loaded(n):
+    def handle_loaded(entries):
+        assert len(entries) == len(slots)
 
-#         def foo(entries):
-#             assert len(entries) == n
+        if other_dir:
+            slots.reverse()
 
-#         return foo
+        for entry, slot in zip(entries, slots):
+            assert entry[0].fst == slot[0]
+            assert entry[0].lst == slot[1]
 
-#     worker = RayDateLoader(date_offt=date, session=session)
+    worker.loaded.connect(handle_loaded)
 
-#     with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-#         worker.loaded.connect(handle_loaded(1))
-
-#         worker.work()
-
-#     worker = RayDateLoader(
-#         date_offt=date + timedelta(days=1), session=session
-#     )
-
-#     with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-#         worker.loaded.connect(handle_loaded(1))
-
-#         worker.work()
-
-#     worker = RayDateLoader(
-#         date_offt=date - timedelta(days=1), session=session
-#     )
-
-#     with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-#         worker.loaded.connect(handle_loaded(0))
-
-#         worker.work()
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()

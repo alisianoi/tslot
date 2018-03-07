@@ -173,7 +173,7 @@ class RayDateLoader(DataLoader):
             self.session = self.create_session()
 
         DateLimitQuery = self.session.query(
-            SlotModel.fst
+            func.DATE(SlotModel.fst).label('fst_date')
         ).filter(
             key(SlotModel.fst, self.dt_offset)
         ).order_by(
@@ -185,7 +185,7 @@ class RayDateLoader(DataLoader):
         RayDateQuery = self.session.query(
             SlotModel, TaskModel
         ).filter(
-            SlotModel.fst == DateLimitQuery.c.fst
+            func.DATE(SlotModel.fst) == DateLimitQuery.c.fst_date
             , SlotModel.task_id == TaskModel.id
         ).order_by(dates_order).order_by(times_order)
 

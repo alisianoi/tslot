@@ -420,3 +420,91 @@ def test_ray_date_loader_dates_dir_1(
 
     with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
         worker.work()
+
+
+def test_ray_date_loader_slice_0(session, qtbot):
+
+    slots = setup_two_slots_two_dates(session)
+
+    worker = RayDateLoader(
+        dt_offset=slots[-1][-1].add(days=1).start_of('day')
+        , direction='future_to_past'
+        , slice_fst=0
+        , slice_lst=1
+    )
+
+    worker.session = session
+
+    def handle_loaded(entries):
+        assert len(entries) == 1
+
+    worker.loaded.connect(handle_loaded)
+
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()
+
+
+def test_ray_date_loader_slice_1(session, qtbot):
+
+    slots = setup_two_slots_two_dates(session)
+
+    worker = RayDateLoader(
+        dt_offset=slots[0][0].subtract(days=1).start_of('day')
+        , direction='past_to_future'
+        , slice_fst=0
+        , slice_lst=1
+    )
+
+    worker.session = session
+
+    def handle_loaded(entries):
+        assert len(entries) == 1
+
+    worker.loaded.connect(handle_loaded)
+
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()
+
+
+def test_ray_date_loader_slice_2(session, qtbot):
+
+    slots = setup_four_slots_two_dates(session)
+
+    worker = RayDateLoader(
+        dt_offset=slots[-1][-1].add(days=1).start_of('day')
+        , direction='future_to_past'
+        , slice_fst=0
+        , slice_lst=1
+    )
+
+    worker.session = session
+
+    def handle_loaded(entries):
+        assert len(entries) == 2
+
+    worker.loaded.connect(handle_loaded)
+
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()
+
+
+def test_ray_date_loader_slice_3(session, qtbot):
+
+    slots = setup_four_slots_two_dates(session)
+
+    worker = RayDateLoader(
+        dt_offset=slots[0][0].subtract(days=1).start_of('day')
+        , direction='past_to_future'
+        , slice_fst=0
+        , slice_lst=1
+    )
+
+    worker.session = session
+
+    def handle_loaded(entries):
+        assert len(entries) == 2
+
+    worker.loaded.connect(handle_loaded)
+
+    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
+        worker.work()

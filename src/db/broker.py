@@ -5,17 +5,18 @@ from pathlib import Path
 
 from PyQt5.QtCore import *
 
-from src.db.loader import DataLoader, RayDateLoader
-from src.types import LoadFailed
+from src.db.loader import LoadFailed, TLoader
+from src.db.loader_for_slots import TRaySlotLoader
+
 from src.utils import logged
 
 
 class DataRunnable(QRunnable):
     '''
-    Wrap a subclass of DataLoader and enable its execution in a thread
+    Wrap a subclass of TLoader and enable its execution in a thread
     '''
 
-    def __init__(self, worker: DataLoader):
+    def __init__(self, worker: TLoader):
 
         super().__init__()
 
@@ -141,7 +142,7 @@ class TDataBroker(QObject):
             return self.errored.emit('Expected slice_fst <= slice_lst')
 
         self.dispatch_worker(
-            RayDateLoader(
+            TRaySlotLoader(
                 date_offt=date_offt
                 , direction=direction
                 , slice_fst=slice_fst
@@ -152,7 +153,7 @@ class TDataBroker(QObject):
         )
 
     @logged
-    def dispatch_worker(self, worker: DataLoader):
+    def dispatch_worker(self, worker: TLoader):
         '''
         Connect worker signals to slot callbacks and start its thread
         '''

@@ -26,6 +26,9 @@ class LoadFailed(Exception):
 
         self.message = message
 
+    def __repr__(self):
+        return f'LoadFailed({self.message})'
+
 
 class TLoader(QObject):
     '''

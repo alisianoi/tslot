@@ -47,29 +47,18 @@ Duration of One Day
    - it lasts longer than one day
    - it lasts less than one day but begins "late"
 
-#. Identical tables should be merged together by default
+#. Identical tables should be collapsed together by default
 
    - likely to happen if one slot spans 2 or more days
    - unlikely: if all of the entries start/stop at very close times
 
-Editing a Single Time Slot
-==========================
-
-#. When editing task name:
-
-   - if the new name does not exist, create it, otherwise reuse it
-
-#. When editing tag name(s):
-
-   - if the new name does not exist, create it, otherwise reuse it
-
-#. When editing slot times:
+When editing slot times
+=======================
 
    - do not allow new fst to overlap with preceeding lst times
    - suggest preceeding lst time as new value for current fst time
    - do not allow new lst to overlap with subsequent fst times
    - suggest subsequent fst time as new value for current lst time
-
 
 Design
 ######

@@ -79,16 +79,16 @@ class TDataBroker(QObject):
     @pyqtSlot(datetime.date)
     def load_next(
         self
-        , date_offt: datetime.date=None
+        , dt_offset: datetime.date=None
         , slice_fst: int=0
         , slice_lst: int=100
     ):
 
-        if date_offt is None:
-            date_offt = datetime.datetime.utcnow().date()
+        if dt_offset is None:
+            dt_offset = datetime.datetime.utcnow().date()
 
         self.load_ray_dates(
-            date_offt
+            dt_offset
             , direction='next'
             , slice_fst=slice_fst
             , slice_lst=slice_lst
@@ -97,16 +97,16 @@ class TDataBroker(QObject):
     @pyqtSlot(datetime.date)
     def load_prev(
         self
-        , date_offt: datetime.date=None
+        , dt_offset: datetime.date=None
         , slice_fst: int=0
         , slice_lst: int=100
     ):
 
-        if date_offt is None:
-            date_offt = datetime.datetime.utcnow().date()
+        if dt_offset is None:
+            dt_offset = datetime.datetime.utcnow().date()
 
         self.load_ray_dates(
-            date_offt
+            dt_offset
             , direction='prev'
             , slice_fst=slice_fst
             , slice_lst=slice_lst
@@ -123,7 +123,7 @@ class TDataBroker(QObject):
     @logged
     def load_ray_dates(
         self
-        , date_offt: datetime.date
+        , dt_offset: datetime.date
         , direction: str='next'
         , slice_fst: int=0
         , slice_lst: int=100
@@ -132,7 +132,7 @@ class TDataBroker(QObject):
         Ask for at most a few dates starting (stopping) at specific date
 
         Args:
-            date_offt: the anchor date
+            dt_offset: the anchor date
             direction: loading into the future or into the past
             slice_fst: the first date to return
             slice_lst: the first date to *not* return
@@ -143,7 +143,7 @@ class TDataBroker(QObject):
 
         self.dispatch_worker(
             TRaySlotLoader(
-                date_offt=date_offt
+                dt_offset=dt_offset
                 , direction=direction
                 , slice_fst=slice_fst
                 , slice_lst=slice_lst

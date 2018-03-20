@@ -6,7 +6,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.slot import TTableModel, TTableView
-from src.types import LoadFailed
+from src.db.loader import LoadFailed
 from src.utils import logged
 
 

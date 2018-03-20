@@ -4,7 +4,7 @@ import logging
 from PyQt5.QtCore import *
 
 from src.scroll import TTableModel
-from src.types import LoadFailed
+from src.db.loader import LoadFailed
 
 
 class TDataCache(QObject):

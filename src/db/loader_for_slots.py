@@ -7,7 +7,7 @@ import pendulum
 from sqlalchemy import func
 from PyQt5.QtCore import QObject
 
-from src.db.loader import TLoader
+from src.db.loader import TLoader, LoadFailed
 from src.db.model import TaskModel, SlotModel
 
 

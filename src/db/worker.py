@@ -11,69 +11,50 @@ from PyQt5.QtWidgets import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.fetch import TFetchRequest, TFetchResponse
+from src.msg.stash import TStashRequest, TStashResponse
 from src.utils import logged
 
 
-class LoadFailed(Exception):
-
-    def __init__(self, message):
-
-        super().__init__()
-
-        self.logger = logging.getLogger('tslot')
-        self.logger.warning('Emitting a LoadFailed:')
-        self.logger.warning(message)
-
-        self.message = message
-
-    def __repr__(self):
-        return f'LoadFailed({self.message})'
-
-
-class TLoader(QObject):
+class TWorker(QObject):
     '''
-    Abstract class for database queries that happen in the background
+    Provides a set of common signals and methods for all subclasses
 
     This opens a brand new session every time because the SQLAlchemy
     session object should be opened and used in the same thread.
+
+    This provides the necessary signals/slots that the business logic
+    classes will trigger. Deriving classes should use those signals.
 
     Args:
         path   : path to the SQLite database file
         parent : parent object if Qt ownership is required
     '''
 
-    # Emitted once data is written to the database
-    stored = pyqtSignal()
-    # Emitted once a list of data returns from the database query 
-    loaded = pyqtSignal(list)
-    # Emitted if there is an error at any point
-    failed = pyqtSignal(LoadFailed)
-
-
+    # TODO: the two signals below are not actively used
     # Emitted before the database query
     started = pyqtSignal()
     # Emitted after the database query
     stopped = pyqtSignal()
 
+    # Emitted if there is an error at any point
+    alerted = pyqtSignal(TFailure)
+
     @logged
-    def __init__(
-        self
-        , path   : Path=None
-        , parent : QObject=None
-    ):
+    def __init__(self, path: Path=None, parent: QObject=None):
 
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         self.path = path
         self.query = None
         self.session = None
 
     def work(self):
-        return self.failed.emit(
-            LoadFailed('Failed to load anything: default work method')
+        return self.alerted.emit(
+            TFailure('Failed to load anything: default work method')
         )
 
     @logged
@@ -83,8 +64,8 @@ class TLoader(QObject):
         '''
 
         if not isinstance(self.path, Path) or not self.path.exists():
-            return self.failed.emit(
-                LoadFailed(f'Path to database is gone {self.path}')
+            return self.alerted.emit(
+                TFailure(f'Path to database is gone {self.path}')
             )
 
         self.logger.debug(f'Will create db session to {self.path}')
@@ -95,3 +76,33 @@ class TLoader(QObject):
         SessionMaker = sessionmaker(bind=engine)
 
         return SessionMaker()
+
+
+class TReader(TWorker):
+    '''
+    Provides the base class for all different *Reader classes
+    '''
+
+    fetched = pyqtSignal(TFetchResponse)
+
+    def __init__(
+        self
+        , request: TFetchRequest
+        , path: Path=None
+        , parent: QObject=None
+    ):
+
+        super().__init__(path, parent)
+
+        self.request = request
+
+class TWriter(TWorker):
+    '''
+    Provides the base class for all different *Writer classes
+    '''
+
+    stashed = pyqtSignal(TStashResponse)
+
+    def __init__(self, path: Path=None, parent: QObject=None):
+
+        super().__init__(path, parent)

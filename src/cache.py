@@ -1,70 +1,28 @@
-import datetime
-import logging
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from PyQt5.QtCore import *
-
-from src.scroll import TTableModel
-from src.db.loader import LoadFailed
+from src.msg.base import TRequest, TResponse, TFailure
 
 
-class TDataCache(QObject):
+class TCacheBroker(QObject):
 
-    requested_next = pyqtSignal(datetime.date)
-    requested_prev = pyqtSignal(datetime.date)
-
-    requested_date = pyqtSignal(datetime.date)
-    requested_dates = pyqtSignal(datetime.date, datetime.date)
-
-    loaded = pyqtSignal(list)
-    failed = pyqtSignal(LoadFailed)
+    requested = pyqtSignal(TRequest)
+    responded = pyqtSignal(TResponse)
+    triggered = pyqtSignal(TFailure)
 
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
+    @pyqtSlot(TRequest)
+    def handle_requested(self, request: TRequest):
+        # Connected to TWidget.requested
+        self.requested.emit(request)
 
-    @pyqtSlot(datetime.date)
-    def load_next(self, date: datetime.date):
-        # TODO: add cache manipulations here
-        self.requested_next.emit(date)
+    @pyqtSlot(TResponse)
+    def handle_responded(self, response: TResponse):
+        # Connected to TDiskBroker.responded
+        self.responded.emit(response)
 
-    @pyqtSlot(datetime.date)
-    def load_prev(self, date: datetime.date):
-        # TODO: add cache manipulations here
-        self.reqeusted_prev.emit(date)
-
-    @pyqtSlot(datetime.date)
-    def load_date(self, date: datetime.date):
-        # TODO: add cache manipulations here
-        self.requested_date.emit(date)
-
-    @pyqtSlot(datetime.date, datetime.date)
-    def load_dates(self, fst_date: datetime.date, lst_date: datetime.date):
-        # TODO: add cache manipulations here
-        self.requested_dates.emit(fst_date, lst_date)
-
-    @pyqtSlot(list)
-    def cache(self, entries):
-        if not entries:
-            return self.loaded.emit([])
-
-        models = []
-        fst, lst, n = 0, 0, len(entries)
-
-        while fst != n:
-
-            model = TTableModel()
-
-            while lst != n and entries[fst][0] == entries[lst][0]:
-
-                model.entries.append(entries[lst])
-
-                lst += 1
-
-            models.append(model)
-
-            fst = lst
-
-        self.loaded.emit(models)
+    @pyqtSlot(TFailure)
+    def handle_triggered(self, failure: TFailure):
+        self.failed.emit(failure)

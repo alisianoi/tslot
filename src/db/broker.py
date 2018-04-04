@@ -1,22 +1,28 @@
 import datetime
+import pendulum
 import logging
 
 from pathlib import Path
 
 from PyQt5.QtCore import *
 
-from src.db.loader import LoadFailed, TLoader
-from src.db.loader_for_slots import TRaySlotLoader
+from src.db.worker import TWorker, TReader, TWriter
+from src.db.reader_for_slots import TRaySlotReader
+
+from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.fetch import TFetchRequest, TFetchResponse
+from src.msg.stash import TStashRequest, TStashResponse
+from src.msg.fetch_slot import TRaySlotFetchRequest
 
 from src.utils import logged
 
 
 class DataRunnable(QRunnable):
     '''
-    Wrap a subclass of TLoader and enable its execution in a thread
+    Store an instance of a TWorker and later run it in another thread
     '''
 
-    def __init__(self, worker: TLoader):
+    def __init__(self, worker: TWorker):
 
         super().__init__()
 
@@ -26,7 +32,7 @@ class DataRunnable(QRunnable):
         self.worker.work()
 
 
-class TDataBroker(QObject):
+class TDiskBroker(QObject):
     '''
     Provide (unique) database session and (unique) threadpool
 
@@ -41,20 +47,14 @@ class TDataBroker(QObject):
         parent: if Qt ownership is required, provides parent object
     '''
 
-    loaded = pyqtSignal(list)
-    failed = pyqtSignal(LoadFailed)
+    responded = pyqtSignal(TResponse)
+    triggered = pyqtSignal(TFailure)
 
-    @logged
-    def __init__(
-        self
-        , path  : Path=None
-        , parent: QObject=None
-    ):
+    def __init__(self, path: Path=None, parent: QObject=None):
 
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         if path is None:
             path = Path(Path.cwd(), Path('tslot.db'))
@@ -76,98 +76,56 @@ class TDataBroker(QObject):
         self.threadpool.waitForDone()
 
     @logged
-    @pyqtSlot(datetime.date)
-    def load_next(
-        self
-        , dt_offset: datetime.date=None
-        , slice_fst: int=0
-        , slice_lst: int=100
-    ):
+    @pyqtSlot(TRequest)
+    def handle_requested(self, request: TRequest):
 
-        if dt_offset is None:
-            dt_offset = datetime.datetime.utcnow().date()
+        if isinstance(request, TRaySlotFetchRequest):
 
-        self.load_ray_dates(
-            dt_offset
-            , direction='next'
-            , slice_fst=slice_fst
-            , slice_lst=slice_lst
-        )
+            return self.load_ray_dates(request)
 
-    @pyqtSlot(datetime.date)
-    def load_prev(
-        self
-        , dt_offset: datetime.date=None
-        , slice_fst: int=0
-        , slice_lst: int=100
-    ):
+        raise RuntimeError(f'Unknown TRequest {request}')
 
-        if dt_offset is None:
-            dt_offset = datetime.datetime.utcnow().date()
+    @pyqtSlot(TFetchResponse)
+    def handle_fetched(self, response: TFetchResponse):
+        self.responded.emit(response)
 
-        self.load_ray_dates(
-            dt_offset
-            , direction='prev'
-            , slice_fst=slice_fst
-            , slice_lst=slice_lst
-        )
+    @pyqtSlot(TStashResponse)
+    def handle_stashed(self, response: TStashResponse):
+        self.responded.emit(response)
 
-    @pyqtSlot(datetime.date)
-    def load_date(self, date: datetime.date):
-        pass
-
-    @pyqtSlot(datetime.date, datetime.date)
-    def load_dates(self, fst: datetime.date, lst: datetime.date):
-        pass
+    @pyqtSlot(TFailure)
+    def handle_alerted(self, failure: TFailure):
+        self.triggered.emit(failure)
 
     @logged
-    def load_ray_dates(
-        self
-        , dt_offset: datetime.date
-        , direction: str='next'
-        , slice_fst: int=0
-        , slice_lst: int=100
-    ):
-        '''
-        Ask for at most a few dates starting (stopping) at specific date
+    def load_ray_dates(self, request: TRaySlotFetchRequest):
 
-        Args:
-            dt_offset: the anchor date
-            direction: loading into the future or into the past
-            slice_fst: the first date to return
-            slice_lst: the first date to *not* return
-        '''
-
-        if (slice_fst > slice_lst):
-            return self.errored.emit('Expected slice_fst <= slice_lst')
-
-        self.dispatch_worker(
-            TRaySlotLoader(
-                dt_offset=dt_offset
-                , direction=direction
-                , slice_fst=slice_fst
-                , slice_lst=slice_lst
-                , path=self.path
-                , parent=self
-            )
+        self.dispatch_reader(
+            TRaySlotReader(request, self.path, parent=self)
         )
 
     @logged
-    def dispatch_worker(self, worker: TLoader):
-        '''
-        Connect worker signals to slot callbacks and start its thread
-        '''
+    def dispatch_reader(self, reader: TReader):
 
-        worker.loaded.connect(self.loaded)
-        worker.failed.connect(self.failed)
+        reader.fetched.connect(self.handle_fetched)
+
+        self.dispatch_worker(reader)
+
+    @logged
+    def dispatch_writer(self, writer: TWriter):
+
+        writer.stashed.connect(self.handle_stashed)
+
+        self.dispatch_worker(writer)
+
+    @logged
+    def dispatch_worker(self, worker: TWorker):
+        worker.alerted.connect(self.handle_alerted)
 
         worker.started.connect(self.fn_started)
         worker.stopped.connect(self.fn_stopped)
 
         self.threadpool.start(DataRunnable(worker))
-
-    def store_slots(self):
-        raise NotImplementedError()
 
     @logged
     @pyqtSlot()

@@ -1,12 +1,12 @@
-import datetime
 import logging
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotFetchResponse
 from src.slot import TTableModel, TTableView
-from src.db.loader import LoadFailed
 from src.utils import logged
 
 
@@ -18,18 +18,14 @@ class TScrollWidget(QWidget):
     implementing infinite scroll for a series of tables of slots.
     '''
 
-    requested_next = pyqtSignal(datetime.date)
-    requested_prev = pyqtSignal(datetime.date)
-
-    requested_date = pyqtSignal(datetime.date)
-    requested_dates = pyqtSignal(datetime.date, datetime.date)
+    requested = pyqtSignal(TRequest)
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent=parent)
 
+        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         self.widgets = {}
         self.space_above = 0
@@ -38,18 +34,25 @@ class TScrollWidget(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-    @pyqtSlot(list)
-    def show(self, models):
-        for model in models:
-            view = TTableView(self)
+    def kickstart(self):
+        self.requested.emit(TRaySlotFetchRequest(slice_lst=3))
 
-            view.setModel(model)
+    @pyqtSlot(TResponse)
+    def handle_responded(self, response: TResponse):
 
-            self.layout.addWidget(view)
+        if isinstance(response, TRaySlotFetchResponse):
 
-    @pyqtSlot(LoadFailed)
-    def fail(self, reason: LoadFailed):
+            self.handle_responded0(response)
+
+        self.logger.info(f'{self.name} skips {type(response)}')
+
+    def handle_responded0(self, response: TRaySlotFetchResponse):
+
         pass
+
+    @pyqtSlot(TFailure)
+    def handle_triggered(self, failure: TFailure):
+        raise NotImplementedError("TScrollWidget.handle_triggered")
 
 
 class TScrollArea(QScrollArea):

@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-import datetime
 import logging
+import pendulum
 import sys
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.cache import TDataCache
-from src.db.broker import TDataBroker
+from src.cache import TCacheBroker
+from src.db.broker import TDiskBroker
 from src.font import initialize_font_databse
 from src.scroll import TScrollArea
-from src.tick import TMainControlsWidget
 from src.stylist import Stylist
+from src.tick import TMainControlsWidget
 from src.utils import configure_logging
 
 
@@ -35,24 +35,25 @@ class TCentralWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.cache = TDataCache(parent=self)
-        self.broker = TDataBroker(parent=self)
+        self.cache = TCacheBroker(parent=self)
+        self.broker = TDiskBroker(parent=self)
 
-        self.broker.loaded.connect(self.cache.cache)
-        self.broker.failed.connect(self.cache.failed)
+        # Connect database and in-memory brokers:
+        self.broker.responded.connect(self.cache.handle_responded)
+        self.broker.triggered.connect(self.cache.handle_triggered)
+        self.cache.requested.connect(self.broker.handle_requested)
 
-        self.cache.requested_next.connect(self.broker.load_next)
-        self.cache.requested_prev.connect(self.broker.load_prev)
-        self.cache.requested_date.connect(self.broker.load_date)
-        self.cache.requested_dates.connect(self.broker.load_dates)
+        # Connect in-memory broker and GUI widget(s):
+        self.cache.responded.connect(
+            self.scroll.widget.handle_responded
+        )
+        self.cache.triggered.connect(
+            self.scroll.widget.handle_triggered
+        )
 
-        self.cache.loaded.connect(self.scroll.widget.show)
-        self.cache.failed.connect(self.scroll.widget.fail)
-
-        self.scroll.widget.requested_next.connect(self.cache.load_next)
-        self.scroll.widget.requested_prev.connect(self.cache.load_prev)
-        self.scroll.widget.requested_date.connect(self.cache.load_date)
-        self.scroll.widget.requested_dates.connect(self.cache.load_dates)
+        self.scroll.widget.requested.connect(
+            self.cache.handle_requested
+        )
 
         # TODO: move this into a thread
         self.stylist = Stylist(parent=self)
@@ -70,13 +71,12 @@ class TMainWindow(QMainWindow):
 
         super().__init__(parent)
 
-        self.central_widget = TCentralWidget()
+        self.widget = TCentralWidget()
 
-        self.setCentralWidget(self.central_widget)
+        self.setCentralWidget(self.widget)
 
-        self.central_widget.scroll.widget.requested_next.emit(
-            datetime.datetime.utcnow().date()
-        )
+        # Kickstart all widgets (signals/slots are connected now)
+        self.widget.scroll.widget.kickstart()
 
 
 if __name__ == '__main__':

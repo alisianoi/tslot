@@ -4,8 +4,9 @@ from pathlib import Path
 
 from PyQt5.QtCore import QObject
 
+from src.messages import LoadFailure
 from src.db.model import TagModel, TaskModel
-from src.db.loader import TLoader, LoadFailed
+from src.db.loader import TLoader
 
 
 class TTagLoader(TLoader):
@@ -25,7 +26,7 @@ class TTagLoader(TLoader):
 
         if not isinstance(self.tasks, list):
             return self.failed.emit(
-                LoadFailed('Expected tasks to be a list')
+                LoadFailure('Expected tasks to be a list')
             )
 
         if len(self.tasks) == 0:
@@ -41,7 +42,7 @@ class TTagLoader(TLoader):
 
         if task_ids is None:
             return self.failed.emit(
-                LoadFailed('Expected tasks to be a homogenous list')
+                LoadFailure('Expected tasks to be a homogenous list')
             )
 
         result = self.session.query(

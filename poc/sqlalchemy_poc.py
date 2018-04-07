@@ -11,13 +11,36 @@ from sqlalchemy import cast, func, asc, desc
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, relationship
 
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Table, Column, ForeignKey
 from sqlalchemy.types import DATE, TIME
 from sqlalchemy.types import Integer, String, Date, Time, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+
+tags_and_slots = Table(
+    'tags_and_slots'
+    , Base.metadata
+    , Column('tag_id', Integer, ForeignKey('tag.id'))
+    , Column('slot_id', Integer, ForeignKey('slot.id'))
+)
+
+
+class MyTag(Base):
+
+    __tablename__ = 'tag'
+
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String)
+
+    slots = relationship(
+        'MySlot', secondary=tags_and_slots, back_populates='tags'
+    )
+
+    def __repr__(self):
+        return f'MyTag(id={self.id}, name={self.name})'
 
 
 class MySlot(Base):
@@ -28,6 +51,10 @@ class MySlot(Base):
 
     fst = Column(DateTime)
     lst = Column(DateTime)
+
+    tags = relationship(
+        'MyTag', secondary=tags_and_slots, back_populates='slots'
+    )
 
     def __repr__(self):
         return f'MySlot(id={self.id}, fst={self.fst}, lst={self.lst})'
@@ -40,6 +67,7 @@ if __name__ == '__main__':
             Path(Path.cwd(), Path('sqlalchemy_poc.db'))
         )
     )
+
     SessionMaker = sessionmaker()
     SessionMaker.configure(bind=engine)
 
@@ -59,20 +87,44 @@ if __name__ == '__main__':
     slot0 = MySlot(fst=fst0, lst=lst0)
     slot1 = MySlot(fst=fst1, lst=lst1)
 
+    tag1 = MyTag(name='tag1')
+    tag2 = MyTag(name='tag2')
+    tag3 = MyTag(name='tag3')
+
+    slot0.tags = [tag1, tag2]
+    slot1.tags = [tag3]
+
+    slots = [slot0, slot1]
+
     session.add_all([slot0, slot1])
+    session.commit()
 
-    query = session.query(MySlot).order_by(
-        cast(MySlot.fst, DATE).asc(), cast(MySlot.fst, TIME).desc()
+    SlotQuery = session.query(
+        MySlot, MyTag
+    ).filter(
+        MySlot.id.in_([slot.id for slot in slots]), MyTag.slots
     )
 
-    print(query)
-    print(query.all())
+    pprint.pprint(str(SlotQuery))
+    pprint.pprint(SlotQuery.all())
 
-    query = session.query(MySlot).order_by(
-        func.DATE(MySlot.fst).asc(), func.TIME(MySlot.fst).desc()
-    )
+    # TagQuery0 = session.query(MyTag).filter(MyTag.id == tags_and_slots.c.tag_id and tags_and_slots.c.slot_id == SlotQuery.c.id)
+    # TagQuery1 = session.query(MySlot,MyTag).filter(MyTag.id == tags_and_slots.c.tag_id, tags_and_slots.c.slot_id == SlotQuery.c.id, MySlot.tags)
 
-    print(query)
-    print(query.all())
+    # pprint.pprint(str(TagQuery0))
+    # pprint.pprint(str(TagQuery1))
 
+    # pprint.pprint(TagQuery0.all())
+    # pprint.pprint(TagQuery1.all())
 
+    # query = session.query(MySlot, MyTag).group_by(MySlot.id)
+
+    # print(query)
+    # pprint.pprint(query.all())
+
+    # query = session.query(MySlot).order_by(
+    #     func.DATE(MySlot.fst).asc(), func.TIME(MySlot.fst).desc()
+    # )
+
+    # print(query)
+    # print(query.all())

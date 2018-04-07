@@ -10,14 +10,6 @@ from src.db.model import Base, TagModel
 from src.db.model import DateModel, TaskModel, SlotModel
 
 
-def utc_to_local(utc_dt):
-    '''
-    Convert UTC+00:00 time to UTC+XX:YY local time
-    '''
-
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tzinfo=None)
-
-
 def create_a_day(session, delta):
     '''
     Create a single smiple day of tasks

@@ -1,5 +1,7 @@
 import logging
 
+import pendulum
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -27,15 +29,31 @@ class TScrollWidget(QWidget):
         self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
-        self.widgets = {}
+        self.widgets = []
         self.space_above = 0
         self.space_below = 0
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
+        self.dt_offset = pendulum.today()
+        self.direction = "future_to_past"
+        self.dates_dir = "future_to_past"
+        self.times_dir = "future_to_past"
+        self.slice_fst = 0
+        self.slice_lst = 3
+
     def kickstart(self):
-        self.requested.emit(TRaySlotFetchRequest(slice_lst=3))
+        self.requested.emit(
+            TRaySlotFetchRequest(
+                dt_offset = self.dt_offset
+                , direction = self.direction
+                , dates_dir = self.dates_dir
+                , times_dir = self.times_dir
+                , slice_fst = self.slice_fst
+                , slice_lst = self.slice_lst
+            )
+        )
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse):
@@ -48,7 +66,25 @@ class TScrollWidget(QWidget):
 
     def handle_responded0(self, response: TRaySlotFetchResponse):
 
-        pass
+        if self.direction != response.direction:
+            # General direction has changed, can't use the data
+            return
+
+        if self.times_dir != response.times_dir:
+            response.in_times_dir(self.times_dir)
+
+        if self.dates_dir != response.dates_dir:
+            response.in_dates_dir(self.dates_dir)
+
+        for day in response.break_by_date():
+            fst_slot, lst_slot = day
+
+            view = TTableView(self)
+            model = TTableModel(response.items[fst_slot:lst_slot])
+
+            view.setModel(model)
+
+            self.layout.addWidget(view)
 
     @pyqtSlot(TFailure)
     def handle_triggered(self, failure: TFailure):

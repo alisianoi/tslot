@@ -12,14 +12,14 @@ from src.utils import orient2str, role2str, logged
 
 class TTableModel(QAbstractTableModel):
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, items: list, parent: QObject=None):
 
         super().__init__(parent)
 
+        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
-        self.entries = []
+        self.entries = items
 
     @logged
     def headerData(
@@ -28,8 +28,10 @@ class TTableModel(QAbstractTableModel):
         , orientation: Qt.Orientation
         , role       : Qt.ItemDataRole=Qt.DisplayRole
     ):
+
         if orientation == Qt.Vertical:
             return super().headerData(section, orientation, role)
+
         if role == Qt.DisplayRole:
             return self.headerDataDisplayRole(section)
 
@@ -62,6 +64,7 @@ class TTableModel(QAbstractTableModel):
         , index: QModelIndex=QModelIndex()
         , role : Qt.ItemDataRole=Qt.DisplayRole
     ):
+
         if not index.isValid():
             self.logger.debug('Requested index is not valid')
             return QVariant()
@@ -76,6 +79,7 @@ class TTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             return self.dataDisplayRole(index)
+
         if role == Qt.TextAlignmentRole:
             return self.dataTextAlignmentRole(index)
 
@@ -86,7 +90,7 @@ class TTableModel(QAbstractTableModel):
 
         row, column = index.row(), index.column()
 
-        date, slot, task = self.entries[row]
+        slot, task = self.entries[row]
 
         if column == 0:
             return task.name
@@ -101,10 +105,7 @@ class TTableModel(QAbstractTableModel):
             return str(slot.lst)
 
         if column == 4:
-            return str(
-                datetime.combine(date.date, slot.lst) - \
-                datetime.combine(date.date, slot.fst)
-            )
+            return str(slot.lst - slot.fst)
 
         self.logger.debug('Defaulting to QVariant')
         return QVariant()

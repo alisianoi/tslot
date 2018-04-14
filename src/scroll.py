@@ -100,8 +100,8 @@ class TScrollArea(QScrollArea):
 
         super().__init__(parent=parent)
 
+        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
-        self.logger.debug(self.__class__.__name__ + ' has a logger')
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 

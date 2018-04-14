@@ -3,38 +3,33 @@
 import sys
 
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 
-class MyTableWidget(QTableWidget):
+class MyScrollWidget(QWidget):
 
-    def __init__(
-        self
-        , i     : int
-        , row   : int=1
-        , column: int=2
-        , parent: QWidget=None
-    ):
+    def __init__(self, parent: QWidget=None):
 
-        super().__init__(parent=parent)
+        super().__init__(parent)
 
-        self.i = i
+        self.i = 3
 
-        self.setRowCount(row)
-        self.setColumnCount(column)
+        self.layout = QVBoxLayout()
 
-        self.setHorizontalHeaderLabels(['Message', 'Index'])
+        self.layout.addWidget(QPushButton('0'))
+        self.layout.addWidget(QPushButton('1'))
+        self.layout.addWidget(QPushButton('2'))
 
-        self.setItem(0, 0, QTableWidgetItem('Super secret message'))
-        self.setItem(0, 1, QTableWidgetItem(str(self.i)))
+        self.setStyleSheet('background-color: red')
 
-        self.verticalHeader().setMinimumSectionSize(1)
+        self.setLayout(self.layout)
 
-    def item(self, row: int, column: int):
-        if column == 0:
-            return 'Some meaningful message'
-        if column == 1:
-            return str(self.i)
+    def show_next(self):
+        
+        self.layout.addWidget(QPushButton(str(self.i)))
+
+        self.i += 1
 
 
 class MyScrollArea(QScrollArea):
@@ -43,55 +38,47 @@ class MyScrollArea(QScrollArea):
 
         super().__init__(parent)
 
+        self.layout = QVBoxLayout()
 
-class MyWidgetHolder(QFrame):
+        self.wgt = MyScrollWidget(self)
+
+        self.setWidget(self.wgt)
+        self.setWidgetResizable(True)
+
+        self.setLayout(self.layout)
+
+    def event(self, event: QEvent):
+
+        if isinstance(event, QWheelEvent):
+
+            self.widget().show_next()
+
+        return super().event(event)
+
+
+class MyCentralWidget(QWidget):
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
-        self.layout = QVBoxLayout(self)
+        self.layout = QVBoxLayout()
 
-        self.setLayout(self.layout)
-
-    def addWidget(self, widget: QWidget):
-
-        self.layout.addWidget(widget)
-
-
-class MyCentralWidget(QWidget):
-
-    def __init__(self, parent: QObject=None):
-
-        super().__init__(parent)
-
-        self.layout = QVBoxLayout(self)
-
-        self.scroll = MyScrollArea(self)
-        self.scroll.setWidgetResizable(True)
-
-        self.holder = MyWidgetHolder(self.scroll)
-
-        for i in range(10):
-            self.holder.addWidget(QPushButton('whatever'))
-
-        self.scroll.setWidget(self.holder)
-
-        self.layout.addWidget(self.scroll)
+        self.layout.addWidget(QPushButton('Hello, world!'))
+        self.layout.addWidget(MyScrollArea(self))
 
         self.setLayout(self.layout)
 
 
 class MyMainWindow(QMainWindow):
 
-    def __init__(self, parent: QObject=None):
+    def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
-        self.central_widget = MyCentralWidget(self)
+        self.wgt = MyCentralWidget(self)
 
-        self.setCentralWidget(self.central_widget)
-
+        self.setCentralWidget(self.wgt)
 
 if __name__ == '__main__':
 

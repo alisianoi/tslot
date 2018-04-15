@@ -2,6 +2,8 @@
 
 import sys
 
+from time import sleep
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -13,23 +15,32 @@ class MyScrollWidget(QWidget):
 
         super().__init__(parent)
 
-        self.i = 3
-
         self.layout = QVBoxLayout()
 
-        self.layout.addWidget(QPushButton('0'))
-        self.layout.addWidget(QPushButton('1'))
-        self.layout.addWidget(QPushButton('2'))
+        self.i = 10
+
+        for i in range(self.i):
+            self.layout.addWidget(QPushButton(str(i)))
+
+        self.layout.addStretch(1)
 
         self.setStyleSheet('background-color: red')
 
         self.setLayout(self.layout)
 
     def show_next(self):
-        
+
+        self.layout.takeAt(self.layout.count() - 1)
+
         self.layout.addWidget(QPushButton(str(self.i)))
 
+        self.layout.addStretch(1)
+
         self.i += 1
+
+    def show_prev(self):
+
+        pass
 
 
 class MyScrollArea(QScrollArea):
@@ -45,16 +56,36 @@ class MyScrollArea(QScrollArea):
         self.setWidget(self.wgt)
         self.setWidgetResizable(True)
 
+        self.show_next_shortcut = QShortcut(
+            QKeySequence(self.tr('Ctrl+m', 'Show next')), self
+        )
+
+        self.show_next_shortcut.activated.connect(
+            self.handle_show_next_shortcut
+        )
+
         self.setLayout(self.layout)
 
-    def event(self, event: QEvent):
+    # def event(self, event: QEvent):
 
-        if isinstance(event, QWheelEvent):
+    #     if isinstance(event, QWheelEvent):
 
-            self.widget().show_next()
+    #         # self.widget().show_next()
+    #         print('angle:')
+    #         print(event.angleDelta())
+    #         print('pixel:')
+    #         print(event.pixelDelta())
 
-        return super().event(event)
+    #     return super().event(event)
 
+    def wheelEvent(self, event: QWheelEvent):
+
+        pass
+
+    @pyqtSlot()
+    def handle_show_next_shortcut(self):
+
+        self.wgt.show_next()
 
 class MyCentralWidget(QWidget):
 
@@ -64,7 +95,6 @@ class MyCentralWidget(QWidget):
 
         self.layout = QVBoxLayout()
 
-        self.layout.addWidget(QPushButton('Hello, world!'))
         self.layout.addWidget(MyScrollArea(self))
 
         self.setLayout(self.layout)

@@ -43,15 +43,15 @@ class TCentralWidget(QWidget):
         self.broker.triggered.connect(self.cache.handle_triggered)
         self.cache.requested.connect(self.broker.handle_requested)
 
-        # Connect in-memory broker and GUI widget(s):
+        # Connect in-memory brokers and GUI widget(s):
         self.cache.responded.connect(
-            self.scroll.widget.handle_responded
+            self.scroll.widget().handle_responded
         )
         self.cache.triggered.connect(
-            self.scroll.widget.handle_triggered
+            self.scroll.widget().handle_triggered
         )
 
-        self.scroll.widget.requested.connect(
+        self.scroll.widget().requested.connect(
             self.cache.handle_requested
         )
 
@@ -63,6 +63,24 @@ class TCentralWidget(QWidget):
 
         # TODO: move this into a thread
         initialize_font_databse()
+
+        # Experiment with shortcuts:
+        self.show_next_shortcut = QShortcut(
+            QKeySequence(Qt.CTRL + Qt.Key_M), self
+        )
+
+        self.show_next_shortcut.activated.connect(
+            self.handle_show_next_shortcut
+        )
+
+        self.show_next_shortcut.activated.connect(
+            self.scroll.handle_show_next_shortcut
+        )
+
+    @pyqtSlot()
+    def handle_show_next_shortcut(self):
+        self.logger.info('enter handle_show_next_shortcut')
+
 
 
 class TMainWindow(QMainWindow):
@@ -76,7 +94,7 @@ class TMainWindow(QMainWindow):
         self.setCentralWidget(self.widget)
 
         # Kickstart all widgets (signals/slots are connected now)
-        self.widget.scroll.widget.kickstart()
+        self.widget.scroll.widget().kickstart()
 
 
 if __name__ == '__main__':

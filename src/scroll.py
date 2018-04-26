@@ -29,29 +29,41 @@ class TScrollWidget(QWidget):
         self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
-        self.widgets = []
-        self.space_above = 0
-        self.space_below = 0
-
-        self.layout = QVBoxLayout()
-        self.setLayout(self.layout)
-
         self.dt_offset = pendulum.today()
         self.direction = "future_to_past"
         self.dates_dir = "future_to_past"
         self.times_dir = "future_to_past"
+
         self.slice_fst = 0
-        self.slice_lst = 3
+        self.slice_lst = 0
+
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        self.kickstarted = False
 
     def kickstart(self):
+        if self.kickstarted:
+            return
+
+        self.request(0, 1)
+
+        self.kickstarted = True
+
+    def request_next(self):
+
+        self.request(self.slice_lst, self.slice_lst + 1)
+
+    def request(self, slice_fst: int, slice_lst: int):
+
         self.requested.emit(
             TRaySlotFetchRequest(
                 dt_offset = self.dt_offset
                 , direction = self.direction
                 , dates_dir = self.dates_dir
                 , times_dir = self.times_dir
-                , slice_fst = self.slice_fst
-                , slice_lst = self.slice_lst
+                , slice_fst = slice_fst
+                , slice_lst = slice_lst
             )
         )
 
@@ -67,7 +79,8 @@ class TScrollWidget(QWidget):
     def handle_responded0(self, response: TRaySlotFetchResponse):
 
         if self.direction != response.direction:
-            # General direction has changed, can't use the data
+            # widget's data direction and response's data direction are
+            # not the same; Cannot use response data, so discard it
             return
 
         if self.times_dir != response.times_dir:
@@ -84,11 +97,29 @@ class TScrollWidget(QWidget):
 
             view.setModel(model)
 
-            self.layout.addWidget(view)
+            self.show_next(view)
+
+        if response.slice_fst < self.slice_fst:
+            self.slice_fst = response.slice_fst
+        if response.slice_lst > self.slice_lst:
+            self.slice_fst = response.slice_lst
+
+    def show_next(self, view: TTableView):
+
+        # TODO: why does inserting now work?
+        # Remove the spacer that props widgets up
+        self.layout.takeAt(self.layout.count() - 1)
+        # Add the next widget
+        self.layout.addWidget(view)
+        # Add the spacer back to prop widgets up
+        self.layout.addStretch(1)
+
+    def show_prev(self, view: TTableView):
+        raise NotImplementedError()
 
     @pyqtSlot(TFailure)
     def handle_triggered(self, failure: TFailure):
-        raise NotImplementedError("TScrollWidget.handle_triggered")
+        raise NotImplementedError()
 
 
 class TScrollArea(QScrollArea):
@@ -105,10 +136,14 @@ class TScrollArea(QScrollArea):
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.widget = TScrollWidget(parent=self)
-
-        self.setWidget(self.widget)
+        self.setWidget(TScrollWidget())
         self.setWidgetResizable(True)
+
+
+    @pyqtSlot()
+    def handle_show_next_shortcut(self):
+
+        self.logger.info('enter handle_show_next_shortcut')
 
     def event(self, event: QEvent):
 

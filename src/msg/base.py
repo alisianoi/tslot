@@ -35,21 +35,19 @@ class TRequest(TMessage):
 
     def __init__(self):
 
-        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
 class TResponse(TMessage):
 
     def __init__(self, request: TRequest):
 
-        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
         # Copy all parameters that the request had into the response
         msg = 'Collision of attribute name {} between {} and {}'
 
         for key, val in request.__dict__.items():
-            if key == 'name':
+            if key == 'logger':
                 continue
 
             if key in self.__dict__:

@@ -57,7 +57,7 @@ class TScrollWidget(QWidget):
     def request(self, slice_fst: int, slice_lst: int):
 
         request = TRaySlotFetchRequest(
-            dt_offset = self.dt_offset
+              dt_offset = self.dt_offset
             , direction = self.direction
             , dates_dir = self.dates_dir
             , times_dir = self.times_dir
@@ -66,12 +66,11 @@ class TScrollWidget(QWidget):
         )
 
         self.logger.info(request)
+
         self.requested.emit(request)
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse):
-
-        self.logger.info(f'{self.name} handles {response}')
 
         if isinstance(response, TRaySlotFetchResponse):
 
@@ -82,6 +81,9 @@ class TScrollWidget(QWidget):
     def handle_ray_slot_fetch(self, response: TRaySlotFetchResponse):
 
         self.logger.info(f'{self.name} handles {response}')
+
+        if response.is_empty():
+            return
 
         if self.direction != response.direction:
             # widget's data direction and response's data direction are
@@ -107,7 +109,7 @@ class TScrollWidget(QWidget):
         if response.slice_fst < self.slice_fst:
             self.slice_fst = response.slice_fst
         if response.slice_lst > self.slice_lst:
-            self.slice_fst = response.slice_lst
+            self.slice_lst = response.slice_lst
 
     def show_next(self, view: TTableView):
 
@@ -147,8 +149,6 @@ class TScrollArea(QScrollArea):
 
     @pyqtSlot()
     def handle_show_next_shortcut(self):
-
-        self.logger.info('enter handle_show_next_shortcut')
 
         self.widget().request_next()
 

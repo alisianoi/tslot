@@ -28,3 +28,6 @@ class TFetchResponse(TResponse):
         super().__init__(request)
 
         self.items = items
+
+    def is_empty(self) -> bool:
+        return False if self.items else True

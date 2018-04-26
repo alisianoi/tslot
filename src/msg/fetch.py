@@ -19,12 +19,12 @@ class TFetchRequest(TRequest):
         self.slice_lst = slice_lst
 
     def __repr__(self):
-        msg = self.__class__.__name__ + '('
+        args = ', '.join(
+            str(key) + '=' + str(val)
+            for key, val in self.__dict__.items()
+        )
 
-        for key, val in self.__dict__.items():
-            msg += ket + '=' + val
-
-        return msg + ')'
+        return self.__class__.__name__ + '(' + args + ')'
 
 class TFetchResponse(TResponse):
     '''

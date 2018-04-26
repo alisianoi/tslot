@@ -56,27 +56,32 @@ class TScrollWidget(QWidget):
 
     def request(self, slice_fst: int, slice_lst: int):
 
-        self.requested.emit(
-            TRaySlotFetchRequest(
-                dt_offset = self.dt_offset
-                , direction = self.direction
-                , dates_dir = self.dates_dir
-                , times_dir = self.times_dir
-                , slice_fst = slice_fst
-                , slice_lst = slice_lst
-            )
+        request = TRaySlotFetchRequest(
+            dt_offset = self.dt_offset
+            , direction = self.direction
+            , dates_dir = self.dates_dir
+            , times_dir = self.times_dir
+            , slice_fst = slice_fst
+            , slice_lst = slice_lst
         )
+
+        self.logger.info(request)
+        self.requested.emit(request)
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse):
 
+        self.logger.info(f'{self.name} handles {response}')
+
         if isinstance(response, TRaySlotFetchResponse):
 
-            self.handle_responded0(response)
+            return self.handle_ray_slot_fetch(response)
 
-        self.logger.info(f'{self.name} skips {type(response)}')
+        self.logger.info(f'{self.name} skips {response}')
 
-    def handle_responded0(self, response: TRaySlotFetchResponse):
+    def handle_ray_slot_fetch(self, response: TRaySlotFetchResponse):
+
+        self.logger.info(f'{self.name} handles {response}')
 
         if self.direction != response.direction:
             # widget's data direction and response's data direction are
@@ -145,13 +150,15 @@ class TScrollArea(QScrollArea):
 
         self.logger.info('enter handle_show_next_shortcut')
 
+        self.widget().request_next()
+
     def event(self, event: QEvent):
 
-        if isinstance(event, QResizeEvent):
-            self.logger.info(f'ScrollArea ResizeEvent {event.oldSize()} -> {event.size()}')
-        elif isinstance(event, QMoveEvent):
-            self.logger.info(f'ScrollArea MoveEvent {event.oldPos()} -> {event.pos()}')
-        else:
-            self.logger.info(f'ScrollArea {event}')
+        # if isinstance(event, QResizeEvent):
+        #     self.logger.info(f'ScrollArea ResizeEvent {event.oldSize()} -> {event.size()}')
+        # elif isinstance(event, QMoveEvent):
+        #     self.logger.info(f'ScrollArea MoveEvent {event.oldPos()} -> {event.pos()}')
+        # else:
+        #     self.logger.info(f'ScrollArea {event}')
 
         return super().event(event)

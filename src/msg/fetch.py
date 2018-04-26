@@ -18,14 +18,6 @@ class TFetchRequest(TRequest):
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
 
-    def __repr__(self):
-        args = ', '.join(
-            str(key) + '=' + str(val)
-            for key, val in self.__dict__.items()
-        )
-
-        return self.__class__.__name__ + '(' + args + ')'
-
 class TFetchResponse(TResponse):
     '''
     Provides the base class for all different data fetching responses
@@ -36,6 +28,3 @@ class TFetchResponse(TResponse):
         super().__init__(request)
 
         self.items = items
-
-    def __repr__(self):
-        return f'LoadResponse(len(items)={len(self.items)})'

@@ -1,6 +1,26 @@
 import logging
 
-class TFailure:
+
+class TMessage:
+
+    def key_val_or_key_len(self, key, val):
+
+        if isinstance(val, list) and len(val) > 3:
+            return f'len({key})={len(val)}'
+        if isinstance(val, dict) and len(val) > 3:
+            return f'len({key})={len(val)}'
+
+        return f'{key}={val}'
+
+    def __repr__(self):
+        args = ', '.join(
+            self.key_val_or_key_len(key, val)
+            for key, val in self.__dict__.items()
+        )
+
+        return self.__class__.__name__ + '(' + args + ')'
+
+class TFailure(TMessage):
 
     def __init__(self, message):
 
@@ -11,17 +31,14 @@ class TFailure:
 
         self.logger.debug(self)
 
-    def __repr__(self):
-        return f'TFailure(message={self.message})'
-
-class TRequest:
+class TRequest(TMessage):
 
     def __init__(self):
 
         self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
-class TResponse:
+class TResponse(TMessage):
 
     def __init__(self, request: TRequest):
 
@@ -41,4 +58,3 @@ class TResponse:
                 )
 
             self.__dict__[key] = val
-

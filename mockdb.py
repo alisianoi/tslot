@@ -20,6 +20,7 @@ def create_a_day(session, delta):
     '''
 
     chores_tag = TagModel(name='Chores')
+    health_tag = TagModel(name='Health')
     workout_tag = TagModel(name='Workout')
     freetime_tag = TagModel(name='Freetime')
 
@@ -34,6 +35,7 @@ def create_a_day(session, delta):
     anaerobic_task = TaskModel(name='Lift \'em weights')
 
     chores_tag.tasks = [cook_task, shop_task, wash_task]
+    health_tag.tasks = [aerobic_task, anaerobic_task]
     workout_tag.tasks = [aerobic_task, anaerobic_task]
     freetime_tag.tasks = [movies_task, internet_task]
 

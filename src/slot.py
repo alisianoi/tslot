@@ -90,13 +90,13 @@ class TTableModel(QAbstractTableModel):
 
         row, column = index.row(), index.column()
 
-        slot, task = self.entries[row]
+        slot, task, tags = self.entries[row]
 
         if column == 0:
             return task.name
 
         if column == 1:
-            return "no tags"
+            return ' '.join(tag.name for tag in tags)
 
         if column == 2:
             return str(slot.fst)

@@ -7,12 +7,12 @@ from pathlib import Path
 from PyQt5.QtCore import *
 
 from src.db.worker import TWorker, TReader, TWriter
-from src.db.reader_for_slots import TRaySlotReader
+from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 
 from src.msg.base import TRequest, TResponse, TFailure
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.fetch_slot import TRaySlotFetchRequest
+from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
 
 from src.utils import logged
 
@@ -81,7 +81,11 @@ class TDiskBroker(QObject):
 
         if isinstance(request, TRaySlotFetchRequest):
 
-            return self.load_ray_dates(request)
+            return self.handle_ray_slot_fetch(request)
+
+        if isinstance(request, TRaySlotWithTagFetchRequest):
+
+            return self.handle_ray_slot_with_tag_fetch(request)
 
         raise RuntimeError(f'Unknown TRequest {request}')
 
@@ -98,10 +102,21 @@ class TDiskBroker(QObject):
         self.triggered.emit(failure)
 
     @logged
-    def load_ray_dates(self, request: TRaySlotFetchRequest):
+    def handle_ray_slot_fetch(
+            self, request: TRaySlotFetchRequest
+    ) -> None:
 
         self.dispatch_reader(
             TRaySlotReader(request, self.path, parent=self)
+        )
+
+    @logged
+    def handle_ray_slot_with_tag_fetch(
+            self, request: TRaySlotWithTagFetchRequest
+    ) -> None:
+
+        self.dispatch_reader(
+            TRaySlotWithTagReader(request, self.path, parent=self)
         )
 
     @logged

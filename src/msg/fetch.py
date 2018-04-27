@@ -2,6 +2,8 @@ import logging
 
 from src.msg.base import TRequest, TResponse
 
+LOAD_DIRECTIONS = ['past_to_future', 'future_to_past']
+
 
 class TFetchRequest(TRequest):
     '''

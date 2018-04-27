@@ -7,7 +7,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotFetchResponse
+from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.fetch_slot import TRaySlotFetchResponse, TRaySlotWithTagFetchResponse
 from src.slot import TTableModel, TTableView
 from src.utils import logged
 
@@ -56,7 +57,7 @@ class TScrollWidget(QWidget):
 
     def request(self, slice_fst: int, slice_lst: int):
 
-        request = TRaySlotFetchRequest(
+        request = TRaySlotWithTagFetchRequest(
               dt_offset = self.dt_offset
             , direction = self.direction
             , dates_dir = self.dates_dir
@@ -76,9 +77,50 @@ class TScrollWidget(QWidget):
 
             return self.handle_ray_slot_fetch(response)
 
+        if isinstance(response, TRaySlotWithTagFetchResponse):
+
+            return self.handle_ray_slot_with_tag_fetch(response)
+
         self.logger.info(f'{self.name} skips {response}')
 
-    def handle_ray_slot_fetch(self, response: TRaySlotFetchResponse):
+    def handle_ray_slot_fetch(
+            self, response: TRaySlotFetchResponse
+    ) -> None:
+
+        self.logger.info(f'{self.name} handles {response}')
+
+        if response.is_empty():
+            return
+
+        if self.direction != response.direction:
+            # widget's data direction and response's data direction are
+            # not the same; Cannot use response data, so discard it
+            return
+
+        if self.times_dir != response.times_dir:
+            response.in_times_dir(self.times_dir)
+
+        if self.dates_dir != response.dates_dir:
+            response.in_dates_dir(self.dates_dir)
+
+        for day in response.break_by_date():
+            fst_slot, lst_slot = day
+
+            view = TTableView(self)
+            model = TTableModel(response.items[fst_slot:lst_slot])
+
+            view.setModel(model)
+
+            self.show_next(view)
+
+        if response.slice_fst < self.slice_fst:
+            self.slice_fst = response.slice_fst
+        if response.slice_lst > self.slice_lst:
+            self.slice_lst = response.slice_lst
+
+    def handle_ray_slot_with_tag_fetch(
+            self, response: TRaySlotWithTagFetchResponse
+    ) -> None:
 
         self.logger.info(f'{self.name} handles {response}')
 
@@ -141,7 +183,7 @@ class TScrollArea(QScrollArea):
         self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setWidget(TScrollWidget())
         self.setWidgetResizable(True)

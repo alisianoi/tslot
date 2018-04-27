@@ -1,6 +1,19 @@
 Thoughts
 ########
 
+How to represent recorded time?
+-------------------------------
+
+1. As a table of task - tag - start - stop - elapsed
+
+2. As a simple calendar view -- works too
+
+3. As a daily histogram that either shows tags or tasks (or mix?)
+   spans several days and can show one, two, three or a couple records together
+
+4. As a GitHub heatmap, which shows habit tracking
+
+
 Tag and Task debate
 -------------------
 

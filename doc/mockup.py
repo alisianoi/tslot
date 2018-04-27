@@ -22,7 +22,8 @@ class TFetchResponse:
 class TStashRequest:
     '''Basse class for all types of write requests, like StoreRequestSlot'''
 
-class TCompleteRequest
+class TCompleteRequest:
+    '''???'''
 
 class TWorker:
 

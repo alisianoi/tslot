@@ -1,3 +1,28 @@
+Menu items
+----------
+
+Menu
+
+Home
+Tracking
+Recording
+
+Data -> date / week / month / year
+Summary
+Statistics
+
+Rules
+Config
+Configuration
+Settings
+
+About
+Credit
+
+
+Signals / Slots
+---------------
+
 # save     -- saved      (4, 5)
 # store    -- stored     (5, 6)
 # stash    -- stashed    (5, 7)

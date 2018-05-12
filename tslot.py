@@ -13,7 +13,7 @@ from src.db.broker import TDiskBroker
 from src.font import initialize_font_databse
 from src.scroll import TScrollArea
 from src.stylist import Stylist
-from src.tick import TMainControlsWidget
+from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
 from src.utils import configure_logging
 
 
@@ -25,12 +25,12 @@ class TCentralWidget(QWidget):
 
         self.logger = logging.getLogger('tslot')
 
-        self.controls = TMainControlsWidget(parent=self)
+        self.timer_controls = TTimerControlsWidget(parent=self)
         self.scroll = TScrollArea(parent=self)
 
         self.layout = QVBoxLayout()
 
-        self.layout.addWidget(self.controls)
+        self.layout.addWidget(self.timer_controls)
         self.layout.addWidget(self.scroll)
 
         self.setLayout(self.layout)

@@ -7,7 +7,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import orient2str, role2str, logged
+from src.utils import logged
+from src.utils import orient2str, role2str
+from src.utils import pendulum2str, timedelta2str
 
 
 class TTableModel(QAbstractTableModel):
@@ -99,13 +101,13 @@ class TTableModel(QAbstractTableModel):
             return ' '.join(tag.name for tag in tags)
 
         if column == 2:
-            return str(slot.fst)
+            return pendulum2str(slot.fst)
 
         if column == 3:
-            return str(slot.lst)
+            return pendulum2str(slot.lst)
 
         if column == 4:
-            return str(slot.lst - slot.fst)
+            return timedelta2str(slot.lst - slot.fst)
 
         self.logger.debug('Defaulting to QVariant')
         return QVariant()
@@ -135,12 +137,16 @@ class THeaderView(QHeaderView):
         super().__init__(orientation, parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('TSlotHorizontalHeaderView has a logger')
 
-        Stretch, Fixed = QHeaderView.Stretch, QHeaderView.Fixed
+        Stretch = QHeaderView.Stretch
+        ResizeToContents = QHeaderView.ResizeToContents
 
         self.section_resize_modes = [
-            Stretch, Stretch, Fixed, Fixed, Fixed
+            Stretch # name of task
+            , Stretch # list of tags
+            , ResizeToContents # start time
+            , ResizeToContents # finish time
+            , ResizeToContents # elapsed time
         ]
 
     @logged
@@ -152,7 +158,7 @@ class THeaderView(QHeaderView):
         setSectionResizeMode which works only when you've set the model.
         '''
         if model is None:
-            raise RuntimeError('model must be not None')
+            raise RuntimeError('Must provide a model')
 
         super().setModel(model)
 
@@ -170,6 +176,8 @@ class TTableView(QTableView):
 
         super().__init__(parent)
 
+        self.logger = logging.getLogger('tslot')
+
         self.verticalHeader().hide()
 
         # Horizontal size can grow/shrink as parent widget sees fit
@@ -182,10 +190,13 @@ class TTableView(QTableView):
         self.setFont(QFont('Quicksand-Medium', 12))
 
         self.setShowGrid(False)
+        self.setAlternatingRowColors(True)
 
     def sizeHint(self):
 
         model = self.model()
+
+        # self.logger.info(model)
 
         if model is None:
             return super().sizeHint()

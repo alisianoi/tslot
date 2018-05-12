@@ -1,5 +1,8 @@
 import logging.config
 
+import datetime
+import pendulum
+
 from functools import wraps
 from PyQt5.QtCore import *
 
@@ -10,7 +13,7 @@ def orient2str(orientation: Qt.Orientation):
     elif orientation == 0x2 and orientation == Qt.Vertical:
         return 'Qt.Vertical'
 
-    return 'Unknown Orientation (Orientation Number Change?): ' + str(orientation)
+    return f'Unknown Orientation (wrong number?): {orientation}'
 
 def role2str(role: Qt.ItemDataRole):
     if role == 0 and role == Qt.DisplayRole:
@@ -48,6 +51,27 @@ def role2str(role: Qt.ItemDataRole):
 
     return 'Unknown Role (Role Number Change?): ' + str(role)
 
+
+def timedelta2str(delta: datetime.timedelta) -> str:
+
+    seconds = int(delta.total_seconds())
+
+    seconds_per_minute = 60
+    seconds_per_hour = 3600
+
+    hh = seconds // seconds_per_hour
+    mm = seconds % seconds_per_hour // seconds_per_minute
+    ss = seconds % seconds_per_minute
+
+    return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
+
+def pendulum2str(pnd: pendulum.Pendulum) -> str:
+
+    t = pnd.time()
+
+    hh, mm, ss = t.hour, t.minute, t.second
+
+    return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
 def logged(foo, logger=logging.getLogger('tslot')):
     '''
@@ -105,7 +129,7 @@ def configure_logging():
         'loggers': {
             'tslot': {
                 'handlers': ['console', 'file']
-                , 'level': 'DEBUG',
+                , 'level': 'INFO',
             }
         }
     })

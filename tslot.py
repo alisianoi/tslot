@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import *
 from src.cache import TCacheBroker
 from src.db.broker import TDiskBroker
 from src.font import initialize_font_databse
-from src.scroll import TScrollArea
+from src.ui.home.t_scroll_area import TScrollArea
 from src.stylist import Stylist
 from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
 from src.utils import configure_logging

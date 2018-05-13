@@ -39,6 +39,8 @@ class TScrollWidget(QWidget):
         self.slice_lst = 0
 
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
         self.setLayout(self.layout)
 
         self.kickstarted = False

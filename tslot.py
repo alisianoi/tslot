@@ -4,6 +4,8 @@ import logging
 import pendulum
 import sys
 
+from pathlib import Path
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -11,9 +13,10 @@ from PyQt5.QtWidgets import *
 from src.cache import TCacheBroker
 from src.db.broker import TDiskBroker
 from src.font import initialize_font_databse
+from src.ui.menu.t_menu_wgt import TDockMenuWidget
 from src.ui.home.t_scroll_area import TScrollArea
 from src.stylist import Stylist
-from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
+from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
 from src.utils import configure_logging
 
 
@@ -25,12 +28,10 @@ class TCentralWidget(QWidget):
 
         self.logger = logging.getLogger('tslot')
 
-        self.timer_controls = TTimerControlsWidget(parent=self)
         self.scroll = TScrollArea(parent=self)
 
         self.layout = QVBoxLayout()
 
-        self.layout.addWidget(self.timer_controls)
         self.layout.addWidget(self.scroll)
 
         self.setLayout(self.layout)
@@ -56,7 +57,7 @@ class TCentralWidget(QWidget):
         )
 
         # TODO: move this into a thread
-        self.stylist = Stylist(parent=self)
+        self.stylist = Stylist(parent=self, path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
 
         for style in self.stylist.styles:
             self.setStyleSheet(self.stylist.styles[style])
@@ -82,16 +83,20 @@ class TCentralWidget(QWidget):
         self.logger.info('enter handle_show_next_shortcut')
 
 
-
 class TMainWindow(QMainWindow):
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
+        self.menu = TDockMenuWidget()
+        self.timer = TTimerControlsDockWidget()
         self.widget = TCentralWidget()
 
         self.setCentralWidget(self.widget)
+
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.menu)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.timer)
 
         # Kickstart all widgets (signals/slots are connected now)
         self.widget.scroll.widget().kickstart()

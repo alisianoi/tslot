@@ -53,3 +53,11 @@ class TDockMenuWidget(QDockWidget):
         self.setAllowedAreas(Qt.LeftDockWidgetArea)
 
         self.setWidget(TMenuWidget(self))
+
+    @pyqtSlot()
+    def toggle_menu(self):
+
+        if (self.isHidden()):
+            self.show()
+        else:
+            self.hide()

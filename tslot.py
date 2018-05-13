@@ -98,6 +98,11 @@ class TMainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.menu)
         self.addDockWidget(Qt.TopDockWidgetArea, self.timer)
 
+        # Connect some more signals/slots between different widgets
+        self.timer.widget().menu_btn.clicked.connect(
+            self.menu.toggle_menu
+        )
+
         # Kickstart all widgets (signals/slots are connected now)
         self.widget.scroll.widget().kickstart()
 

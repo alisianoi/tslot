@@ -23,13 +23,21 @@ def initialize_font_databse(path: Path=None):
     if not path.exists():
         return
 
+    msg = 'Will add {} to application font db'
+
     must_visit = [path]
 
     while must_visit:
         path = must_visit.pop()
 
         for entry in path.iterdir():
+            name = str(entry)
+
             if entry.name.endswith('.ttf'):
-                database.addApplicationFont(str(entry))
+                database.addApplicationFont(name)
+                logger.debug(msg.format(name))
+            elif entry.name.endswith('.otf'):
+                database.addApplicationFont(name)
+                logger.debug(msg.format(name))
             elif entry.is_dir():
                 must_visit.append(entry)

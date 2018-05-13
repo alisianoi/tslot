@@ -17,7 +17,6 @@ class Stylist(QObject):
         super().__init__(parent)
 
         self.logger = logging.getLogger('tslot')
-        self.logger.debug('Stylist has a logger')
 
         self.styles = {}
 

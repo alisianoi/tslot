@@ -14,7 +14,6 @@ def initialize_font_databse(path: Path=None):
     '''
     
     logger = logging.getLogger('tslot')
-    logger.debug('initialize_font_database has a logger')
 
     database = QFontDatabase()
 

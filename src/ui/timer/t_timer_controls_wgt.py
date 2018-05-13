@@ -21,7 +21,7 @@ class TTimerControlsWidget(QWidget):
         self.push_btn = QPushButton()
 
         self.layout = QHBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(10, 0, 10, 0)
 
         # The numbers at the end are stretch factors; How to do better?
         self.layout.addWidget(self.task_ldt, 7)

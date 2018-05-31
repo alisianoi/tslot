@@ -98,6 +98,8 @@ class TMainWindow(QMainWindow):
         self.addDockWidget(Qt.LeftDockWidgetArea, self.menu)
         self.addDockWidget(Qt.TopDockWidgetArea, self.timer)
 
+        self.setFont(QFont('Quicksand-Medium', 12))
+
         # Connect some more signals/slots between different widgets
         self.timer.widget().menu_btn.clicked.connect(
             self.menu.toggle_menu

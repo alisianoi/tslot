@@ -1,6 +1,8 @@
 __*__
 *.db
 *.log*
+*.zip
+*.tar.gz
 .idea
 .coverage
 .pytest_cache

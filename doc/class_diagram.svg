@@ -22,6 +22,49 @@
   <defs
      id="defs2">
     <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker5210"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="EmptyTriangleOutL">
+      <path
+         transform="scale(0.8) translate(-6,0)"
+         style="fill-rule:evenodd;fill:#ffffff;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         id="path5208" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyTriangleOutL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="marker4791"
+       style="overflow:visible"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         id="path4789"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;fill:#ffffff;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.8) translate(-6,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="EmptyTriangleOutL"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="marker4619"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4617"
+         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
+         style="fill-rule:evenodd;fill:#ffffff;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         transform="scale(0.8) translate(-6,0)" />
+    </marker>
+    <marker
        inkscape:stockid="EmptyTriangleOutL"
        orient="auto"
        refY="0.0"
@@ -354,8 +397,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="360.11277"
-     inkscape:cy="647.92398"
+     inkscape:cx="263.40003"
+     inkscape:cy="51.988401"
      inkscape:document-units="mm"
      inkscape:current-layer="g9543"
      showgrid="true"
@@ -366,7 +409,8 @@
      inkscape:window-height="1009"
      inkscape:window-x="0"
      inkscape:window-y="36"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:lockguides="false">
     <inkscape:grid
        type="xygrid"
        id="grid7735"
@@ -682,7 +726,7 @@
          inkscape:connection-end="#g9635" />
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker10574)"
-         d="M 35.534539,147 V 137"
+         d="M 35,147 V 137"
          id="path10754"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
@@ -884,7 +928,7 @@
          inkscape:connection-end="#g9625" />
       <g
          id="g4824"
-         transform="translate(0.00932312,2.7974446e-6)">
+         transform="translate(-59.990677,2.7974446e-6)">
         <rect
            y="147"
            x="-80.009323"
@@ -908,7 +952,7 @@
              id="flowPara4817">THintRequest</flowPara></flowRoot>      </g>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker4836)"
-         d="M -55.579754,147 V 132 H 0"
+         d="M -115,147 V 132 H 0"
          id="path4826"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
@@ -916,7 +960,7 @@
          inkscape:connection-end="#g9724" />
       <g
          id="g4979"
-         transform="translate(-29.990601,-19.999997)">
+         transform="translate(-89.990602,-19.999997)">
         <rect
            y="167"
            x="-120.0094"
@@ -940,14 +984,15 @@
              id="flowPara4972">TTimerRequest</flowPara></flowRoot>      </g>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker4991)"
-         d="m -122.82894,147 0,-15 H 0"
+         d="M -180,147 V 132 H 0"
          id="path4981"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
          inkscape:connection-start="#g4979"
          inkscape:connection-end="#g9724" />
       <g
-         id="g5140">
+         id="g5140"
+         transform="translate(60.009369,2.7974446e-6)">
         <rect
            y="147"
            x="259.99063"
@@ -971,7 +1016,7 @@
              id="flowPara5133">THintResponse</flowPara></flowRoot>      </g>
       <g
          id="g5463"
-         transform="translate(90.009277,70.000003)">
+         transform="translate(150.00928,70.000003)">
         <rect
            y="77"
            x="239.99072"
@@ -995,7 +1040,7 @@
              id="flowPara5150">TTimerResponse</flowPara></flowRoot>      </g>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5162)"
-         d="M 289.99063,147 V 132 H 230"
+         d="M 352.09524,147 V 132 H 230"
          id="path5152"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
@@ -1003,11 +1048,377 @@
          inkscape:connection-end="#g9635" />
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5312)"
-         d="M 360,147 V 132 H 230"
+         d="M 420,147 V 132 H 230"
          id="path5302"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
          inkscape:connection-start="#rect5142"
+         inkscape:connection-end="#g9635" />
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot1141"
+         style="font-style:normal;font-weight:normal;font-size:13.33333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         transform="matrix(0.26458333,0,0,0.26458333,-30,87.000003)"><flowRegion
+           id="flowRegion1143"><rect
+             id="rect1145"
+             width="302.36221"
+             height="75.590553"
+             x="113.38583"
+             y="642.51971" /></flowRegion><flowPara
+           id="flowPara1147"></flowPara></flowRoot>      <g
+         id="g1195"
+         transform="translate(90,40.000003)">
+        <rect
+           y="327"
+           x="0"
+           height="9.9999971"
+           width="60"
+           id="rect1139"
+           style="fill:#ff7f2a;stroke-width:0.19364913;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.19364913, 0.19364913;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-24.426651,158.13361)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1149"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1151"><rect
+               style="font-size:24px"
+               y="642.51971"
+               x="113.38583"
+               height="75.590553"
+               width="188.97638"
+               id="rect1153" /></flowRegion><flowPara
+             id="flowPara1155">TCentralWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1270"
+         transform="translate(100,10.000012)">
+        <rect
+           y="377"
+           x="0"
+           height="9.9999952"
+           width="60"
+           id="rect1164"
+           style="fill:#ff7f2a;stroke-width:0.07699903;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.07699903, 0.07699903;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,132.32812,98.749076)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1166"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1168"><rect
+               style="font-size:24px"
+               y="1058.2677"
+               x="-453.5433"
+               height="226.77165"
+               width="642.51971"
+               id="rect1170" /></flowRegion><flowPara
+             id="flowPara1174">TScrollArea</flowPara></flowRoot>      </g>
+      <g
+         id="g1253"
+         transform="translate(89.9906,50.000003)">
+        <g
+           id="g1228">
+          <rect
+             style="fill:#ff7f2a;stroke-width:0.24999999;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.24999998, 0.24999998;stroke-dashoffset:0"
+             id="rect1209"
+             width="60"
+             height="9.999999"
+             x="10"
+             y="377" />
+          <flowRoot
+             xml:space="preserve"
+             id="flowRoot1211"
+             style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+             transform="matrix(0.26458333,0,0,0.26458333,-21.983296,88.749169)"><flowRegion
+               id="flowRegion1213"
+               style="font-size:24px"><rect
+                 id="rect1215"
+                 width="302.36221"
+                 height="75.590553"
+                 x="151.18111"
+                 y="1096.063"
+                 style="font-size:24px" /></flowRegion><flowPara
+               id="flowPara1219">TCacheBroker</flowPara></flowRoot>        </g>
+      </g>
+      <g
+         id="g1277"
+         transform="translate(99.9906,50.000003)">
+        <rect
+           y="397"
+           x="-3.6376953e-06"
+           height="10"
+           width="60.000004"
+           id="rect1230"
+           style="fill:#ff7f2a;stroke-width:0.46291006;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.46291006, 0.46291006;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,110.89428,178.74903)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1232"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1234"><rect
+               style="font-size:24px"
+               y="831.49603"
+               x="-377.95276"
+               height="37.795277"
+               width="264.56693"
+               id="rect1236" /></flowRegion><flowPara
+             id="flowPara1238">TDiskBroker</flowPara></flowRoot>      </g>
+      <g
+         id="g1294"
+         transform="translate(229.9906,130)">
+        <rect
+           y="337"
+           x="-130"
+           height="10"
+           width="60"
+           id="rect1279"
+           style="fill:#ff7f2a;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-9.9357311,88.133328)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1281"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1283"><rect
+               style="font-size:24px"
+               y="944.8819"
+               x="-377.95276"
+               height="37.795277"
+               width="226.77165"
+               id="rect1285" /></flowRegion><flowPara
+             id="flowPara1287">Stylist</flowPara></flowRoot>      </g>
+      <g
+         id="g1313"
+         transform="translate(209.9906,-79.999997)">
+        <rect
+           y="327"
+           x="-130.00935"
+           height="10"
+           width="60"
+           id="rect1298"
+           style="fill:#ff7f2a;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-21.916443,88.749218)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1300"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1302"><rect
+               style="font-size:24px"
+               y="907.08661"
+               x="-377.95276"
+               height="37.795277"
+               width="226.77165"
+               id="rect1304" /></flowRegion><flowPara
+             id="flowPara1306">TMainWindow</flowPara></flowRoot>      </g>
+      <g
+         id="g1330"
+         transform="translate(209.9906,-79.999997)">
+        <rect
+           y="347"
+           x="-120.0094"
+           height="10"
+           width="60"
+           id="rect1315"
+           style="fill:#ff7f2a;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-29.750027,88.133422)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1317"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1319"><rect
+               style="font-size:24px"
+               y="982.67719"
+               x="-340.15747"
+               height="37.795277"
+               width="226.77165"
+               id="rect1321" /></flowRegion><flowPara
+             id="flowPara1323">TDockMenuWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1364"
+         transform="translate(210,-79.999994)">
+        <rect
+           y="387"
+           x="-120.0094"
+           height="10"
+           width="90"
+           id="rect1349"
+           style="fill:#ff7f2a;stroke-width:0.43301269;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.43301269, 0.43301269;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-28.200368,88.133797)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1351"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1353"><rect
+               style="font-size:24px"
+               y="1133.8583"
+               x="-340.15747"
+               height="37.795277"
+               width="453.5433"
+               id="rect1355" /></flowRegion><flowPara
+             id="flowPara1357">TTimerControlsDockWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1402"
+         transform="translate(210,-79.999994)">
+        <rect
+           y="407"
+           x="-110.00919"
+           height="10"
+           width="80"
+           id="rect1366"
+           style="fill:#ff7f2a;stroke-width:0.42640144;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.42640144, 0.42640144;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-25.225873,88.133468)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1368"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1370"><rect
+               style="font-size:24px"
+               y="1209.4489"
+               x="-302.36221"
+               height="37.795277"
+               width="415.74802"
+               id="rect1372" /></flowRegion><flowPara
+             id="flowPara1376">TTimerControlsWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1395"
+         transform="translate(210,-79.999994)">
+        <rect
+           y="427"
+           x="-100.00923"
+           height="10"
+           width="60"
+           id="rect1380"
+           style="fill:#ff7f2a;stroke-width:0.40824828;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.40824828, 0.40824828;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-22.079342,88.133655)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1382"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1384"><rect
+               style="font-size:24px"
+               y="1285.0394"
+               x="-264.56693"
+               height="37.795277"
+               width="340.15747"
+               id="rect1386" /></flowRegion><flowPara
+             id="flowPara1388">TTimerWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1419"
+         transform="translate(210,-79.999994)">
+        <rect
+           y="487"
+           x="-100.00923"
+           height="10"
+           width="60"
+           id="rect1404"
+           style="fill:#ff7f2a;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-21.763082,88.133701)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1406"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1408"><rect
+               style="font-size:24px"
+               y="1511.811"
+               x="-264.56693"
+               height="37.795277"
+               width="226.77165"
+               id="rect1410" /></flowRegion><flowPara
+             id="flowPara1412">TScrollWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1436"
+         transform="translate(209.9906,-79.999997)">
+        <rect
+           y="367"
+           x="-110.00919"
+           height="10"
+           width="60"
+           id="rect1421"
+           style="fill:#ff7f2a;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-21.775531,88.13361)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1423"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1425"><rect
+               style="font-size:24px"
+               y="1058.2677"
+               x="-302.36221"
+               height="37.795277"
+               width="226.77165"
+               id="rect1427" /></flowRegion><flowPara
+             id="flowPara1429">TMenuWidget</flowPara></flowRoot>      </g>
+      <g
+         id="g1453"
+         transform="translate(10.009277,2.7974446e-6)">
+        <rect
+           y="147"
+           x="-90.009277"
+           height="10"
+           width="70"
+           id="rect1438"
+           style="fill:#cccccc;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-18.176902,88.077804)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot1440"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion1442"><rect
+               style="font-size:24px"
+               y="226.77165"
+               x="-226.77165"
+               height="37.795277"
+               width="264.56693"
+               id="rect1444" /></flowRegion><flowPara
+             id="flowPara1446">TStoreRequest</flowPara></flowRoot>      </g>
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker4791)"
+         d="M -45,147 V 132 H 0"
+         id="path4609"
+         inkscape:connector-curvature="0"
+         inkscape:connector-type="orthogonal"
+         inkscape:connection-end="#g9724"
+         inkscape:connection-start="#g1453" />
+      <g
+         id="g5198"
+         transform="translate(-39.990784,-29.999997)">
+        <rect
+           y="177"
+           x="279.99078"
+           height="10"
+           width="70"
+           id="rect5183"
+           style="fill:#cccccc;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.49999999, 0.49999999;stroke-dashoffset:0" />
+        <flowRoot
+           transform="matrix(0.26458333,0,0,0.26458333,-20.435754,88.077569)"
+           style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           id="flowRoot5185"
+           xml:space="preserve"><flowRegion
+             style="font-size:24px"
+             id="flowRegion5187"><rect
+               style="font-size:24px"
+               y="340.15747"
+               x="1171.6536"
+               height="37.795277"
+               width="264.56693"
+               id="rect5189" /></flowRegion><flowPara
+             id="flowPara5191">TStoreResponse</flowPara></flowRoot>      </g>
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.50000001, 0.50000001;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5210)"
+         d="M 273.98037,147 V 132 H 230"
+         id="path5200"
+         inkscape:connector-curvature="0"
+         inkscape:connector-type="orthogonal"
+         inkscape:connection-start="#g5198"
          inkscape:connection-end="#g9635" />
     </g>
   </g>

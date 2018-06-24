@@ -7,7 +7,10 @@ LOAD_DIRECTIONS = ['past_to_future', 'future_to_past']
 
 class TFetchRequest(TRequest):
     '''
-    Provides the base class for all different data fetching requests
+    Base class for different data fetching requests
+
+    :param slice_fst: the first item to include
+    :param slice_lst: the first item to exclude
     '''
 
     def __init__(self, slice_fst: int=0, slice_lst: int=128):
@@ -22,7 +25,10 @@ class TFetchRequest(TRequest):
 
 class TFetchResponse(TResponse):
     '''
-    Provides the base class for all different data fetching responses
+    Base class for different data fetching responses
+
+    :param items:   the fetched items
+    :param request: the original request
     '''
 
     def __init__(self, items: list, request: TFetchRequest):

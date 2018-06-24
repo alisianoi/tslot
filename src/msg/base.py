@@ -2,8 +2,16 @@ import logging
 
 
 class TMessage:
+    '''
+    Base class for all messages
+    '''
 
     def key_val_or_key_len(self, key, val):
+        '''
+        Return a reasonable key-value string
+
+        If the value is too long, truncate it
+        '''
 
         if isinstance(val, list) and len(val) > 3:
             return f'len({key})={len(val)}'
@@ -21,6 +29,9 @@ class TMessage:
         return self.__class__.__name__ + '(' + args + ')'
 
 class TFailure(TMessage):
+    '''
+    Base class for all messages about some failure
+    '''
 
     def __init__(self, message):
 
@@ -32,18 +43,26 @@ class TFailure(TMessage):
         self.logger.debug(self)
 
 class TRequest(TMessage):
+    '''
+    Base class for all requests
+    '''
 
     def __init__(self):
 
         self.logger = logging.getLogger('tslot')
 
 class TResponse(TMessage):
+    '''
+    Base class for all responses
+
+    :param request: the original request message
+    '''
 
     def __init__(self, request: TRequest):
 
         self.logger = logging.getLogger('tslot')
 
-        # Copy all parameters that the request had into the response
+        # Copy all parameters from the request into the response
         msg = 'Collision of attribute name {} between {} and {}'
 
         for key, val in request.__dict__.items():

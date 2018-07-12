@@ -95,7 +95,9 @@ class TRaySlotFetchRequest(TSlotFetchRequest):
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
-            raise RuntimeError(f'Expected direction from {LOAD_DIRECTION}, was {direction}')
+            raise RuntimeError(
+                f'Expected direction from {LOAD_DIRECTION}, was {direction}'
+            )
 
         self.dt_offset = dt_offset
         self.direction = direction
@@ -105,11 +107,22 @@ class TRaySlotWithTagFetchRequest(TSlotFetchRequest):
     """
     Ask for recorded time slots before (after) a datetime offset
 
-    The time slots are returned together with their assigned tags.
+    The time slots are returned together with their assigned
+    tags. Each slot could have several tags simultaneously. In a
+    relational database that is represented with a table where each
+    row holds a slot followed by one of its tags. So, the slots are
+    duplicated. Instead of this, you could instruct the Python code
+    to flatten out the tags and remove the duplication.
 
-    See TRaySlotFetchRequest
+    Example (flat tags):
+    [['slot0', ['tag0', 'tag1']], ['slot1', ['tag2']]]
 
-    :param flat_tags: TODO: what is flat tags?
+    Example (non-flat tags):
+    [['slot0', 'tag0'], ['slot0', 'tag1'], ['slot1', 'tag2']]
+
+    See :class TRaySlotFetchRequest:
+
+    :param flat_tags: flatten the tags of each slot into a list
     """
 
     def __init__(
@@ -145,14 +158,20 @@ class TSlotFetchResponse(TFetchResponse):
 
     def __init__(self, items: list, request: TSlotFetchRequest):
 
-        super().__init__(items, request)
+        super().__init__()
+
+        self.items = items
+        self.request = request
 
         # Convert from UTC+00:00 to local timezone
         self.in_timezone(tz=pendulum.local_timezone())
 
+    def is_empty(self) -> bool:
+        return True if not self.items else False
+
     def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
 
-        self.dt_offset = self.dt_offset.in_timezone(tz)
+        self.dt_offset = self.request.dt_offset.in_timezone(tz)
 
         for i, item in enumerate(self.items):
             slot = item[0]
@@ -170,7 +189,7 @@ class TSlotFetchResponse(TFetchResponse):
 
     def in_times_dir(self, times_dir: str='past_to_future'):
 
-        if self.times_dir == times_dir:
+        if self.request.times_dir == times_dir:
             return
 
         self.reverse_times_dir()
@@ -180,14 +199,14 @@ class TSlotFetchResponse(TFetchResponse):
         for (fst, lst) in self.break_by_date():
             self.items[fst:lst] = self.items[fst:lst][::-1]
 
-        if self.times_dir == 'past_to_future':
-            self.times_dir = 'future_to_past'
+        if self.request.times_dir == 'past_to_future':
+            self.request.times_dir = 'future_to_past'
         else:
-            self.times_dir = 'past_to_future'
+            self.request.times_dir = 'past_to_future'
 
     def in_dates_dir(self, dates_dir: str='past_to_future'):
 
-        if self.dates_dir == dates_dir:
+        if self.request.dates_dir == dates_dir:
             return
 
         self.reverse_dates_dir()
@@ -199,11 +218,11 @@ class TSlotFetchResponse(TFetchResponse):
         if reverse_times_dir_too:
             return
 
-        old_times_dir = self.times_dir
+        old_times_dir = self.request.times_dir
 
         self.reverse_times_dir()
 
-        self.times_dir = old_times_dir
+        self.request.times_dir = old_times_dir
 
     def break_by_date(self):
 
@@ -233,7 +252,10 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
 
     def __init__(self, items: list, request: TRaySlotFetchRequest):
 
-        super().__init__(items, request)
+        super().__init__()
+
+        self.items = items
+        self.request = request
 
 
 class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
@@ -243,7 +265,7 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         super().__init__(items, request)
 
-        if not self.flat_tags:
+        if not self.request.flat_tags:
             self.condense_tags()
 
     def condense_tags(self):

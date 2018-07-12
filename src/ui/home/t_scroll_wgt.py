@@ -129,15 +129,15 @@ class TScrollWidget(QWidget):
         if response.is_empty():
             return
 
-        if self.direction != response.direction:
+        if self.direction != response.request.direction:
             # widget's data direction and response's data direction are
             # not the same; Cannot use response data, so discard it
             return
 
-        if self.times_dir != response.times_dir:
+        if self.times_dir != response.request.times_dir:
             response.in_times_dir(self.times_dir)
 
-        if self.dates_dir != response.dates_dir:
+        if self.dates_dir != response.request.dates_dir:
             response.in_dates_dir(self.dates_dir)
 
         for day in response.break_by_date():
@@ -150,10 +150,10 @@ class TScrollWidget(QWidget):
 
             self.show_next(view)
 
-        if response.slice_fst < self.slice_fst:
-            self.slice_fst = response.slice_fst
-        if response.slice_lst > self.slice_lst:
-            self.slice_lst = response.slice_lst
+        if response.request.slice_fst < self.slice_fst:
+            self.slice_fst = response.request.slice_fst
+        if response.request.slice_lst > self.slice_lst:
+            self.slice_lst = response.request.slice_lst
 
     def show_next(self, view: TTableView):
 

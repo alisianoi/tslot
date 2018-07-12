@@ -8,9 +8,7 @@ from src.ui.home.t_scroll_wgt import TScrollWidget
 
 
 class TScrollArea(QScrollArea):
-    '''
-    Provide the top-level scroll-enabled area
-    '''
+    """Provide the top-level scroll-enabled area"""
 
     def __init__(self, parent: QWidget=None):
 

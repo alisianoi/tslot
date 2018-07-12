@@ -30,7 +30,7 @@ class TMessage:
 
 class TFailure(TMessage):
     '''
-    Base class for all messages about some failure
+    Base class for all failure messages
     '''
 
     def __init__(self, message):
@@ -43,9 +43,7 @@ class TFailure(TMessage):
         self.logger.debug(self)
 
 class TRequest(TMessage):
-    '''
-    Base class for all requests
-    '''
+    """Base class for all requests"""
 
     def __init__(self):
 

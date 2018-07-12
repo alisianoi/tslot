@@ -25,7 +25,7 @@ class TTimerControlsWidget(QWidget):
         self.layout.setContentsMargins(10, 0, 10, 0)
 
         # The numbers at the end are stretch factors; How to do better?
-        self.layout.addWidget(self.menu_btn)
+        self.layout.addWidget(self.menu_btn, 0.5)
         self.layout.addWidget(self.task_ldt, 7)
         self.layout.addWidget(self.timer_wgt, 1)
         self.layout.addWidget(self.push_btn, 1)

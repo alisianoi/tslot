@@ -396,9 +396,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="263.40003"
-     inkscape:cy="51.988401"
+     inkscape:zoom="0.7"
+     inkscape:cx="541.59099"
+     inkscape:cy="403.13964"
      inkscape:document-units="mm"
      inkscape:current-layer="g9543"
      showgrid="true"
@@ -1040,7 +1040,7 @@
              id="flowPara5150">TTimerResponse</flowPara></flowRoot>      </g>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 0.5;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5162)"
-         d="M 352.09524,147 V 132 H 230"
+         d="M 350,147 V 132 H 230"
          id="path5152"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"
@@ -1065,7 +1065,7 @@
              height="75.590553"
              x="113.38583"
              y="642.51971" /></flowRegion><flowPara
-           id="flowPara1147"></flowPara></flowRoot>      <g
+           id="flowPara1147" /></flowRoot>      <g
          id="g1195"
          transform="translate(90,40.000003)">
         <rect
@@ -1358,7 +1358,8 @@
              id="flowPara1429">TMenuWidget</flowPara></flowRoot>      </g>
       <g
          id="g1453"
-         transform="translate(10.009277,2.7974446e-6)">
+         transform="translate(10.009277,2.7974446e-6)"
+         inkscape:connector-avoid="true">
         <rect
            y="147"
            x="-90.009277"
@@ -1390,7 +1391,8 @@
          inkscape:connection-start="#g1453" />
       <g
          id="g5198"
-         transform="translate(-39.990784,-29.999997)">
+         transform="translate(-39.990784,-29.999997)"
+         inkscape:connector-avoid="true">
         <rect
            y="177"
            x="279.99078"
@@ -1414,7 +1416,7 @@
              id="flowPara5191">TStoreResponse</flowPara></flowRoot>      </g>
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.50000001, 0.50000001;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#marker5210)"
-         d="M 273.98037,147 V 132 H 230"
+         d="M 275,147 V 132 H 230"
          id="path5200"
          inkscape:connector-curvature="0"
          inkscape:connector-type="orthogonal"

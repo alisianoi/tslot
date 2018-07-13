@@ -1,5 +1,5 @@
 pyqt5==5.10.1
-sqlalchemy==1.2.5
+sqlalchemy==1.2.10
 pendulum==1.4.2
 pytest==3.4.2
 pytest-qt==2.3.1

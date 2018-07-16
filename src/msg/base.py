@@ -49,12 +49,27 @@ class TRequest(TMessage):
 
         self.logger = logging.getLogger('tslot')
 
+
 class TResponse(TMessage):
-    '''
-    Base class for all responses
+    """Base class for all responses"""
+
+    pass
+
+
+class TSimpleResponse(TResponse):
+    """Base class for all *simple* responses"""
+
+    pass
+
+class TComplexResponse(TResponse):
+    """
+    Base class for all *complex* responses
+
+    These responses are complex because they also contain the request that is
+    being responded to.
 
     :param request: the original request message
-    '''
+    """
 
     def __init__(self, request: TRequest):
 

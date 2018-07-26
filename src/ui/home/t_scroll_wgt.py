@@ -14,12 +14,12 @@ from src.ui.home.t_table_view import TTableView
 from src.ui.home.t_table_model import TTableModel
 
 class TScrollWidget(QWidget):
-    '''
+    """
     Provide the top-level widget for the scroll-enabled area
 
     This widget should add/remove incoming SlotTableView's, effectively
     implementing infinite scroll for a series of tables of slots.
-    '''
+    """
 
     requested = pyqtSignal(TRequest)
 
@@ -27,7 +27,6 @@ class TScrollWidget(QWidget):
 
         super().__init__(parent=parent)
 
-        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
         self.dt_offset = pendulum.today()
@@ -124,20 +123,18 @@ class TScrollWidget(QWidget):
             self, response: TRaySlotWithTagFetchResponse
     ) -> None:
 
-        self.logger.info(f'{self.name} handles {response}')
-
         if response.is_empty():
             return
 
-        if self.direction != response.request.direction:
+        if self.direction != response.direction:
             # widget's data direction and response's data direction are
             # not the same; Cannot use response data, so discard it
             return
 
-        if self.times_dir != response.request.times_dir:
+        if self.times_dir != response.times_dir:
             response.in_times_dir(self.times_dir)
 
-        if self.dates_dir != response.request.dates_dir:
+        if self.dates_dir != response.dates_dir:
             response.in_dates_dir(self.dates_dir)
 
         for day in response.break_by_date():
@@ -150,10 +147,10 @@ class TScrollWidget(QWidget):
 
             self.show_next(view)
 
-        if response.request.slice_fst < self.slice_fst:
-            self.slice_fst = response.request.slice_fst
-        if response.request.slice_lst > self.slice_lst:
-            self.slice_lst = response.request.slice_lst
+        if response.slice_fst < self.slice_fst:
+            self.slice_fst = response.slice_fst
+        if response.slice_lst > self.slice_lst:
+            self.slice_lst = response.slice_lst
 
     def show_next(self, view: TTableView):
 

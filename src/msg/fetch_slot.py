@@ -32,9 +32,7 @@ class TSlotFetchRequest(TFetchRequest):
         , times_dir: str='past_to_future'
         , slice_fst: int=0
         , slice_lst: int=128
-    ):
-
-        super().__init__()
+    ) -> None:
 
         msg = 'Expected {} from {}, was {}'
 
@@ -90,7 +88,7 @@ class TRaySlotFetchRequest(TSlotFetchRequest):
         , times_dir: str='past_to_future'
         , slice_fst: int=0
         , slice_lst: int=128
-    ):
+    ) -> None:
 
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
@@ -150,7 +148,7 @@ class TSlotFetchResponse(TFetchResponse):
     """
     Present a list of time slots as response to some request
 
-    This class acts as a base class for several response classes.
+    This is the base class for several types of responses.
 
     :param items: the list of time slots
     :param request: the original request to fetch time slots
@@ -158,10 +156,10 @@ class TSlotFetchResponse(TFetchResponse):
 
     def __init__(self, items: list, request: TSlotFetchRequest):
 
-        super().__init__()
-
         self.items = items
-        self.request = request
+
+        self.dates_dir = request.dates_dir
+        self.times_dir = request.times_dir
 
         # Convert from UTC+00:00 to local timezone
         self.in_timezone(tz=pendulum.local_timezone())
@@ -170,8 +168,11 @@ class TSlotFetchResponse(TFetchResponse):
         return True if not self.items else False
 
     def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+        """
+        Convert all the time slots into the supplied timezone
 
-        self.dt_offset = self.request.dt_offset.in_timezone(tz)
+        :param tz: the supplied timezone
+        """
 
         for i, item in enumerate(self.items):
             slot = item[0]
@@ -181,15 +182,9 @@ class TSlotFetchResponse(TFetchResponse):
 
             self.items[i] = item
 
-    def in_direction(self, direction: str='past_to_future'):
-
-        # Direction is given with respect to the datetime offset
-        # Changing direction means you must make another request
-        raise RuntimeError('Cannot change direction')
-
     def in_times_dir(self, times_dir: str='past_to_future'):
 
-        if self.request.times_dir == times_dir:
+        if self.times_dir == times_dir:
             return
 
         self.reverse_times_dir()
@@ -199,14 +194,14 @@ class TSlotFetchResponse(TFetchResponse):
         for (fst, lst) in self.break_by_date():
             self.items[fst:lst] = self.items[fst:lst][::-1]
 
-        if self.request.times_dir == 'past_to_future':
-            self.request.times_dir = 'future_to_past'
+        if self.times_dir == 'past_to_future':
+            self.times_dir = 'future_to_past'
         else:
-            self.request.times_dir = 'past_to_future'
+            self.times_dir = 'past_to_future'
 
     def in_dates_dir(self, dates_dir: str='past_to_future'):
 
-        if self.request.dates_dir == dates_dir:
+        if self.dates_dir == dates_dir:
             return
 
         self.reverse_dates_dir()
@@ -218,13 +213,16 @@ class TSlotFetchResponse(TFetchResponse):
         if reverse_times_dir_too:
             return
 
-        old_times_dir = self.request.times_dir
+        old_times_dir = self.times_dir
 
         self.reverse_times_dir()
 
-        self.request.times_dir = old_times_dir
+        self.times_dir = old_times_dir
 
     def break_by_date(self):
+        """
+        Regroup the supplied list of time slots by date
+        """
 
         i, j = 0, 0
         result = []
@@ -252,10 +250,23 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
 
     def __init__(self, items: list, request: TRaySlotFetchRequest):
 
-        super().__init__()
+        super().__init__(items, request)
 
-        self.items = items
-        self.request = request
+        self.slice_fst = request.slice_fst
+        self.slice_lst = request.slice_lst
+        self.dt_offset = request.dt_offset
+        self.direction = request.direction
+
+    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+        """
+        Convert all the time slots into the supplied timezone
+
+        :param tz: the supplied timezone
+        """
+
+        self.dt_offset = self.dt_offset.in_timezone(tz)
+
+        super().in_timezone(tz)
 
 
 class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
@@ -265,7 +276,13 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         super().__init__(items, request)
 
-        if not self.request.flat_tags:
+        self.slice_fst = request.slice_fst
+        self.slice_lst = request.slice_lst
+        self.dt_offset = request.dt_offset
+        self.direction = request.direction
+        self.flat_tags = request.flat_tags
+
+        if not self.flat_tags:
             self.condense_tags()
 
     def condense_tags(self):

@@ -16,16 +16,16 @@ from src.db.model import SlotModel, TaskModel, TagModel
 
 
 class TSlotReader(TReader):
-    '''
+    """
     Provides the base class for all different *SlotReader classes
-    '''
+    """
 
     def __init__(
         self
         , request: TSlotFetchRequest
         , path   : Path=None
         , parent : QObject=None
-    ):
+    ) -> None:
 
         super().__init__(request=request, path=path, parent=parent)
 

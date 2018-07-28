@@ -8,6 +8,9 @@ from src.utils import configure_logging
 
 
 def put_one_date(session, fst, lst, name=None):
+    """
+    Put one task at the given time slot into the provided database session
+    """
 
     if name is None:
         name = 'task'
@@ -23,9 +26,9 @@ def put_one_date(session, fst, lst, name=None):
 
 
 def setup_one_slot_whole_date(session, dt=None):
-    '''
+    """
     Put one slot into the database that will occupy the entire date
-    '''
+    """
 
     if dt is None:
         dt = pendulum.create(year=2010, month=6, day=15, tz='utc')

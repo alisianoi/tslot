@@ -18,9 +18,9 @@ from src.utils import logged
 
 
 class DataRunnable(QRunnable):
-    '''
+    """
     Store an instance of a TWorker and later run it in another thread
-    '''
+    """
 
     def __init__(self, worker: TWorker):
 
@@ -33,7 +33,7 @@ class DataRunnable(QRunnable):
 
 
 class TDiskBroker(QObject):
-    '''
+    """
     Provide (unique) database session and (unique) threadpool
 
     The database communication is dispatched to separate threads. This
@@ -45,7 +45,7 @@ class TDiskBroker(QObject):
     Args:
         path  : full path to the database; If None, use default
         parent: if Qt ownership is required, provides parent object
-    '''
+    """
 
     responded = pyqtSignal(TResponse)
     triggered = pyqtSignal(TFailure)
@@ -64,9 +64,9 @@ class TDiskBroker(QObject):
         self.threadpool = QThreadPool(parent)
 
     def __del__(self):
-        '''
+        """
         Wait for all the threads to finish
-        '''
+        """
 
         # This avoids a 1 in 10k deadlock which would sometimes happen.
         # See: https://github.com/pytest-dev/pytest-qt/issues/199

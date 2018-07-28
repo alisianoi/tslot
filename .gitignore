@@ -7,3 +7,4 @@ __*__
 .coverage
 .pytest_cache
 .python-version
+doc/_build

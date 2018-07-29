@@ -166,13 +166,23 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
 class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
     """Return time slots for a ray slot fetch with tags request"""
 
-    def __init__(self, items: list, request: TRaySlotWithTagFetchRequest):
+    def __init__(
+        self
+        , items: list
+        , dt_offset: Date
+        , direction: str
+        , dates_dir: str
+        , times_dir: str
+        , flat_tags: bool
+        , slice_fst: int
+        , slice_lst: int
+    ) -> None:
 
-        super().__init__(items, request.dates_dir, request.times_dir, request.slice_fst, request.slice_lst)
+        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
 
-        self.dt_offset = request.dt_offset
-        self.direction = request.direction
-        self.flat_tags = request.flat_tags
+        self.dt_offset = dt_offset
+        self.direction = direction
+        self.flat_tags = flat_tags
 
         if not self.flat_tags:
             self.condense_tags()
@@ -231,13 +241,75 @@ class TRaySlotFetchResponseFactory:
     ) -> TRaySlotFetchResponse:
 
         return TRaySlotFetchResponse(
-            items, dt_offset, direction, dates_dir, times_dir, slice_fst, slice_lst
+            items
+            , dt_offset
+            , direction
+            , dates_dir
+            , times_dir
+            , slice_fst
+            , slice_lst
         )
 
     @classmethod
     def from_request(items: list, request: TRaySlotFetchRequest):
 
-        return TRaySlotFetchRequest(
-            items, request.dt_offset, request.direction, request.dates_dir,
-            request.times_dir, request.slice_fst, request.slice_lst
+        return TRaySlotFetchRequestFactory.from_params(
+            items
+            , request.dt_offset
+            , request.direction
+            , request.dates_dir
+            , request.times_dir
+            , request.slice_fst
+            , request.slice_lst
+        )
+
+
+class TRaySlotWithTagFetchResponseFactory:
+    """
+    Construct a TRaySlotWithTagFetchResponse
+
+    There are at least two ways to get the necessary parameters to construct the
+    response. Firstly, the parameters could be coming directly from the request
+    (i.e. the original request is known). Secondly, the parameters could have
+    been modified or provided directly, in which case the original request could
+    not be available.
+    """
+
+    @classmethod
+    def from_params(
+        items: list
+        , dt_offset: Date
+        , direction: str
+        , dates_dir: str
+        , times_dir: str
+        , flat_tags: bool
+        , slice_fst: int
+        , slice_lst: int
+    ) -> TRaySlotWithTagFetchResponse:
+
+        return TRaySlotWithTagFetchResponse(
+            items
+            , dt_offset
+            , direction
+            , dates_dir
+            , times_dir
+            , flat_tags
+            , slice_fst
+            , slice_lst
+        )
+
+    @classmethod
+    def from_request(
+        items: list, request: TRaySlotWithTagFetchRequest
+    ) -> TRaySlotWithTagFetchRequest:
+
+        return TRaySlotWithTagFetchResponseFactory.from_params(
+            items
+            , request.dt_offset
+            , request.direction
+            , request.dates_dir
+            , request.times_dir
+            , request.flat_tags
+            , request.slice_fst
+            , request.slice_lst
         )

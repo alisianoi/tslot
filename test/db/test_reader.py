@@ -41,9 +41,9 @@ def setup_one_slot_whole_date(session, dt=None):
 
 
 def setup_one_slot_one_date(session, dt=None):
-    '''
+    """
     Put one one-hour slot into the database
-    '''
+    """
 
     if dt is None:
         dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
@@ -57,11 +57,11 @@ def setup_one_slot_one_date(session, dt=None):
 
 
 def setup_two_slots_one_date(session, dt=None):
-    '''
+    """
     Put two one-hour same-date slots into the database
 
     Return those slots ordered past_to_future for date and for time
-    '''
+    """
 
     if dt is None:
         dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
@@ -79,11 +79,11 @@ def setup_two_slots_one_date(session, dt=None):
 
 
 def setup_two_slots_two_dates(session, dt=None):
-    '''
+    """
     Put two dates with one one-hour slot each into the database
 
     Return those slots ordered past_to_future for date and for time
-    '''
+    """
 
     if dt is None:
         dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
@@ -99,11 +99,11 @@ def setup_two_slots_two_dates(session, dt=None):
 
 
 def setup_four_slots_two_dates(session, dt=None):
-    '''
+    """
     Put two dates with two one-hour slots each into the database
 
     Return those slots ordered past_to_future for date and for time
-    '''
+    """
 
     if dt is None:
         dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')

@@ -4,13 +4,17 @@ from PyQt5.QtWidgets import *
 
 
 class TTimerWidget(QWidget):
-    '''
-    Start a QTimer and display the ticking time
+    """
+    Keep track of a ticking timer, update label with current time
 
-    Args:
-        value: initial value for the timer
-        sleep: interval value between timer signals (1 second)
-    '''
+    Contains a QTimer and a QLabel to display current time value.
+    QTimer is launched with the given initial value and a sleep
+    interval. Each sleep interval the timer wakes up and then the
+    label value is updated.
+
+    :param value: initial QTimer value
+    :param sleep: milliseconds between QTimer ticks
+    """
 
     stopped = pyqtSignal(QTime)
 
@@ -38,10 +42,10 @@ class TTimerWidget(QWidget):
 
         self.setLayout(self.layout)
 
-        self.timer.timeout.connect(self.update_timer)
+        self.timer.timeout.connect(self.handle_timeout)
 
     @pyqtSlot()
-    def update_timer(self):
+    def handle_timeout(self):
         self.value = self.value.addSecs(1)
 
         self.tick_lbl.setText(self.value.toString())
@@ -64,3 +68,6 @@ class TTimerWidget(QWidget):
 
     def setFont(self, font: QFont):
         self.tick_lbl.setFont(font)
+
+    def isActive(self) -> bool:
+        return self.timer.isActive()

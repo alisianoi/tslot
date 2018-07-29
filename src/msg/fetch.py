@@ -2,34 +2,39 @@ import logging
 
 from src.msg.base import TRequest, TResponse
 
-LOAD_DIRECTIONS = ['past_to_future', 'future_to_past']
-
 
 class TFetchRequest(TRequest):
-    '''
-    Provides the base class for all different data fetching requests
-    '''
+    """
+    Ask the backend to fulfill some read-only request
 
-    def __init__(self, slice_fst: int=0, slice_lst: int=128):
+    This is the base class for different kinds of requests:
 
-        if slice_fst > slice_lst:
-            raise RuntimeError(
-                'Expected slice_fst to be <= than slice_lst'
-            )
+    1. Recorded time slot requests
+    2. Currently active timer requests
+    3. Task/Project/Tag autocompletion requests
+    4. etc
 
-        self.slice_fst = slice_fst
-        self.slice_lst = slice_lst
+    For writing to the backend, see TStoreRequest.
+    """
+
+    def __init__(self):
+        pass
+
 
 class TFetchResponse(TResponse):
-    '''
-    Provides the base class for all different data fetching responses
-    '''
+    """
+    Ask the frontend to process some response
 
-    def __init__(self, items: list, request: TFetchRequest):
+    This is the base class for different kinds of responses:
 
-        super().__init__(request)
+    1. Respond with a list of recorded time slots
+    2. Respond with a list of currently active timers
+    3. Respond with a list of autocompletion suggestsions
+    4. etc
 
-        self.items = items
+    This is expected to be a reply to some previous request, see
+    subclasses of TFetchRequest.
+    """
 
-    def is_empty(self) -> bool:
-        return False if self.items else True
+    def __init__(self):
+        pass

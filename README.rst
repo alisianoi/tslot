@@ -42,10 +42,6 @@ Duration of One Day
 ===================
 
 #. One table corresponds to one day
-#. A slot should be split if:
-
-   - it lasts longer than one day
-   - it lasts less than one day but begins "late"
 
 #. Identical tables should be collapsed together by default
 

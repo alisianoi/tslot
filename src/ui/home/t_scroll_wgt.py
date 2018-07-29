@@ -7,19 +7,19 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotFetchResponse
-from src.msg.fetch_slot import TRaySlotWithTagFetchRequest, TRaySlotWithTagFetchResponse
+from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.slot_fetch_response import TRaySlotFetchResponse, TRaySlotWithTagFetchResponse
 
 from src.ui.home.t_table_view import TTableView
 from src.ui.home.t_table_model import TTableModel
 
 class TScrollWidget(QWidget):
-    '''
+    """
     Provide the top-level widget for the scroll-enabled area
 
     This widget should add/remove incoming SlotTableView's, effectively
     implementing infinite scroll for a series of tables of slots.
-    '''
+    """
 
     requested = pyqtSignal(TRequest)
 
@@ -27,7 +27,6 @@ class TScrollWidget(QWidget):
 
         super().__init__(parent=parent)
 
-        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
         self.dt_offset = pendulum.today()
@@ -123,8 +122,6 @@ class TScrollWidget(QWidget):
     def handle_ray_slot_with_tag_fetch(
             self, response: TRaySlotWithTagFetchResponse
     ) -> None:
-
-        self.logger.info(f'{self.name} handles {response}')
 
         if response.is_empty():
             return

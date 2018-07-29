@@ -1,7 +1,7 @@
 import pprint
 
 from src.db.model import TagModel, TaskModel
-from src.db.loader_for_tags import TTagLoader
+from src.db.reader_for_tags import TTagReader
 
 
 def setup_one_tag_one_task(session):
@@ -31,15 +31,17 @@ def setup_two_tags_one_task(session):
 
     return [tag_model0, tag_model1], [task_model0]
 
-def test_tag_loader_0(session, qtbot):
-    
+def test_tag_reader_0(session, qtbot):
+
     tags, tasks = setup_one_tag_one_task(session)
 
-    worker = TTagLoader(tasks=tasks)
+    worker = TTagReader(tasks=tasks)
 
     worker.session = session
 
-    def handle_loaded(entries):
+    def handle_fetched(response):
+        entries = response.tags
+
         assert len(entries) == 1
 
         for entry in entries:
@@ -48,26 +50,28 @@ def test_tag_loader_0(session, qtbot):
             assert tag in task.tags
             assert task in tag.tasks
 
-    def handle_failed(reason):
+    def handle_alerted(reason):
         assert False, reason
 
-    worker.loaded.connect(handle_loaded)
-    worker.failed.connect(handle_failed)
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
 
-    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-        blocker.connect(worker.failed)
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
 
         worker.work()
 
-def test_tag_loader_1(session, qtbot):
+def test_tag_reader_1(session, qtbot):
 
     tags, tasks = setup_two_tags_one_task(session)
 
-    worker = TTagLoader(tasks=tasks)
+    worker = TTagReader(tasks=tasks)
 
     worker.session = session
 
-    def handle_loaded(entries):
+    def handle_fetched(response):
+        entries = response.tags
+
         assert len(entries) == 2
 
         for entry in entries:
@@ -77,13 +81,13 @@ def test_tag_loader_1(session, qtbot):
             assert tag in task.tags
             assert task in tag.tasks
 
-    def handle_failed(reason):
+    def handle_alerted(reason):
         assert False, reason
 
-    worker.loaded.connect(handle_loaded)
-    worker.failed.connect(handle_failed)
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
 
-    with qtbot.waitSignal(worker.loaded, timeout=1000) as blocker:
-        blocker.connect(worker.failed)
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
 
         worker.work()

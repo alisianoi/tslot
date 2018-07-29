@@ -6,6 +6,13 @@ from src.ui.timer.t_timer_wgt import TTimerWidget
 
 
 class TTimerControlsWidget(QWidget):
+    """
+    Add basic controls to start/stop time tracking for a task
+
+    Contains a line edit to name the current task and a push button to
+    toggle its timer. Also holds a timer widget and a menu toggle
+    button.
+    """
 
     started = pyqtSignal()
     stopped = pyqtSignal()
@@ -13,8 +20,6 @@ class TTimerControlsWidget(QWidget):
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
-
-        self.ticking = False
 
         self.menu_btn = QPushButton('\uf0c9')
         self.task_ldt = QLineEdit()
@@ -25,7 +30,7 @@ class TTimerControlsWidget(QWidget):
         self.layout.setContentsMargins(10, 0, 10, 0)
 
         # The numbers at the end are stretch factors; How to do better?
-        self.layout.addWidget(self.menu_btn)
+        self.layout.addWidget(self.menu_btn, 0.5)
         self.layout.addWidget(self.task_ldt, 7)
         self.layout.addWidget(self.timer_wgt, 1)
         self.layout.addWidget(self.push_btn, 1)
@@ -51,7 +56,7 @@ class TTimerControlsWidget(QWidget):
     def toggle_timer(self):
         self.push_btn.setDisabled(True)
 
-        if self.ticking:
+        if self.timer_wgt.isActive():
             self.stop_timer()
         else:
             self.start_timer()
@@ -59,21 +64,19 @@ class TTimerControlsWidget(QWidget):
         self.push_btn.setDisabled(False)
 
     def start_timer(self):
-        if self.ticking:
+        if self.timer_wgt.isActive():
             return
 
         self.timer_wgt.start_timer()
         self.push_btn.setText('Stop')
-        self.ticking = True
 
         self.started.emit()
 
     def stop_timer(self):
-        if not self.ticking:
+        if not self.timer_wgt.isActive():
             return
 
         self.timer_wgt.stop_timer()
         self.push_btn.setText('Start')
-        self.ticking = False
 
         self.stopped.emit()

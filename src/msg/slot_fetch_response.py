@@ -231,7 +231,8 @@ class TRaySlotFetchResponseFactory:
 
     @classmethod
     def from_params(
-        items: list
+        cls
+        , items: list
         , dt_offset: Date
         , direction: str
         , dates_dir: str
@@ -251,9 +252,9 @@ class TRaySlotFetchResponseFactory:
         )
 
     @classmethod
-    def from_request(items: list, request: TRaySlotFetchRequest):
+    def from_request(cls, items: list, request: TRaySlotFetchRequest):
 
-        return TRaySlotFetchRequestFactory.from_params(
+        return TRaySlotFetchResponseFactory.from_params(
             items
             , request.dt_offset
             , request.direction
@@ -277,7 +278,8 @@ class TRaySlotWithTagFetchResponseFactory:
 
     @classmethod
     def from_params(
-        items: list
+        cls
+        , items: list
         , dt_offset: Date
         , direction: str
         , dates_dir: str
@@ -300,7 +302,7 @@ class TRaySlotWithTagFetchResponseFactory:
 
     @classmethod
     def from_request(
-        items: list, request: TRaySlotWithTagFetchRequest
+        cls, items: list, request: TRaySlotWithTagFetchRequest
     ) -> TRaySlotWithTagFetchRequest:
 
         return TRaySlotWithTagFetchResponseFactory.from_params(

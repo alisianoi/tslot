@@ -18,31 +18,25 @@ from src.utils import logged
 
 
 class TWorker(QObject):
-    '''
-    Provides a set of common signals and methods for all subclasses
+    """
+    Provide the base class for all workers (readers and writers)
 
-    This opens a brand new session every time because the SQLAlchemy
-    session object should be opened and used in the same thread.
+    Open a brand new database session every time because the SQLAlchemy session
+    object should be opened and used in the same thread.
+    """
 
-    This provides the necessary signals/slots that the business logic
-    classes will trigger. Deriving classes should use those signals.
-
-    Args:
-        path   : path to the SQLite database file
-        parent : parent object if Qt ownership is required
-    '''
-
-    # TODO: the two signals below are not actively used
-    # Emitted before the database query
     started = pyqtSignal()
-    # Emitted after the database query
     stopped = pyqtSignal()
-
-    # Emitted if there is an error at any point
     alerted = pyqtSignal(TFailure)
 
-    @logged
-    def __init__(self, path: Path=None, parent: QObject=None):
+    def __init__(self, path: Path=None, parent: QObject=None) -> None:
+        """
+        Initialize a database worker
+
+        Args:
+            path   : path to the SQLite database file
+            parent : parent object if Qt ownership is required
+        """
 
         super().__init__(parent)
 
@@ -50,18 +44,23 @@ class TWorker(QObject):
 
         self.path = path
         self.query = None
+
         self.session = None
 
-    def work(self):
+    def work(self) -> None:
+        """
+        Provide the default work method which subclasses should overwrite
+
+        Some signal (either a common one like started/stopped or a
+        worker-specific one) should be emitted when the work is done.
+        """
+
         return self.alerted.emit(
             TFailure('Failed to load anything: default work method')
         )
 
-    @logged
     def create_session(self):
-        '''
-        Create an SQLite/SQLAlchemy database session
-        '''
+        """Open a brand new SQLite/SQLAlchemy database session"""
 
         if not isinstance(self.path, Path) or not self.path.exists():
             return self.alerted.emit(
@@ -79,27 +78,34 @@ class TWorker(QObject):
 
 
 class TReader(TWorker):
-    '''
-    Provides the base class for all different *Reader classes
-    '''
+    """Provide the base class for all different database readers"""
 
     fetched = pyqtSignal(TFetchResponse)
 
     def __init__(
         self
         , request: TFetchRequest
-        , path: Path=None
-        , parent: QObject=None
-    ):
+        , path   : Path=None
+        , parent : QObject=None
+    ) -> None:
+        """
+        Initialize a database reader
+
+        Args:
+            request: a fetch request for some data from the database
+            path   : the path to the database
+            parent : parent object if Qt ownership is required
+        """
 
         super().__init__(path, parent)
 
         self.request = request
 
+# TODO: the TWriter is under construction (i.e. missing write requests, etc.)
 class TWriter(TWorker):
-    '''
-    Provides the base class for all different *Writer classes
-    '''
+    """
+    Provides the base class for all different database writers
+    """
 
     stashed = pyqtSignal(TStashResponse)
 

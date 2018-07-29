@@ -65,7 +65,7 @@ def timedelta2str(delta: datetime.timedelta) -> str:
 
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
-def pendulum2str(pnd: pendulum.Pendulum) -> str:
+def pendulum2str(pnd: pendulum.DateTime) -> str:
 
     t = pnd.time()
 

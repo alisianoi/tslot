@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from PyQt5.QtCore import *
 
-from src.db.broker import TDataBroker
+from src.db.broker import TDiskBroker
 from src.db.model import TagModel, TaskModel, SlotModel
 
 def utc_to_local(utc_dt):

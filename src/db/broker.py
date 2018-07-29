@@ -12,15 +12,15 @@ from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 from src.msg.base import TRequest, TResponse, TFailure
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
 
 from src.utils import logged
 
 
 class DataRunnable(QRunnable):
-    '''
+    """
     Store an instance of a TWorker and later run it in another thread
-    '''
+    """
 
     def __init__(self, worker: TWorker):
 
@@ -33,7 +33,7 @@ class DataRunnable(QRunnable):
 
 
 class TDiskBroker(QObject):
-    '''
+    """
     Provide (unique) database session and (unique) threadpool
 
     The database communication is dispatched to separate threads. This
@@ -45,7 +45,7 @@ class TDiskBroker(QObject):
     Args:
         path  : full path to the database; If None, use default
         parent: if Qt ownership is required, provides parent object
-    '''
+    """
 
     responded = pyqtSignal(TResponse)
     triggered = pyqtSignal(TFailure)
@@ -64,9 +64,7 @@ class TDiskBroker(QObject):
         self.threadpool = QThreadPool(parent)
 
     def __del__(self):
-        '''
-        Wait for all the threads to finish
-        '''
+        """Wait for all the threads to finish"""
 
         # This avoids a 1 in 10k deadlock which would sometimes happen.
         # See: https://github.com/pytest-dev/pytest-qt/issues/199
@@ -77,33 +75,38 @@ class TDiskBroker(QObject):
 
     @logged
     @pyqtSlot(TRequest)
-    def handle_requested(self, request: TRequest):
+    def handle_requested(self, request: TRequest) -> None:
+        """Find a suitable handler for the request to the database"""
 
         if isinstance(request, TRaySlotFetchRequest):
-
             return self.handle_ray_slot_fetch(request)
 
         if isinstance(request, TRaySlotWithTagFetchRequest):
-
             return self.handle_ray_slot_with_tag_fetch(request)
 
-        raise RuntimeError(f'Unknown TRequest {request}')
+        raise RuntimeError(f'Unknown database request:\n {request}')
 
     @pyqtSlot(TFetchResponse)
-    def handle_fetched(self, response: TFetchResponse):
+    def handle_fetched(self, response: TFetchResponse) -> None:
+        """Forward the database response for a fetch request"""
+
         self.responded.emit(response)
 
     @pyqtSlot(TStashResponse)
-    def handle_stashed(self, response: TStashResponse):
+    def handle_stashed(self, response: TStashResponse) -> None:
+        """Forward the database response for a stash request"""
+
         self.responded.emit(response)
 
     @pyqtSlot(TFailure)
-    def handle_alerted(self, failure: TFailure):
+    def handle_alerted(self, failure: TFailure) -> None:
+        """Forward the database failure for some previous request"""
+
         self.triggered.emit(failure)
 
     @logged
     def handle_ray_slot_fetch(
-            self, request: TRaySlotFetchRequest
+        self, request: TRaySlotFetchRequest
     ) -> None:
 
         self.dispatch_reader(
@@ -121,6 +124,7 @@ class TDiskBroker(QObject):
 
     @logged
     def dispatch_reader(self, reader: TReader):
+        """Dispatch a given reader into a separate thread"""
 
         reader.fetched.connect(self.handle_fetched)
 
@@ -128,6 +132,7 @@ class TDiskBroker(QObject):
 
     @logged
     def dispatch_writer(self, writer: TWriter):
+        """Dispatch a given writer into a separate thread"""
 
         writer.stashed.connect(self.handle_stashed)
 
@@ -135,6 +140,16 @@ class TDiskBroker(QObject):
 
     @logged
     def dispatch_worker(self, worker: TWorker):
+        """
+        Dispatch a given worker into a separate thread
+
+        The worker-specific signals should already have been connected. Connect
+        the signals/slots that are common to all workers and then dispatch.
+
+        Args:
+            worker: the worker to be dispatched
+        """
+
         worker.alerted.connect(self.handle_alerted)
 
         worker.started.connect(self.fn_started)

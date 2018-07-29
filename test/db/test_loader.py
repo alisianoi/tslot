@@ -31,7 +31,7 @@ def setup_one_slot_whole_date(session, dt=None):
     """
 
     if dt is None:
-        dt = pendulum.create(year=2010, month=6, day=15, tz='utc')
+        dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
 
     fst, lst = dt.start_of('day'), dt.end_of('day')
 
@@ -46,7 +46,7 @@ def setup_one_slot_one_date(session, dt=None):
     '''
 
     if dt is None:
-        dt = pendulum.create(year=2010, month=6, day=15, tz='utc')
+        dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
 
     fst = dt.replace(hour=11, minute=30, second=0, microsecond=0)
     lst = dt.replace(hour=12, minute=30, second=0, microsecond=0)
@@ -64,7 +64,7 @@ def setup_two_slots_one_date(session, dt=None):
     '''
 
     if dt is None:
-        dt = pendulum.create(year=2010, month=6, day=15, tz='utc')
+        dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
 
     fst0 = dt.replace(hour=5, minute=0, second=0, microsecond=0)
     lst0 = dt.replace(hour=6, minute=0, second=0, microsecond=0)
@@ -86,7 +86,7 @@ def setup_two_slots_two_dates(session, dt=None):
     '''
 
     if dt is None:
-        dt = pendulum.create(year=2010, month=6, day=15, tz='utc')
+        dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
 
     slots = []
 
@@ -106,7 +106,7 @@ def setup_four_slots_two_dates(session, dt=None):
     '''
 
     if dt is None:
-        dt = pendulum.create(year=2010, month=6, day=15, tz='utc')
+        dt = pendulum.datetime(year=2010, month=6, day=15, tz='utc')
 
     slots = []
 

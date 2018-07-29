@@ -1,6 +1,7 @@
 import pendulum
 
-from pendulum import Date, Timezone
+from pendulum import Date
+from pendulum.tz.timezone import Timezone
 
 from src.msg.fetch import TFetchResponse
 from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest

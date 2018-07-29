@@ -7,8 +7,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotFetchResponse
-from src.msg.fetch_slot import TRaySlotWithTagFetchRequest, TRaySlotWithTagFetchResponse
+from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.slot_fetch_response import TRaySlotFetchResponse, TRaySlotWithTagFetchResponse
 
 from src.ui.home.t_table_view import TTableView
 from src.ui.home.t_table_model import TTableModel

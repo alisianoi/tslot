@@ -8,8 +8,9 @@ from sqlalchemy import func
 from PyQt5.QtCore import QObject
 
 from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.fetch_slot import TSlotFetchRequest, TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
-from src.msg.fetch_slot import TRaySlotFetchResponse, TRaySlotWithTagFetchResponse
+from src.msg.slot_fetch_request import TSlotFetchRequest, TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.slot_fetch_response import TRaySlotFetchResponseFactory
+from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponse
 
 from src.db.worker import TReader
 from src.db.model import SlotModel, TaskModel, TagModel
@@ -161,7 +162,9 @@ class TRaySlotReader(TSlotReader):
 
         self.logger.debug(result)
 
-        self.fetched.emit(TRaySlotFetchResponse(result, self.request))
+        self.fetched.emit(
+            TRaySlotFetchResponseFactory.from_request(result, self.request)
+        )
 
         self.session.close()
 

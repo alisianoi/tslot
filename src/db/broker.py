@@ -12,7 +12,7 @@ from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 from src.msg.base import TRequest, TResponse, TFailure
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.fetch_slot import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
 
 from src.utils import logged
 

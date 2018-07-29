@@ -146,10 +146,14 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
         , slice_lst: int
     ) -> None:
 
-        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
-
         self.dt_offset = dt_offset
         self.direction = direction
+
+        # NOTE: the super() call is made last here for a reason. The superclass
+        # (i.e. TSlotFetchResponse) will call self.in_timezone, which will call
+        # this class'es .in_timezone due to the way super() works. In turn, this
+        # .in_timezone expects self.dt_offset to be set, so here we are.
+        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
 
     def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
         """
@@ -178,11 +182,11 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
         , slice_lst: int
     ) -> None:
 
-        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
-
         self.dt_offset = dt_offset
         self.direction = direction
         self.flat_tags = flat_tags
+
+        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
 
         if not self.flat_tags:
             self.condense_tags()

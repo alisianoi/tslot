@@ -3,16 +3,23 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.ui.timer.t_timer_wgt import TTimerWidget
+from src.msg.base import TRequest
 
 
 class TTimerControlsWidget(QWidget):
     """
     Add basic controls to start/stop time tracking for a task
 
-    Contains a line edit to name the current task and a push button to
-    toggle its timer. Also holds a timer widget and a menu toggle
-    button.
+    Contains a line edit to name the current task and a push button to toggle
+    its timer. Also holds a timer widget and a menu toggle button.
     """
+
+    # TRequest can be one of these:
+    # 1. TTimerRequest -- give me something to time, is there an active timer?
+    # 2. TFetchRequest -- the user started the timer, is there any previous task/tag?
+    # 3. TStoreRequest -- the user stopped the timer, please save and display?
+    # 4. THintRequest -- the user is typing something, can I suggest anything?
+    requested = pyqtSignal(TRequest)
 
     started = pyqtSignal()
     stopped = pyqtSignal()

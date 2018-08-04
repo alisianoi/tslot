@@ -127,8 +127,8 @@ class TScrollWidget(QWidget):
             return
 
         if self.direction != response.direction:
-            # widget's data direction and response's data direction are
-            # not the same; Cannot use response data, so discard it
+            # widget's data direction and response's data direction are not the
+            # same. Cannot use response data, so discard it.
             return
 
         if self.times_dir != response.times_dir:
@@ -154,7 +154,7 @@ class TScrollWidget(QWidget):
 
     def show_next(self, view: TTableView):
 
-        # TODO: why does inserting now work?
+        # TODO: why does inserting not work?
         # Remove the spacer that props widgets up
         self.layout.takeAt(self.layout.count() - 1)
         # Add the next widget

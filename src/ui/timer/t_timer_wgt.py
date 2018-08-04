@@ -7,10 +7,9 @@ class TTimerWidget(QWidget):
     """
     Keep track of a ticking timer, update label with current time
 
-    Contains a QTimer and a QLabel to display current time value.
-    QTimer is launched with the given initial value and a sleep
-    interval. Each sleep interval the timer wakes up and then the
-    label value is updated.
+    Contains a QTimer and a QLabel to display current time value. QTimer is
+    launched with the given initial value and a sleep interval. Each sleep
+    interval the timer wakes up and then the label value is updated.
 
     :param value: initial QTimer value
     :param sleep: milliseconds between QTimer ticks

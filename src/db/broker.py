@@ -18,9 +18,7 @@ from src.utils import logged
 
 
 class DataRunnable(QRunnable):
-    """
-    Store an instance of a TWorker and later run it in another thread
-    """
+    """Wrap an instance of a TWorker and later run it in another thread"""
 
     def __init__(self, worker: TWorker):
 
@@ -32,7 +30,7 @@ class DataRunnable(QRunnable):
         self.worker.work()
 
 
-class TDiskBroker(QObject):
+class TVaultBroker(QObject):
     """
     Provide (unique) database session and (unique) threadpool
 

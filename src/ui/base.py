@@ -1,9 +1,15 @@
+import logging
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.msg.base import TRequest, TResponse, TFailure
 
+
+# PyQt has some limitations when it comes to multiple inheritance. So, in order
+# to have a common set of signals, slots and methods on the custom widgets, it
+# is necessary to write some duplicated code. So here goes:
 
 class TWidget(QWidget):
     """
@@ -22,6 +28,8 @@ class TWidget(QWidget):
 
     def __init__(self, parent: QWidget=None) -> None:
         super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
 
     def kickstart(self) -> None:
         pass
@@ -56,6 +64,8 @@ class TDockWidget(QDockWidget):
 
     def __init__(self, parent: QWidget=None) -> None:
         super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
 
     def kickstart(self) -> None:
         pass

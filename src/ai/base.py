@@ -1,3 +1,5 @@
+import logging
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -23,17 +25,19 @@ class TObject(QObject):
     def __init__(self, parent: QObject=None) -> None:
         super().__init__(parent)
 
+        self.logger = logging.getLogger('tslot')
+
     def kickstart(self) -> None:
         pass
 
-    @pyqtSlot
+    @pyqtSlot(TRequest)
     def handle_requested(self, signal: TRequest) -> None:
         self.requested.emit(signal)
 
-    @pyqtSlot
+    @pyqtSlot(TRequest)
     def handle_responded(self, signal: TResponse) -> None:
         self.responded.emit(signal)
 
-    @pyqtSlot
+    @pyqtSlot(TRequest)
     def handle_triggered(self, signal: TFailure) -> None:
         self.triggered.emit(signal)

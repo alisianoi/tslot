@@ -93,8 +93,15 @@ class TMainWindow(QMainWindow):
         self.cache.responded.connect(
             self.widget.scroll.widget().handle_responded
         )
+        self.cache.responded.connect(
+            self.timer.handle_responded
+        )
+
         self.cache.triggered.connect(
             self.widget.scroll.widget().handle_triggered
+        )
+        self.cache.triggered.connect(
+            self.timer.handle_triggered
         )
 
         self.widget.scroll.widget().requested.connect(

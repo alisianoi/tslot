@@ -2,10 +2,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.msg.base import TRequest, TResponse, TFailure
+from src.ui.base import TWidget, TDockWidget
 from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
 
 
-class TTimerControlsDockWidget(QDockWidget):
+class TTimerControlsDockWidget(TDockWidget):
     """
     Provide the top-level timer area
 
@@ -14,11 +15,7 @@ class TTimerControlsDockWidget(QDockWidget):
     several docks + main area.
     """
 
-    requested = pyqtSignal(TRequest)
-    responded = pyqtSignal(TResponse)
-    triggered = pyqtSignal(TFailure)
-
-    def __init__(self, parent: QObject=None) -> None:
+    def __init__(self, parent: TWidget=None) -> None:
 
         super().__init__(parent)
 

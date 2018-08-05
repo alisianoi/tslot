@@ -1,12 +1,16 @@
+import logging
+
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
-from src.msg.base import TRequest
+from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.timer import TTimerRequest, TTimerResponse
 
 
-class TTimerControlsWidget(QWidget):
+class TTimerControlsWidget(TWidget):
     """
     Add basic controls to start/stop time tracking for a task
 
@@ -14,12 +18,11 @@ class TTimerControlsWidget(QWidget):
     its timer. Also holds a timer widget and a menu toggle button.
     """
 
-    # TRequest can be one of these:
+    # TRequest can be one of these in requested = pyqtSignal(TRequest):
     # 1. TTimerRequest -- give me something to time, is there an active timer?
     # 2. TFetchRequest -- the user started the timer, is there any previous task/tag?
     # 3. TStoreRequest -- the user stopped the timer, please save and display?
     # 4. THintRequest -- the user is typing something, can I suggest anything?
-    requested = pyqtSignal(TRequest)
 
     started = pyqtSignal()
     stopped = pyqtSignal()
@@ -27,6 +30,8 @@ class TTimerControlsWidget(QWidget):
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
 
         self.menu_btn = QPushButton('\uf0c9')
         self.task_ldt = QLineEdit()
@@ -59,6 +64,14 @@ class TTimerControlsWidget(QWidget):
 
         self.push_btn.clicked.connect(self.toggle_timer)
 
+        self.kickstarted = False
+
+    def kickstart(self):
+
+        self.requested.emit(TTimerRequest)
+
+        self.kickstarted = True
+
     @pyqtSlot()
     def toggle_timer(self):
         self.push_btn.setDisabled(True)
@@ -87,3 +100,20 @@ class TTimerControlsWidget(QWidget):
         self.push_btn.setText('Start')
 
         self.stopped.emit()
+
+    @pyqtSlot(TResponse)
+    def handle_responded(self, response: TResponse) -> None:
+
+        if isinstance(response, TTimerResponse):
+            self.handle_timer_response(response)
+
+        self.logger.debug(f'ignores {response}')
+
+    def handle_timer_response(self, response: TTimerResponse):
+
+        if response.item is None:
+            return None
+
+        self.task_ldt.setText(response.item.name)
+
+        # TODO: actually start the timer

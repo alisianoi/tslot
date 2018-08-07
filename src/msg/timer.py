@@ -1,30 +1,18 @@
 from PyQt5.QtCore import *
 
-from src.msg.base import TMessage, TRequest, TResponse
+from src.db.model import SlotModel
+from src.msg.fetch import TFetchRequest, TFetchResponse
 
 
-class TTimerRequest(TRequest):
+class TTimerRequest(TFetchRequest):
+    """Request a currently active timer"""
 
-    def __init__(
-            self, value: QTime, task: str='', tags: list=None
-    ) -> None:
-
-        super().__init__()
-
-        self.value = 
+    pass
 
 
-class TTimerResponse(TMessage):
+class TTimerResponse(TFetchResponse):
+    """Respond with a currently active timer (or empty)"""
 
-    def __init__(
-        self
-        , value  : QTime
-        , task   : str=''
-        , tags   : list=None
-        , request: TTimerRequest
-    ) -> None:
+    def __init__(self, items: SlotModel=None) -> None:
 
-        super().__init__(request)
-
-        self.task = task
-        self.tags = [] if tags is None else tags
+        self.items = items

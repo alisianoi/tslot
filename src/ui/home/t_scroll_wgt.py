@@ -75,20 +75,14 @@ class TScrollWidget(QWidget):
     def handle_responded(self, response: TResponse):
 
         if isinstance(response, TRaySlotFetchResponse):
-
             return self.handle_ray_slot_fetch(response)
 
         if isinstance(response, TRaySlotWithTagFetchResponse):
-
             return self.handle_ray_slot_with_tag_fetch(response)
-
-        self.logger.info(f'{self.name} skips {response}')
 
     def handle_ray_slot_fetch(
             self, response: TRaySlotFetchResponse
     ) -> None:
-
-        self.logger.info(f'{self.name} handles {response}')
 
         if response.is_empty():
             return

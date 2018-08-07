@@ -22,4 +22,14 @@ class TTimerControlsDockWidget(TDockWidget):
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.setAllowedAreas(Qt.TopDockWidgetArea)
 
-        self.setWidget(TTimerControlsWidget(self))
+        self.timer_controls_wgt = TTimerControlsWidget(self)
+
+        self.setWidget(self.timer_controls_wgt)
+
+        self.responded.connect(self.timer_controls_wgt.handle_responded)
+        self.triggered.connect(self.timer_controls_wgt.handle_triggered)
+
+        self.timer_controls_wgt.requested.connect(self.handle_requested)
+
+    def kickstart(self):
+        self.timer_controls_wgt.kickstart()

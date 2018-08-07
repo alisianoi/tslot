@@ -6,13 +6,16 @@ from pathlib import Path
 
 from PyQt5.QtCore import *
 
+from src.ai.base import TObject
 from src.db.worker import TWorker, TReader, TWriter
 from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
+from src.db.reader_for_timer import TTimerReader
 
 from src.msg.base import TRequest, TResponse, TFailure
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
 from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.msg.timer import TTimerRequest
 
 from src.utils import logged
 
@@ -30,7 +33,7 @@ class DataRunnable(QRunnable):
         self.worker.work()
 
 
-class TVaultBroker(QObject):
+class TVaultBroker(TObject):
     """
     Provide (unique) database session and (unique) threadpool
 
@@ -45,14 +48,9 @@ class TVaultBroker(QObject):
         parent: if Qt ownership is required, provides parent object
     """
 
-    responded = pyqtSignal(TResponse)
-    triggered = pyqtSignal(TFailure)
-
     def __init__(self, path: Path=None, parent: QObject=None):
 
         super().__init__(parent)
-
-        self.logger = logging.getLogger('tslot')
 
         if path is None:
             path = Path(Path.cwd(), Path('tslot.db'))
@@ -75,6 +73,9 @@ class TVaultBroker(QObject):
     @pyqtSlot(TRequest)
     def handle_requested(self, request: TRequest) -> None:
         """Find a suitable handler for the request to the database"""
+
+        if isinstance(request, TTimerRequest):
+            return self.handle_timer_request(request)
 
         if isinstance(request, TRaySlotFetchRequest):
             return self.handle_ray_slot_fetch(request)
@@ -102,18 +103,19 @@ class TVaultBroker(QObject):
 
         self.triggered.emit(failure)
 
+    def handle_timer_request(self, request: TTimerRequest) -> None:
+        self.dispatch_reader(TTimerReader(request, self.path, parent=self))
+
     @logged
     def handle_ray_slot_fetch(
         self, request: TRaySlotFetchRequest
     ) -> None:
 
-        self.dispatch_reader(
-            TRaySlotReader(request, self.path, parent=self)
-        )
+        self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
     @logged
     def handle_ray_slot_with_tag_fetch(
-            self, request: TRaySlotWithTagFetchRequest
+        self, request: TRaySlotWithTagFetchRequest
     ) -> None:
 
         self.dispatch_reader(

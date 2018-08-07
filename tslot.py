@@ -107,6 +107,9 @@ class TMainWindow(QMainWindow):
         self.widget.scroll.widget().requested.connect(
             self.cache.handle_requested
         )
+        self.timer.requested.connect(
+            self.cache.handle_requested
+        )
 
         # Connect some more signals/slots between different widgets
         self.timer.widget().menu_btn.clicked.connect(
@@ -114,7 +117,12 @@ class TMainWindow(QMainWindow):
         )
 
         # Kickstart all widgets (signals/slots are connected now)
+        self.kickstart()
+
+    def kickstart(self):
+
         self.widget.scroll.widget().kickstart()
+        self.timer.kickstart()
 
 
 if __name__ == '__main__':

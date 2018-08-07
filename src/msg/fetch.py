@@ -1,5 +1,3 @@
-import logging
-
 from src.msg.base import TRequest, TResponse
 
 

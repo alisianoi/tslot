@@ -31,8 +31,6 @@ class TTimerControlsWidget(TWidget):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
-
         self.menu_btn = QPushButton('\uf0c9')
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
@@ -64,13 +62,8 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.clicked.connect(self.toggle_timer)
 
-        self.kickstarted = False
-
     def kickstart(self):
-
-        self.requested.emit(TTimerRequest)
-
-        self.kickstarted = True
+        self.requested.emit(TTimerRequest())
 
     @pyqtSlot()
     def toggle_timer(self):
@@ -111,9 +104,9 @@ class TTimerControlsWidget(TWidget):
 
     def handle_timer_response(self, response: TTimerResponse):
 
-        if response.item is None:
-            return None
+        if not response.items:
+            return
 
-        self.task_ldt.setText(response.item.name)
+        self.task_ldt.setText(response.items.name)
 
         # TODO: actually start the timer

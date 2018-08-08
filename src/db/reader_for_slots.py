@@ -156,6 +156,8 @@ class TRaySlotReader(TSlotReader):
         RayDateQuery = self.session.query(
             SlotModel, TaskModel
         ).filter(
+            SlotModel.lst != None
+        ).filter(
             func.DATE(SlotModel.fst) == DateLimitQuery.c.fst_date
             , SlotModel.task_id == TaskModel.id
         ).order_by(dates_order).order_by(times_order)
@@ -227,6 +229,8 @@ class TRaySlotWithTagReader(TSlotReader):
 
         RayDateQuery = self.session.query(
             SlotModel, TaskModel, TagModel
+        ).filter(
+            SlotModel.lst != None
         ).filter(
             func.DATE(SlotModel.fst) == DateLimitQuery.c.fst_date
             , SlotModel.task_id == TaskModel.id

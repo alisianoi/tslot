@@ -28,19 +28,21 @@ class TTimerReader(TReader):
             SlotModel.lst == None
         ).all()
 
-        if len(items) != 0 and len(items) != 1:
+        if len(items) == 0:
+            self.fetched.emit(TTimerResponse())
+        elif len(items) == 1:
+            slot = items[0]
+            task = slot.task
+            tags = task.tags
+
+            tslot = TSlotModel(slot.fst, slot.lst, slot.id)
+            ttask = TTaskModel(task.name, task.id)
+            ttags = [TTagModel(tag.name, tag.id) for tag in tags]
+
+            entry = TEntryModel(tslot, ttask, ttags)
+
+            self.fetched.emit(TTimerResponse(entry))
+        else:
             raise RuntimeError("There should be 0 or 1 active timer")
-
-        slot = items[0]
-        task = slot.task
-        tags = task.tags
-
-        tslot = TSlotModel(slot.fst, slot.lst, slot.id)
-        ttask = TTaskModel(task.name, task.id)
-        ttags = [TTagModel(tag.name, tag.id) for tag in tags]
-
-        entry = TEntryModel(tslot, ttask, ttags)
-
-        self.fetched.emit(TTimerResponse(entry))
 
         self.session.close()

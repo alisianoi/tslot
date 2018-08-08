@@ -100,13 +100,11 @@ class TTimerControlsWidget(TWidget):
         if isinstance(response, TTimerResponse):
             self.handle_timer_response(response)
 
-        self.logger.debug(f'ignores {response}')
-
     def handle_timer_response(self, response: TTimerResponse):
 
-        if not response.items:
+        if response.entry is None:
             return
 
-        self.task_ldt.setText(response.items.name)
+        self.task_ldt.setText(response.entry.task.name)
 
         # TODO: actually start the timer

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import *
 
-from src.db.model import SlotModel
+from src.ai.model import TEntryModel
 from src.msg.fetch import TFetchRequest, TFetchResponse
 
 
@@ -13,6 +13,6 @@ class TTimerRequest(TFetchRequest):
 class TTimerResponse(TFetchResponse):
     """Respond with a currently active timer (or empty)"""
 
-    def __init__(self, items: SlotModel=None) -> None:
+    def __init__(self, entry: TEntryModel=None) -> None:
 
-        self.items = items
+        self.entry = entry

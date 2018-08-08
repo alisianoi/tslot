@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 from src.cache import TCacheBroker
 from src.db.broker import TVaultBroker
 from src.font import initialize_font_databse
+from src.ui.base import TWidget
 from src.ui.menu.t_menu_wgt import TDockMenuWidget
 from src.ui.home.t_scroll_area import TScrollArea
 from src.stylist import Stylist
@@ -20,13 +21,11 @@ from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
 from src.utils import configure_logging
 
 
-class TCentralWidget(QWidget):
+class TCentralWidget(TWidget):
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
-
-        self.logger = logging.getLogger('tslot')
 
         self.scroll = TScrollArea(parent=self)
 
@@ -37,7 +36,9 @@ class TCentralWidget(QWidget):
         self.setLayout(self.layout)
 
         # TODO: move this into a thread
-        self.stylist = Stylist(parent=self, path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
+        self.stylist = Stylist(
+            parent=self, path=Path(Path.cwd(), Path('css'), Path('tslot.css'))
+        )
 
         for style in self.stylist.styles:
             self.setStyleSheet(self.stylist.styles[style])

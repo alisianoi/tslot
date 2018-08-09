@@ -1,5 +1,3 @@
-import datetime
-import pendulum
 import logging
 
 from pathlib import Path

@@ -220,6 +220,8 @@ class TRaySlotWithTagReader(TSlotReader):
         DateLimitQuery = self.session.query(
             func.DATE(SlotModel.fst).label('fst_date')
         ).filter(
+            SlotModel.lst != None
+        ).filter(
             key(SlotModel.fst, self.dt_offset)
         ).order_by(
             dates_order

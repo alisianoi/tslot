@@ -105,6 +105,11 @@ class TTimerControlsWidget(TWidget):
         if response.entry is None:
             return
 
+        name = response.entry.task.name
+        prd = pendulum.now() - response.entry.slot.fst
+
+        
         self.task_ldt.setText(response.entry.task.name)
+
 
         # TODO: actually start the timer

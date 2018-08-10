@@ -1,3 +1,5 @@
+import pendulum
+
 from pathlib import Path
 
 from src.ai.base import TObject
@@ -35,7 +37,7 @@ class TTimerReader(TReader):
             task = slot.task
             tags = task.tags
 
-            tslot = TSlotModel(slot.fst, slot.lst, slot.id)
+            tslot = TSlotModel(pendulum.instance(slot.fst), None, slot.id)
             ttask = TTaskModel(task.name, task.id)
             ttags = [TTagModel(tag.name, tag.id) for tag in tags]
 

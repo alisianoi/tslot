@@ -52,10 +52,7 @@ def role2str(role: Qt.ItemDataRole):
     return 'Unknown Role (Role Number Change?): ' + str(role)
 
 
-def timedelta2str(delta: datetime.timedelta) -> str:
-
-    seconds = int(delta.total_seconds())
-
+def seconds_to_str(seconds: int) -> str:
     seconds_per_minute = 60
     seconds_per_hour = 3600
 
@@ -64,6 +61,13 @@ def timedelta2str(delta: datetime.timedelta) -> str:
     ss = seconds % seconds_per_minute
 
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
+
+
+def timedelta2str(delta: datetime.timedelta) -> str:
+    return seconds_to_str(int(delta.total_seconds()))
+
+def period_to_str(prd: pendulum.Period) -> str:
+    return seconds_to_str(prd.seconds)
 
 def pendulum2str(pnd: pendulum.DateTime) -> str:
 

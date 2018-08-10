@@ -64,7 +64,6 @@ class TScrollWidget(TWidget):
 
         self.requested.emit(request)
 
-    @logged
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse):
         self.logger.info(response)

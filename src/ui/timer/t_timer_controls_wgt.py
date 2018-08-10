@@ -1,4 +1,5 @@
 import logging
+import pendulum
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -108,7 +109,6 @@ class TTimerControlsWidget(TWidget):
         name = response.entry.task.name
         prd = pendulum.now() - response.entry.slot.fst
 
-        
         self.task_ldt.setText(response.entry.task.name)
 
 

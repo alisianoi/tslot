@@ -2,8 +2,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from src.ui.base import TWidget
 
-class TTimerWidget(QWidget):
+
+class TTimerWidget(TWidget):
     """
     Keep track of a ticking timer, update label with current time
 
@@ -15,24 +17,17 @@ class TTimerWidget(QWidget):
     :param sleep: milliseconds between QTimer ticks
     """
 
-    stopped = pyqtSignal(QTime)
+    TIMER_IS_ZERO = '00:00:00'
 
-    def __init__(
-        self
-        , value : QTime=QTime(0, 0, 0, 0)
-        , sleep : int=1000
-        , parent: QWidget=None
-    ) -> None:
+    def __init__(self, parent: TWidget=None) -> None:
 
         super().__init__(parent)
 
         self.timer = QTimer(self)
-        self.value = value
-        self.sleep = sleep
 
         self.tick_lbl = QLabel()
         self.tick_lbl.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.tick_lbl.setText(value.toString())
+        self.tick_lbl.setText(TTimerWidget.TIMER_IS_ZERO)
 
         self.layout = QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -45,25 +40,35 @@ class TTimerWidget(QWidget):
 
     @pyqtSlot()
     def handle_timeout(self):
-        self.value = self.value.addSecs(1)
+        self.value = self.value.addSecs(self.sleep // 1000)
+
+        # TODO: make sure the string is well formatted, i.e. hh:mm:ss
+        self.tick_lbl.setText(self.value.toString())
+
+    def start_timer(self, value: QTime=QTime(0, 0, 0, 0), sleep: int=1000):
+        """
+        Start the timer with the given initial value and sleep interval
+
+        :param value: initial time value
+        :param sleep: sleep interval (milliseconds)
+        """
+
+        self.value = value
+        self.sleep = sleep
 
         self.tick_lbl.setText(self.value.toString())
 
-    @pyqtSlot()
-    def start_timer(self):
-        self.timer.setInterval(self.sleep)
-
+        self.timer.setInterval(sleep)
         self.timer.start()
 
-    @pyqtSlot()
     def stop_timer(self):
         self.timer.stop()
 
-        self.stopped.emit(self.value)
+        value, self.value = self.value, QTime(0, 0, 0, 0)
 
-        self.value = QTime(0, 0, 0, 0)
+        self.tick_lbl.setText(TTimerWidget.TIMER_IS_ZERO)
 
-        self.tick_lbl.setText(self.value.toString())
+        return value
 
     def setFont(self, font: QFont):
         self.tick_lbl.setFont(font)

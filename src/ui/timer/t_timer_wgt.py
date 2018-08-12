@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.ui.base import TWidget
+from src.utils import seconds_to_str
 
 
 class TTimerWidget(TWidget):
@@ -40,31 +41,29 @@ class TTimerWidget(TWidget):
 
     @pyqtSlot()
     def handle_timeout(self):
-        self.value = self.value.addSecs(self.sleep // 1000)
+        self.value += self.sleep // 1000
+        self.tick_lbl.setText(seconds_to_str(self.value))
 
-        # TODO: make sure the string is well formatted, i.e. hh:mm:ss
-        self.tick_lbl.setText(self.value.toString())
-
-    def start_timer(self, value: QTime=QTime(0, 0, 0, 0), sleep: int=1000):
+    def start_timer(self, value: int=0, sleep: int=1000):
         """
         Start the timer with the given initial value and sleep interval
 
-        :param value: initial time value
+        :param value: initial number of elapsed seconds
         :param sleep: sleep interval (milliseconds)
         """
 
         self.value = value
         self.sleep = sleep
 
-        self.tick_lbl.setText(self.value.toString())
+        self.tick_lbl.setText(seconds_to_str(self.value))
 
         self.timer.setInterval(sleep)
         self.timer.start()
 
-    def stop_timer(self):
+    def stop_timer(self) -> QTime:
         self.timer.stop()
 
-        value, self.value = self.value, QTime(0, 0, 0, 0)
+        value, self.value = self.value, 0
 
         self.tick_lbl.setText(TTimerWidget.TIMER_IS_ZERO)
 

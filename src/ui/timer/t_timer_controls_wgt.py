@@ -5,10 +5,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from src.ai.model import TSlotModel, TEntryModel
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
 from src.msg.base import TRequest, TResponse, TFailure
 from src.msg.timer import TTimerRequest, TTimerResponse
+from src.utils import seconds_to_hh_mm_ss
 
 
 class TTimerControlsWidget(TWidget):
@@ -68,9 +70,16 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.setDisabled(False)
 
-    def start_timer(self, value: QTime=QTime(0, 0, 0, 0), sleep: int=1000):
+    def start_timer(self, tdata: TEntryModel=None, sleep: int=1000) -> None:
         """
-        Start the timer with the given initial value and sleep interval
+        Start the timer
+
+        Optionally, use the provided initial value as timer offset. Also, use
+        custom timer sleep value if required. Finally, when restarting a timer
+        from the past, use its model.
+
+        Make sure that there is no other timer already running. When creating a
+        brand new timer, make sure to save it to the database.
 
         :param value: initial time value
         :param sleep: sleep interval (milliseconds)
@@ -79,14 +88,40 @@ class TTimerControlsWidget(TWidget):
         if self.timer_wgt.isActive():
             raise RuntimeError('Cannot start two timers at once')
 
+        if tdata is None:
+            value = self.start_new_timer()
+        else:
+            value = self.start_old_timer(tdata)
+
         self.timer_wgt.start_timer(value, sleep)
         self.push_btn.setText('Stop')
+
+    def start_new_timer(self) -> QTime:
+        tslot = TSlotModel(fst=pendulum.now(tz='UTC'))
+
+        self.tdata = TEntryModel(slot=tslot)
+
+        # TODO: must save this new timer to database
+
+        return 0 # zero seconds of running new timer
+
+    def start_old_timer(self, tdata: TEntryModel) -> int:
+        self.tdata = tdata
+
+        period = pendulum.now(tz='UTC') - tdata.slot.fst
+
+        # NOTE: .in_seconds() truncates microseconds
+        return period.in_seconds()
 
     def stop_timer(self):
         if not self.timer_wgt.isActive():
             raise RuntimeError('Cannot stop a stopped timer')
 
+        # NOTE: ignore the actual value
         self.timer_wgt.stop_timer()
+
+        self.tdata.slot.lst = pendulum.now(tz='UTC')
+
         self.push_btn.setText('Start')
 
     @pyqtSlot(TResponse)
@@ -103,22 +138,10 @@ class TTimerControlsWidget(TWidget):
         if self.timer_wgt.isActive():
             raise RuntimeError('Two active timers: one from DB, one from GUI')
 
+        self.task_ldt.setText(response.entry.task.name)
+
         self.push_btn.setDisabled(True)
 
-        self.tdata = response.entry
-
-        self.task_ldt.setText(self.tdata.task.name)
-
-        # TODO: time between now and the actual start of QTimer will be wasted
-        period = pendulum.now(tz='UTC') - self.tdata.slot.fst
-
-        value = QTime(
-            period.hours
-            , period.minutes
-            , period.remaining_seconds
-            , period.microseconds // 1000
-        )
-
-        self.start_timer(value)
+        self.start_timer(response.entry)
 
         self.push_btn.setDisabled(False)

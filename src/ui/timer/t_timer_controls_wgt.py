@@ -19,16 +19,7 @@ class TTimerControlsWidget(TWidget):
     its timer. Also holds a timer widget and a menu toggle button.
     """
 
-    # TRequest can be one of these in requested = pyqtSignal(TRequest):
-    # 1. TTimerRequest -- give me something to time, is there an active timer?
-    # 2. TFetchRequest -- the user started the timer, is there any previous task/tag?
-    # 3. TStoreRequest -- the user stopped the timer, please save and display?
-    # 4. THintRequest -- the user is typing something, can I suggest anything?
-
-    started = pyqtSignal()
-    stopped = pyqtSignal()
-
-    def __init__(self, parent: QWidget=None):
+    def __init__(self, parent: TWidget=None):
 
         super().__init__(parent)
 
@@ -77,23 +68,26 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.setDisabled(False)
 
-    def start_timer(self):
+    def start_timer(self, value: QTime=QTime(0, 0, 0, 0), sleep: int=1000):
+        """
+        Start the timer with the given initial value and sleep interval
+
+        :param value: initial time value
+        :param sleep: sleep interval (milliseconds)
+        """
+
         if self.timer_wgt.isActive():
-            return
+            raise RuntimeError('Cannot start two timers at once')
 
-        self.timer_wgt.start_timer()
+        self.timer_wgt.start_timer(value, sleep)
         self.push_btn.setText('Stop')
-
-        self.started.emit()
 
     def stop_timer(self):
         if not self.timer_wgt.isActive():
-            return
+            raise RuntimeError('Cannot stop a stopped timer')
 
         self.timer_wgt.stop_timer()
         self.push_btn.setText('Start')
-
-        self.stopped.emit()
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse) -> None:
@@ -104,12 +98,27 @@ class TTimerControlsWidget(TWidget):
     def handle_timer_response(self, response: TTimerResponse):
 
         if response.entry is None:
-            return
+            return # database stores no active timer, nothing to do
 
-        name = response.entry.task.name
-        prd = pendulum.now() - response.entry.slot.fst
+        if self.timer_wgt.isActive():
+            raise RuntimeError('Two active timers: one from DB, one from GUI')
 
-        self.task_ldt.setText(response.entry.task.name)
+        self.push_btn.setDisabled(True)
 
+        self.tdata = response.entry
 
-        # TODO: actually start the timer
+        self.task_ldt.setText(self.tdata.task.name)
+
+        # TODO: time between now and the actual start of QTimer will be wasted
+        period = pendulum.now(tz='UTC') - self.tdata.slot.fst
+
+        value = QTime(
+            period.hours
+            , period.minutes
+            , period.remaining_seconds
+            , period.microseconds // 1000
+        )
+
+        self.start_timer(value)
+
+        self.push_btn.setDisabled(False)

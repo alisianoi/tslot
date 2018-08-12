@@ -1,6 +1,6 @@
 from typing import List
 
-from pendulum import Date
+from pendulum import DateTime
 
 
 class TTagModel:
@@ -21,7 +21,7 @@ class TTaskModel:
 
 class TSlotModel:
 
-    def __init__(self, fst: Date, lst: Date=None, id: int=None) -> None:
+    def __init__(self, fst: DateTime, lst: DateTime=None, id: int=None) -> None:
 
         self.id = id
         self.fst = fst

@@ -1,20 +1,19 @@
 import logging
-
 from pathlib import Path
 
 from PyQt5.QtCore import *
 
 from src.ai.base import TObject
-from src.db.worker import TWorker, TReader, TWriter
 from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 from src.db.reader_for_timer import TTimerReader
-
-from src.msg.base import TRequest, TResponse, TFailure
+from src.db.worker import TReader, TWorker, TWriter
+from src.db.writer_for_timer import TTimerWriter
+from src.msg.base import TFailure, TRequest, TResponse
 from src.msg.fetch import TFetchRequest, TFetchResponse
+from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
+                                        TRaySlotWithTagFetchRequest)
 from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
-from src.msg.timer import TTimerRequest
-
+from src.msg.timer import TTimerRequest, TTimerStashRequest
 from src.utils import logged
 
 
@@ -75,6 +74,9 @@ class TVaultBroker(TObject):
         if isinstance(request, TTimerRequest):
             return self.handle_timer_request(request)
 
+        if isinstance(request, TTimerStashRequest):
+            return self.handle_timer_stash_request(request)
+
         if isinstance(request, TRaySlotFetchRequest):
             return self.handle_ray_slot_fetch(request)
 
@@ -103,6 +105,9 @@ class TVaultBroker(TObject):
 
     def handle_timer_request(self, request: TTimerRequest) -> None:
         self.dispatch_reader(TTimerReader(request, self.path, parent=self))
+
+    def handle_timer_stash_request(self, request: TTimerStashRequest) -> None:
+        self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
     @logged
     def handle_ray_slot_fetch(

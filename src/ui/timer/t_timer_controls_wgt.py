@@ -1,16 +1,13 @@
-import logging
 import pendulum
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-
-from src.ai.model import TSlotModel, TEntryModel
+from src.ai.model import TEntryModel, TSlotModel
+from src.msg.base import TResponse
+from src.msg.timer import TTimerRequest, TTimerResponse, TTimerStashRequest
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
-from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.timer import TTimerRequest, TTimerResponse
-from src.utils import seconds_to_hh_mm_ss
 
 
 class TTimerControlsWidget(TWidget):
@@ -96,12 +93,12 @@ class TTimerControlsWidget(TWidget):
         self.timer_wgt.start_timer(value, sleep)
         self.push_btn.setText('Stop')
 
-    def start_new_timer(self) -> QTime:
+    def start_new_timer(self) -> int:
         tslot = TSlotModel(fst=pendulum.now(tz='UTC'))
 
         self.tdata = TEntryModel(slot=tslot)
 
-        # TODO: must save this new timer to database
+        self.requested.emit(TTimerStashRequest(self.tdata))
 
         return 0 # zero seconds of running new timer
 
@@ -121,6 +118,8 @@ class TTimerControlsWidget(TWidget):
         self.timer_wgt.stop_timer()
 
         self.tdata.slot.lst = pendulum.now(tz='UTC')
+
+        self.requested.emit(TTimerStashRequest(self.tdata))
 
         self.push_btn.setText('Start')
 

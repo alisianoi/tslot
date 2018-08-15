@@ -48,3 +48,5 @@ class TTimerReader(TReader):
             raise RuntimeError("There should be 0 or 1 active timer")
 
         self.session.close()
+
+        self.stopped.emit()

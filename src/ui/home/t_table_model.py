@@ -14,10 +14,9 @@ class TTableModel(QAbstractTableModel):
 
         super().__init__(parent)
 
-        self.name = self.__class__.__name__
         self.logger = logging.getLogger('tslot')
 
-        self.entries = items
+        self.items = items
 
     @logged
     def headerData(
@@ -48,10 +47,10 @@ class TTableModel(QAbstractTableModel):
         elif section == 4:
             return 'Elapsed'
 
-        return 'Fix Header'
+        raise RuntimeError(f'Fix .headerDataDisplayRole: section {section}')
 
     def rowCount(self, parent: QModelIndex=QModelIndex()):
-        return len(self.entries)
+        return len(self.items)
 
     def columnCount(self, parent: QModelIndex=QModelIndex()):
         return 5
@@ -81,14 +80,13 @@ class TTableModel(QAbstractTableModel):
         if role == Qt.TextAlignmentRole:
             return self.dataTextAlignmentRole(index)
 
-        self.logger.debug('Defaulting to QVariant')
         return QVariant()
 
     def dataDisplayRole(self, index: QModelIndex=QModelIndex()):
 
         row, column = index.row(), index.column()
 
-        slot, task, tags = self.entries[row]
+        slot, task, tags = self.items[row]
 
         if column == 0:
             return task.name
@@ -105,7 +103,6 @@ class TTableModel(QAbstractTableModel):
         if column == 4:
             return timedelta2str(slot.lst - slot.fst)
 
-        self.logger.debug('Defaulting to QVariant')
         return QVariant()
 
     def dataTextAlignmentRole(self, index: QModelIndex=QModelIndex()):
@@ -113,5 +110,4 @@ class TTableModel(QAbstractTableModel):
         if index.column() == 4:
             return Qt.AlignVCenter | Qt.AlignRight
 
-        self.logger.debug('Defaulting to QVariant')
         return QVariant()

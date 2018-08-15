@@ -1,9 +1,11 @@
+import datetime
 import logging.config
 
-import datetime
 import pendulum
 
+from typing import List
 from functools import wraps
+
 from PyQt5.QtCore import *
 
 
@@ -52,18 +54,28 @@ def role2str(role: Qt.ItemDataRole):
     return 'Unknown Role (Role Number Change?): ' + str(role)
 
 
-def timedelta2str(delta: datetime.timedelta) -> str:
+def seconds_to_hh_mm_ss(seconds: int) -> List[int]:
+    SECONDS_PER_HOUR = 3600
+    SECONDS_PER_MINUTE = 60
 
-    seconds = int(delta.total_seconds())
+    hh = seconds // SECONDS_PER_HOUR
+    mm = seconds % SECONDS_PER_HOUR // SECONDS_PER_MINUTE
+    ss = seconds % SECONDS_PER_MINUTE
 
-    seconds_per_minute = 60
-    seconds_per_hour = 3600
+    return [hh, mm, ss]
 
-    hh = seconds // seconds_per_hour
-    mm = seconds % seconds_per_hour // seconds_per_minute
-    ss = seconds % seconds_per_minute
+
+def seconds_to_str(seconds: int) -> str:
+    hh, mm, ss = seconds_to_hh_mm_ss(seconds)
 
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
+
+
+def timedelta2str(delta: datetime.timedelta) -> str:
+    return seconds_to_str(int(delta.total_seconds()))
+
+def period_to_str(prd: pendulum.Period) -> str:
+    return seconds_to_str(prd.seconds)
 
 def pendulum2str(pnd: pendulum.DateTime) -> str:
 

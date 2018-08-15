@@ -78,7 +78,7 @@ class TWorker(QObject):
 
 
 class TReader(TWorker):
-    """Provide the base class for all different database readers"""
+    """Provide base class for all different database readers"""
 
     fetched = pyqtSignal(TFetchResponse)
 
@@ -101,11 +101,8 @@ class TReader(TWorker):
 
         self.request = request
 
-# TODO: the TWriter is under construction (i.e. missing write requests, etc.)
 class TWriter(TWorker):
-    """
-    Provides the base class for all different database writers
-    """
+    """Provides the base class for all different database writers"""
 
     stashed = pyqtSignal(TStashResponse)
 

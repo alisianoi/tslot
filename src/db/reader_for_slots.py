@@ -17,9 +17,7 @@ from src.db.model import SlotModel, TaskModel, TagModel
 
 
 class TSlotReader(TReader):
-    """
-    Provides the base class for all different *SlotReader classes
-    """
+    """Provide base class for all *SlotReader classes"""
 
     def __init__(
         self
@@ -141,6 +139,8 @@ class TRaySlotReader(TSlotReader):
         if self.session is None:
             self.session = self.create_session()
 
+        # First, filter out the right number of dates that are either before or
+        # after the given date offset. Sort and store these dates to use later.
         DateLimitQuery = self.session.query(
             func.DATE(SlotModel.fst).label('fst_date')
         ).filter(
@@ -151,8 +151,12 @@ class TRaySlotReader(TSlotReader):
             self.slice_fst, self.slice_lst
         ).subquery('DateLimitQuery')
 
+        # Given the right number of dates, filter out all the slots that were
+        # recorded on those dates.
         RayDateQuery = self.session.query(
             SlotModel, TaskModel
+        ).filter(
+            SlotModel.lst != None
         ).filter(
             func.DATE(SlotModel.fst) == DateLimitQuery.c.fst_date
             , SlotModel.task_id == TaskModel.id
@@ -216,6 +220,8 @@ class TRaySlotWithTagReader(TSlotReader):
         DateLimitQuery = self.session.query(
             func.DATE(SlotModel.fst).label('fst_date')
         ).filter(
+            SlotModel.lst != None
+        ).filter(
             key(SlotModel.fst, self.dt_offset)
         ).order_by(
             dates_order
@@ -225,6 +231,8 @@ class TRaySlotWithTagReader(TSlotReader):
 
         RayDateQuery = self.session.query(
             SlotModel, TaskModel, TagModel
+        ).filter(
+            SlotModel.lst != None
         ).filter(
             func.DATE(SlotModel.fst) == DateLimitQuery.c.fst_date
             , SlotModel.task_id == TaskModel.id
@@ -242,7 +250,9 @@ class TRaySlotWithTagReader(TSlotReader):
         self.logger.debug(result)
 
         self.fetched.emit(
-            TRaySlotWithTagFetchResponseFactory.from_request(items=result, request=self.request)
+            TRaySlotWithTagFetchResponseFactory.from_request(
+                items=result, request=self.request
+            )
         )
 
         self.session.close()

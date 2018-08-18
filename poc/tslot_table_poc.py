@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import sys
+from pathlib import Path
 
 from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
                           QAbstractTableModel, QModelIndex, QObject, QSize,
-                          QStringListModel, Qt, QVariant)
+                          QStringListModel, Qt, QVariant, pyqtSlot)
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QCompleter, QHBoxLayout, QLineEdit,
                              QMainWindow, QPushButton, QTableView, QVBoxLayout,
                              QWidget)
@@ -52,10 +54,8 @@ class TTimerLineEdit(QLineEdit):
 
         super().__init__(parent)
 
-        self.setPlaceholderText('Your current task')
-        self.setClearButtonEnabled(True)
-
         self.setFrame(False)
+        self.setPlaceholderText('Your current task')
 
 
 class TTimerPushButton(QPushButton):
@@ -69,22 +69,50 @@ class TTimerView(QWidget):
 
         super().__init__(parent)
 
+        self.active = False
+
+        fontawesome_svgs_solid = Path(
+            Path.cwd(), '..', 'font', 'fontawesome', 'svgs', 'solid'
+        ).resolve()
+
+        self.svg_play = QIcon(str(Path(fontawesome_svgs_solid, 'play.svg')))
+        self.svg_stop = QIcon(str(Path(fontawesome_svgs_solid, 'stop.svg')))
+
         self.timer_mdl = TTimerListModel(self)
         self.timer_cmp = TTimerCompleter(self.timer_mdl)
-
         self.timer_cmp.setModel(self.timer_mdl)
 
         self.timer_ldt = TTimerLineEdit(self)
-        self.timer_btn = TTimerPushButton(self)
-
+        self.timer_ldt.setMinimumHeight(64)
+        self.timer_ldt.setFont(QFont('Quicksand-Medium', 12))
         self.timer_ldt.setCompleter(self.timer_cmp)
 
+        self.timer_btn = TTimerPushButton(self)
+        self.timer_btn.setIcon(self.svg_play)
+        self.timer_btn.setMinimumSize(64, 64)
+        self.timer_btn.setFlat(True)
+
         self.layout = QHBoxLayout()
+
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
 
         self.layout.addWidget(self.timer_ldt)
         self.layout.addWidget(self.timer_btn)
 
         self.setLayout(self.layout)
+
+        self.timer_btn.clicked.connect(self.handle_timer_btn_clicked)
+
+    @pyqtSlot()
+    def handle_timer_btn_clicked(self):
+
+        if self.active:
+            self.active = False
+            self.timer_btn.setIcon(self.svg_play)
+        else:
+            self.active = True
+            self.timer_btn.setIcon(self.svg_stop)
 
 
 class TTableModel(QAbstractTableModel):

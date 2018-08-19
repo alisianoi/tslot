@@ -6,10 +6,42 @@ from pathlib import Path
 from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
                           QAbstractTableModel, QModelIndex, QObject, QSize,
                           QStringListModel, Qt, QVariant, pyqtSlot)
-from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import (QApplication, QCompleter, QHBoxLayout, QLineEdit,
-                             QMainWindow, QPushButton, QTableView, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtGui import QFont, QIcon, QPainter
+from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
+                             QApplication, QCompleter, QHBoxLayout, QLineEdit,
+                             QMainWindow, QPushButton, QStyleOptionViewItem,
+                             QTableView, QVBoxLayout, QWidget)
+
+
+class TTimerPopupDelegate(QAbstractItemDelegate):
+
+    def paint(
+        self
+        , painter: QPainter
+        , option: QStyleOptionViewItem
+        , index: QModelIndex
+    ) -> None:
+
+        super().paint(painter, option, index)
+
+
+class TTimerPopupView(QAbstractItemView):
+
+    def __init__(self, parent: QWidget=None):
+
+        super().__init__(parent)
+
+        self.timer_delegate = TTimerPopupDelegate(self)
+
+        self.setItemDelegate(self.timer_delegate)
+
+    def verticalOffset(self):
+
+        return 16 # random number
+
+    def horizontalOffset(self):
+
+        return 16 # random number
 
 
 class TTimerListModel(QAbstractListModel):
@@ -79,8 +111,10 @@ class TTimerView(QWidget):
         self.svg_stop = QIcon(str(Path(fontawesome_svgs_solid, 'stop.svg')))
 
         self.timer_mdl = TTimerListModel(self)
+        self.timer_pop = TTimerPopupView(self)
         self.timer_cmp = TTimerCompleter(self.timer_mdl)
         self.timer_cmp.setModel(self.timer_mdl)
+        self.timer_cmp.setPopup(self.timer_pop)
 
         self.timer_ldt = TTimerLineEdit(self)
         self.timer_ldt.setMinimumHeight(64)

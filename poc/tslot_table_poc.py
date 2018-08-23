@@ -9,8 +9,66 @@ from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
 from PyQt5.QtGui import QFont, QIcon, QPainter
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QApplication, QCompleter, QHBoxLayout, QLineEdit,
-                             QMainWindow, QPushButton, QStyleOptionViewItem,
-                             QTableView, QVBoxLayout, QWidget)
+                             QMainWindow, QPushButton, QStyledItemDelegate,
+                             QStyleOptionViewItem, QTableView, QVBoxLayout,
+                             QWidget)
+
+
+class TypographyService:
+
+    instances = 0
+
+    def __init__(self):
+
+        TypographyService.instances += 1
+
+        self.font_path = Path(Path.cwd(), '..', 'font').resolve()
+
+        self.fontawesome_svgs_solid = Path(
+            Path.cwd(), '..', 'font', 'fontawesome', 'svgs', 'solid'
+        ).resolve()
+
+        self.quicksand_path = Path(self.font_path, 'Quicksand')
+        self.quicksand_medium = Path(
+            self.quicksand_path, 'Quicksand-Medium.ttf'
+        )
+        self.quicksand_regular = Path(
+            self.quicksand_path, 'Quicksand-Regular.ttf'
+        )
+
+        self.supported_fonts = {
+            'Quicksand-Medium' : self.quicksand_medium
+            , 'Quicksand-Regular': self.quicksand_regular
+        }
+
+        self.supported_icons = {
+            'Fontawesome-Solid': self.fontawesome_svgs_solid
+        }
+
+    def font(self, family: str, size: int) -> QFont:
+
+        try:
+            return QFont(str(self.supported_fonts[family]), size)
+        except KeyError:
+            print(f'No such font: {family}, {size}')
+            return QFont()
+
+    def icon(self, family: str, name: str) -> QIcon:
+        '''
+        Return a QIcon that uses the provided font family and icon name
+
+        :param family: the font family to use
+        :param icon: the icon name
+        '''
+
+        try:
+            return QIcon(str(Path(self.supported_icons[family], name)))
+        except KeyError:
+            print(f'No such icon: {family}, {name}')
+            return QIcon()
+
+
+Typography = TypographyService()
 
 
 class TTimerPopupDelegate(QAbstractItemDelegate):
@@ -103,12 +161,8 @@ class TTimerView(QWidget):
 
         self.active = False
 
-        fontawesome_svgs_solid = Path(
-            Path.cwd(), '..', 'font', 'fontawesome', 'svgs', 'solid'
-        ).resolve()
-
-        self.svg_play = QIcon(str(Path(fontawesome_svgs_solid, 'play.svg')))
-        self.svg_stop = QIcon(str(Path(fontawesome_svgs_solid, 'stop.svg')))
+        self.svg_play = Typography.icon('Fontawesome-Solid', 'play.svg')
+        self.svg_stop = Typography.icon('Fontawesome-Solid', 'stop.svg')
 
         self.timer_mdl = TTimerListModel(self)
         self.timer_pop = TTimerPopupView(self)
@@ -118,7 +172,7 @@ class TTimerView(QWidget):
 
         self.timer_ldt = TTimerLineEdit(self)
         self.timer_ldt.setMinimumHeight(64)
-        self.timer_ldt.setFont(QFont('Quicksand-Medium', 12))
+        self.timer_ldt.setFont(Typography.font('Quicksand-Medium', 12))
         self.timer_ldt.setCompleter(self.timer_cmp)
 
         self.timer_btn = TTimerPushButton(self)
@@ -149,6 +203,63 @@ class TTimerView(QWidget):
             self.timer_btn.setIcon(self.svg_stop)
 
 
+class TTableDelegate(QStyledItemDelegate):
+
+    def createEditor(
+        self
+        , parent : QWidget
+        , options: QStyleOptionViewItem
+        , index  : QModelIndex
+    ) -> QWidget:
+
+        print('.createEditor():')
+
+        return super().createEditor(parent, options, index)
+
+    def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
+
+        print('.setEditorData():')
+        super().setEditorData(editor, index)
+
+    def setModelData(
+        self
+        , editor: QWidget
+        , model : QAbstractItemModel
+        , index : QModelIndex
+    ) -> None:
+
+        print('.setModelData():')
+        super().setModelData(editor, model, index)
+
+    def updateEditorGeometry(
+        self
+        , parent : QWidget
+        , options: QStyleOptionViewItem
+        , index  : QModelIndex
+    ) -> QWidget:
+
+        print('.updateEditorGeometry():')
+        super().updateEditorGeometry(parent, options, index)
+
+    # from the stars tutorial:
+
+    def paint(
+        self
+        , painter: QPainter
+        , option : QStyleOptionViewItem
+        , index  : QModelIndex
+    ) -> None:
+
+        super().paint(painter, option, index)
+
+    def sizeHint(
+        self
+        , option: QStyleOptionViewItem
+        , index : QModelIndex
+    ) -> QSize:
+
+        return super().sizeHint(option, index)
+
 class TTableModel(QAbstractTableModel):
 
     def __init__(self, parent: QObject=None):
@@ -156,25 +267,58 @@ class TTableModel(QAbstractTableModel):
         super().__init__(parent)
 
         self.tdata = [
-              ['row0, col0 (expanding)', 'row0, col1 (expanding)', 'row0, col2']
-            , ['row1, col0 (expanding)', 'row1, col1 (expanding)', 'row1, col2']
-            , ['row2, col0 (expanding)', 'row2, col1 (expanding)', 'row2, col2']
+              ['Hello', 'world']
+              , ['Fish', 'Chips']
         ]
 
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+
+        return Qt.ItemIsEditable | super().flags(index)
+
     def rowCount(self, parent: QModelIndex=None):
-        return 2
+        return len(self.tdata)
 
     def columnCount(self, parent: QModelIndex=None):
-        return 2
+        return len(self.tdata[0]) if self.tdata[0] else 0
 
     def data(self, index: QModelIndex=None, role: int=Qt.DisplayRole):
 
+        if not index.isValid():
+            return QVariant()
+
+        if role == Qt.DisplayRole:
+            return self.tdata[index.row()][index.column()]
+        if role == Qt.FontRole:
+            return Typography.font('Quicksand-Medium', 12)
+
         return QVariant()
 
+    def setData(
+        self
+        , index: QModelIndex
+        , value: QVariant
+        , role : int=Qt.EditRole
+    ) -> bool:
+
+        if role != Qt.EditRole:
+            return False
+
+        self.tdata[index.row()][index.column()] = value
+
+        return True
 
 class TTableView(QTableView):
 
-    pass
+    def __init__(self, parent: QWidget=None):
+
+        super().__init__(parent)
+
+        self.table_delegate = TTableDelegate(self)
+
+        self.setItemDelegate(self.table_delegate)
+
+        # self.verticalHeader().hide()
+        # self.horizontalHeader().hide()
 
 
 class TCentralWidget(QWidget):

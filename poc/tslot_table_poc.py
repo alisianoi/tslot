@@ -154,6 +154,9 @@ class TTimerPushButton(QPushButton):
 
 
 class TTimerView(QWidget):
+    '''
+    Combine a timer line edit with a timer push button and current timer value
+    '''
 
     def __init__(self, parent: QWidget=None):
 
@@ -212,34 +215,36 @@ class TTableDelegate(QStyledItemDelegate):
         , index  : QModelIndex
     ) -> QWidget:
 
-        print('.createEditor():')
+        editor = QLineEdit(parent)
+        editor.setText(index.data())
+        editor.setFont(Typography.font('Quicksand-Medium', 12))
 
-        return super().createEditor(parent, options, index)
+        return editor
+
+        # return super().createEditor(parent, options, index)
 
     def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
 
-        print('.setEditorData():')
-        super().setEditorData(editor, index)
+        print(f'index')
+        editor.setText(index.data())
 
-    def setModelData(
-        self
-        , editor: QWidget
-        , model : QAbstractItemModel
-        , index : QModelIndex
-    ) -> None:
+    # def setModelData(
+    #     self
+    #     , editor: QWidget
+    #     , model : QAbstractItemModel
+    #     , index : QModelIndex
+    # ) -> None:
+    #
+    #     super().setModelData(editor, model, index)
 
-        print('.setModelData():')
-        super().setModelData(editor, model, index)
-
-    def updateEditorGeometry(
-        self
-        , parent : QWidget
-        , options: QStyleOptionViewItem
-        , index  : QModelIndex
-    ) -> QWidget:
-
-        print('.updateEditorGeometry():')
-        super().updateEditorGeometry(parent, options, index)
+    # def updateEditorGeometry(
+    #     self
+    #     , parent : QWidget
+    #     , options: QStyleOptionViewItem
+    #     , index  : QModelIndex
+    # ) -> QWidget:
+    #
+    #     super().updateEditorGeometry(parent, options, index)
 
     # from the stars tutorial:
 

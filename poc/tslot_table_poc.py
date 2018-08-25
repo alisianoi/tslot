@@ -2,13 +2,15 @@
 
 import sys
 from pathlib import Path
+from typing import Any
 
 from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
-                          QAbstractTableModel, QModelIndex, QObject, QSize,
-                          QStringListModel, Qt, QVariant, pyqtSlot)
+                          QAbstractTableModel, QLocale, QModelIndex, QObject,
+                          QSize, QStringListModel, Qt, QVariant, pyqtSlot)
 from PyQt5.QtGui import QFont, QIcon, QPainter
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
-                             QApplication, QCompleter, QHBoxLayout, QLineEdit,
+                             QApplication, QCompleter, QFrame, QHBoxLayout,
+                             QItemEditorFactory, QLineEdit, QListView,
                              QMainWindow, QPushButton, QStyledItemDelegate,
                              QStyleOptionViewItem, QTableView, QVBoxLayout,
                              QWidget)
@@ -71,35 +73,93 @@ class TypographyService:
 Typography = TypographyService()
 
 
-class TTimerPopupDelegate(QAbstractItemDelegate):
+class TTimerPopupDelegate(QStyledItemDelegate):
+
+    def __init__(self, parent: QWidget=None):
+
+        print('delegate.__init__')
+
+        super().__init__(parent)
+
+    def itemEditorFactory() -> QItemEditorFactory:
+
+        print('delegate.itemEditorFactory')
+
+        return super().itemEditorFactory()
+
+    def setItemEditorFactory(self, factory: QItemEditorFactory) -> None:
+
+        print('delegate.setItemEditorFactory')
+
+        super().setItemEditorFactory(factory)
 
     def paint(
         self
         , painter: QPainter
-        , option: QStyleOptionViewItem
-        , index: QModelIndex
+        , option : QStyleOptionViewItem
+        , index  : QModelIndex
     ) -> None:
+
+        print('delegate.paint()')
 
         super().paint(painter, option, index)
 
+    def sizeHint(
+        self
+        , option: QStyleOptionViewItem
+        , index : QModelIndex
+    ) -> QSize:
 
-class TTimerPopupView(QAbstractItemView):
+        size = super().sizeHint(option, index)
+
+        return QSize(size.width(), 64)
+        # return super().sizeHint(option, index)
+
+    def createEditor(
+        self
+        , parent : QWidget
+        , options: QStyleOptionViewItem
+        , index  : QModelIndex
+    ) -> QWidget:
+
+        print('delegate.createEditor')
+
+        editor = QLineEdit(parent)
+        editor.setText(index.data())
+        editor.setFont(Typography.font('Quicksand-Medium', 12))
+
+        return editor
+
+    def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
+
+        print(f'delegate.setEditorData')
+
+        editor.setText(index.data())
+
+    def setModelData(self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex) -> None:
+
+        print('delegate.setModelData')
+
+        super().setModelData(editor, model, index)
+
+    def updateEditorGeometry(self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> None:
+
+        print('delegate.updateEditorGeometry')
+
+        super().updateEditorGeometry(editor, option, index)
+
+
+class TTimerPopupView(QListView):
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
         self.timer_delegate = TTimerPopupDelegate(self)
+        self.setItemDelegateForColumn(0, self.timer_delegate)
 
-        self.setItemDelegate(self.timer_delegate)
-
-    def verticalOffset(self):
-
-        return 16 # random number
-
-    def horizontalOffset(self):
-
-        return 16 # random number
+        self.setFont(Typography.font('Quicksand-Medium', 12))
+        self.setFrameStyle(QFrame.NoFrame)
 
 
 class TTimerListModel(QAbstractListModel):
@@ -137,6 +197,10 @@ class TTimerCompleter(QCompleter):
 
         super().__init__(parent)
 
+        self.popup_view = TTimerPopupView()
+
+        self.setPopup(self.popup_view)
+
 
 class TTimerLineEdit(QLineEdit):
 
@@ -168,10 +232,8 @@ class TTimerView(QWidget):
         self.svg_stop = Typography.icon('Fontawesome-Solid', 'stop.svg')
 
         self.timer_mdl = TTimerListModel(self)
-        self.timer_pop = TTimerPopupView(self)
-        self.timer_cmp = TTimerCompleter(self.timer_mdl)
+        self.timer_cmp = TTimerCompleter(self)
         self.timer_cmp.setModel(self.timer_mdl)
-        self.timer_cmp.setPopup(self.timer_pop)
 
         self.timer_ldt = TTimerLineEdit(self)
         self.timer_ldt.setMinimumHeight(64)
@@ -221,11 +283,8 @@ class TTableDelegate(QStyledItemDelegate):
 
         return editor
 
-        # return super().createEditor(parent, options, index)
-
     def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
 
-        print(f'index')
         editor.setText(index.data())
 
     # def setModelData(
@@ -246,8 +305,6 @@ class TTableDelegate(QStyledItemDelegate):
     #
     #     super().updateEditorGeometry(parent, options, index)
 
-    # from the stars tutorial:
-
     def paint(
         self
         , painter: QPainter
@@ -262,6 +319,8 @@ class TTableDelegate(QStyledItemDelegate):
         , option: QStyleOptionViewItem
         , index : QModelIndex
     ) -> QSize:
+
+        print('table delegate: sizeHint')
 
         return super().sizeHint(option, index)
 

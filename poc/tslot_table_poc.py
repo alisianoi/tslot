@@ -427,18 +427,18 @@ class TTableModel(QAbstractTableModel):
         super().__init__(parent)
 
         self.tdata = [
-            # [
-            #     'Far From the Madding Crowd'
-            #     , datetime(2018, 9, 25, 13, 42, 18)
-            #     , datetime(2018, 9, 25, 13, 48, 29)
-            #     , ['read', 'relax']
-            # ]
-            # , [
-            #     'Crime and Punishment'
-            #     , datetime(2018, 9, 25, 10, 11, 37)
-            #     , datetime(2018, 9, 25, 12, 12, 56)
-            #     , ['read', 'tense']
-            # ]
+            [
+                'Far From the Madding Crowd'
+                , datetime(2018, 9, 25, 13, 42, 18)
+                , datetime(2018, 9, 25, 13, 48, 29)
+                , ['read', 'relax']
+            ]
+            , [
+                'Crime and Punishment'
+                , datetime(2018, 9, 25, 10, 11, 37)
+                , datetime(2018, 9, 25, 12, 12, 56)
+                , ['read', 'tense']
+            ]
         ]
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -644,6 +644,7 @@ class TCentralWidget(QWidget):
 
         self.layout = QVBoxLayout()
 
+        self.layout.addSpacing(64)
         self.layout.addWidget(self.timer_view)
         self.layout.addSpacing(64)
         self.layout.addWidget(self.table_view)

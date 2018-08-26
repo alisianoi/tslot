@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+import logging.config
 import sys
 from functools import wraps
 from pathlib import Path
@@ -20,7 +21,7 @@ from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QTableView, QTimeEdit, QVBoxLayout, QWidget)
 
 
-def logged(foo, logger=logging.getLogger('tslot')):
+def logged(foo, logger=logging.getLogger('poc')):
     '''
     Decorate a function and surround its call with enter/leave logs
 
@@ -36,7 +37,7 @@ def logged(foo, logger=logging.getLogger('tslot')):
 
         result = foo(*args, **kwargs)
 
-        logger.warning(f'leave {foo.__qualname__} ({result})')
+        logger.debug(f'leave {foo.__qualname__} ({result})')
 
         return result
 
@@ -64,6 +65,7 @@ class TypographyService:
 
     instances = 0
 
+    @logged
     def __init__(self):
 
         TypographyService.instances += 1
@@ -119,9 +121,8 @@ Typography = TypographyService()
 
 class TTimerPopupDelegate(QStyledItemDelegate):
 
+    @logged
     def __init__(self, parent: QWidget=None):
-
-        print('delegate.__init__')
 
         super().__init__(parent)
 
@@ -195,6 +196,7 @@ class TTimerPopupDelegate(QStyledItemDelegate):
 
 class TTimerPopupView(QListView):
 
+    @logged
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
@@ -208,6 +210,7 @@ class TTimerPopupView(QListView):
 
 class TTimerListModel(QAbstractListModel):
 
+    @logged
     def __init__(self, parent: QObject=None) -> None:
 
         super().__init__(parent)
@@ -237,6 +240,7 @@ class TTimerListModel(QAbstractListModel):
 
 class TTimerCompleter(QCompleter):
 
+    @logged
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
@@ -248,6 +252,7 @@ class TTimerCompleter(QCompleter):
 
 class TTimerLineEdit(QLineEdit):
 
+    @logged
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
@@ -266,6 +271,7 @@ class TTimerView(QWidget):
     Combine a timer line edit with a timer push button and current timer value
     '''
 
+    @logged
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
@@ -314,13 +320,11 @@ class TTimerView(QWidget):
 
 class TTimerTableTimeValidator(QValidator):
 
+    @logged
     def __init__(self, parent: QObject=None) -> None:
-
-        print('validator.__init__')
 
         super().__init__(parent)
 
-    @logged
     def validate(
         self
         , input: str
@@ -417,23 +421,24 @@ class TTableDelegate(QStyledItemDelegate):
 
 class TTableModel(QAbstractTableModel):
 
+    @logged
     def __init__(self, parent: QObject=None):
 
         super().__init__(parent)
 
         self.tdata = [
-            [
-                'Far From the Madding Crowd'
-                , datetime(2018, 9, 25, 13, 42, 18)
-                , datetime(2018, 9, 25, 13, 48, 29)
-                , ['read', 'relax']
-            ]
-            , [
-                'Crime and Punishment'
-                , datetime(2018, 9, 25, 10, 11, 37)
-                , datetime(2018, 9, 25, 12, 12, 56)
-                , ['read', 'tense']
-            ]
+            # [
+            #     'Far From the Madding Crowd'
+            #     , datetime(2018, 9, 25, 13, 42, 18)
+            #     , datetime(2018, 9, 25, 13, 48, 29)
+            #     , ['read', 'relax']
+            # ]
+            # , [
+            #     'Crime and Punishment'
+            #     , datetime(2018, 9, 25, 10, 11, 37)
+            #     , datetime(2018, 9, 25, 12, 12, 56)
+            #     , ['read', 'tense']
+            # ]
         ]
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -450,6 +455,7 @@ class TTableModel(QAbstractTableModel):
             return 0
         return 4
 
+    @logged
     def data(
         self
         , index: QModelIndex=None
@@ -514,6 +520,7 @@ class TTableHeaderView(QHeaderView):
         https://stackoverflow.com/q/48361795/1269892
     '''
 
+    @logged
     def __init__(
             self
             , orientation: Qt.Orientation=Qt.Horizontal
@@ -530,6 +537,8 @@ class TTableHeaderView(QHeaderView):
             , QHeaderView.ResizeToContents # elapsed time
         ]
 
+        self.setFrameShape(QFrame.NoFrame)
+
     @logged
     def setModel(self, model: QAbstractItemModel=None):
         '''
@@ -538,13 +547,19 @@ class TTableHeaderView(QHeaderView):
         Fine-grained resizing of individual sections requires calling
         setSectionResizeMode which works only when you've set the model.
         '''
+
         if model is None:
             raise RuntimeError('Must provide a model')
 
         super().setModel(model)
 
-        if model.columnCount() != self.count():
-            raise RuntimeError('model.columnCount() != self.count()')
+        if self.count() == 0:
+            return # if the model is empty, nothing to adjust
+
+        if self.count() != model.columnCount():
+            raise RuntimeError('self.count() != model.columnCount()')
+        if self.count() != len(self.section_resize_modes):
+            raise RuntimeError('self.count() != len(self.section_resize_modes)')
 
         # The loop below is the only reason why this method exists
         for i, mode in enumerate(self.section_resize_modes):
@@ -553,11 +568,13 @@ class TTableHeaderView(QHeaderView):
 
 class TTableView(QTableView):
 
+    @logged
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
 
-        self.table_delegate = TTableDelegate(self)
+        self.table_dgt = TTableDelegate(self)
+        self.table_hdr = TTableHeaderView(Qt.Horizontal, self)
 
         # self.setItemDelegate(self.table_delegate)
 
@@ -565,23 +582,39 @@ class TTableView(QTableView):
 
         # self.setShowGrid(False)
 
+        self.setFrameShape(QFrame.NoFrame)
         self.verticalHeader().hide()
         self.horizontalHeader().hide()
 
+    @logged
     def setModel(self, model: QAbstractItemModel):
 
         super().setModel(model)
 
-        # The code below is the reason why this method is overwritten
-        # It creates a brand new header view, installs and triggers it
-        self.table_header = TTableHeaderView(
-            orientation=Qt.Horizontal, parent=self
-        )
-
-        self.setHorizontalHeader(self.table_header)
-
-        self.table_header.setModel(model)
+        self.table_hdr.setModel(model)
+        self.setHorizontalHeader(self.table_hdr)
         self.horizontalHeader().hide()
+
+    @logged
+    def sizeHint(self):
+        '''
+        Adjust the size of the table to the number of rows it currently holds
+        '''
+
+        size_hint = super().sizeHint()
+
+        vheader = self.verticalHeader()
+
+        height = 0 if vheader.isHidden() else vheader.height()
+
+        for i in range(vheader.count()):
+            if not vheader.isSectionHidden(i):
+                height += vheader.sectionSize(i)
+
+        return QSize(size_hint.width(), height)
+
+    def minimumSizeHint(self):
+        return self.sizeHint()
 
 
 class TTimerTable(QWidget):
@@ -589,6 +622,7 @@ class TTimerTable(QWidget):
     Combine a table of time slots and a header with date and total time
     '''
 
+    @logged
     def __init__(self, parent: QWidget=None) -> None:
 
         super().__init__(parent)
@@ -596,6 +630,7 @@ class TTimerTable(QWidget):
 
 class TCentralWidget(QWidget):
 
+    @logged
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
@@ -620,6 +655,7 @@ class TCentralWidget(QWidget):
 
 class TMainWindow(QMainWindow):
 
+    @logged
     def __init__(self):
         super().__init__()
 
@@ -627,6 +663,42 @@ class TMainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
 if __name__ == '__main__':
+
+    logging.config.dictConfig({
+        'version': 1,
+        'formatters': {
+            'verbose': {
+                'format': '%(asctime)22s %(levelname)7s %(module)10s %(process)6d %(thread)15d %(message)s'
+            }
+            , 'simple': {
+                'format': '%(levelname)s %(message)s'
+            }
+        }
+        , 'handlers': {
+            'console': {
+                'level': 'DEBUG'
+                , 'class': 'logging.StreamHandler'
+                , 'formatter': 'verbose'
+            }
+            #, 'file': {
+            #     'level': 'DEBUG'
+            #     , 'class': 'logging.handlers.RotatingFileHandler'
+            #     , 'formatter': 'verbose'
+            #     , 'filename': 'tslot.log'
+            #     , 'maxBytes': 10485760 # 10 MiB
+            #     , 'backupCount': 3
+            # }
+        },
+        'loggers': {
+            'poc': {
+                'handlers': ['console']
+                , 'level': 'DEBUG',
+            }
+        }
+    })
+
+    logger = logging.getLogger('poc')
+    logger.debug('PoC logger up and running')
 
     app = QApplication(sys.argv)
 

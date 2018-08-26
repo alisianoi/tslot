@@ -1,19 +1,63 @@
 #!/usr/bin/env python
 
+import logging
 import sys
+from functools import wraps
 from pathlib import Path
-from typing import Any
+from typing import Any, List, Tuple
 
+from pendulum import datetime
 from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
                           QAbstractTableModel, QLocale, QModelIndex, QObject,
-                          QSize, QStringListModel, Qt, QVariant, pyqtSlot)
-from PyQt5.QtGui import QFont, QIcon, QPainter
+                          QSize, QStringListModel, Qt, QTime, QVariant,
+                          pyqtSlot)
+from PyQt5.QtGui import QFont, QIcon, QPainter, QValidator
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QApplication, QCompleter, QFrame, QHBoxLayout,
                              QItemEditorFactory, QLineEdit, QListView,
                              QMainWindow, QPushButton, QStyledItemDelegate,
-                             QStyleOptionViewItem, QTableView, QVBoxLayout,
-                             QWidget)
+                             QStyleOptionViewItem, QTableView, QTimeEdit,
+                             QVBoxLayout, QWidget)
+
+
+def logged(foo, logger=logging.getLogger('tslot')):
+    '''
+    Decorate a function and surround its call with enter/leave logs
+
+    Produces logging output of the form:
+    > enter foo
+      ...
+    > leave foo (returned value)
+    '''
+
+    @wraps(foo)
+    def wrapper(*args, **kwargs):
+        logger.debug(f'enter {foo.__qualname__}')
+
+        result = foo(*args, **kwargs)
+
+        logger.warning(f'leave {foo.__qualname__} ({result})')
+
+        return result
+
+    return wrapper
+
+
+def seconds_to_hh_mm_ss(seconds: int) -> List[int]:
+    SECONDS_PER_HOUR = 3600
+    SECONDS_PER_MINUTE = 60
+
+    hh = seconds // SECONDS_PER_HOUR
+    mm = seconds % SECONDS_PER_HOUR // SECONDS_PER_MINUTE
+    ss = seconds % SECONDS_PER_MINUTE
+
+    return [hh, mm, ss]
+
+
+def seconds_to_str(seconds: int) -> str:
+    hh, mm, ss = seconds_to_hh_mm_ss(seconds)
+
+    return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
 
 class TypographyService:
@@ -268,6 +312,41 @@ class TTimerView(QWidget):
             self.timer_btn.setIcon(self.svg_stop)
 
 
+class TTimerTableTimeValidator(QValidator):
+
+    def __init__(self, parent: QObject=None) -> None:
+
+        print('validator.__init__')
+
+        super().__init__(parent)
+
+    @logged
+    def validate(
+        self
+        , input: str
+        , pos  : int
+    ) -> Tuple[QValidator.State, str, int]:
+
+        print(f'validator.validate({input}, {pos})')
+
+        values = input.split(':')
+
+        if len(values) != 2:
+            return (QValidator.Intermediate, input, pos)
+
+        hour, minute = values
+
+        try:
+            hour, minute = int(hour), int(minute)
+        except ValueError:
+            return (QValidator.Invalid, input, pos)
+
+        if hour not in range(0, 24) or minute not in range(0, 60):
+            return (QValidator.Invalid, input, pos)
+
+        return (QValidator.Acceptable, input, pos)
+
+
 class TTableDelegate(QStyledItemDelegate):
 
     def createEditor(
@@ -277,15 +356,26 @@ class TTableDelegate(QStyledItemDelegate):
         , index  : QModelIndex
     ) -> QWidget:
 
-        editor = QLineEdit(parent)
-        editor.setText(index.data())
-        editor.setFont(Typography.font('Quicksand-Medium', 12))
+        col = index.column()
+
+        if col in range(0, 4):
+            editor = QLineEdit(parent)
+            editor.setText(index.data())
+            editor.setFont(Typography.font('Quicksand-Medium', 12))
+        else:
+            raise RuntimeError('createEditor')
+
+        if col in range(1, 3):
+            editor.setValidator(TTimerTableTimeValidator(editor))
 
         return editor
 
     def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
 
-        editor.setText(index.data())
+        if index.column() in range(0, 4):
+            editor.setText(index.data())
+        else:
+            raise RuntimeError('setEditorData')
 
     # def setModelData(
     #     self
@@ -324,6 +414,7 @@ class TTableDelegate(QStyledItemDelegate):
 
         return super().sizeHint(option, index)
 
+
 class TTableModel(QAbstractTableModel):
 
     def __init__(self, parent: QObject=None):
@@ -331,8 +422,18 @@ class TTableModel(QAbstractTableModel):
         super().__init__(parent)
 
         self.tdata = [
-              ['Hello', 'world']
-              , ['Fish', 'Chips']
+            [
+                'Far From the Madding Crowd'
+                , datetime(2018, 9, 25, 13, 42, 18)
+                , datetime(2018, 9, 25, 13, 48, 29)
+                , ['read', 'relax']
+            ]
+            , [
+                'Crime and Punishment'
+                , datetime(2018, 9, 25, 10, 11, 37)
+                , datetime(2018, 9, 25, 12, 12, 56)
+                , ['read', 'tense']
+            ]
         ]
 
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
@@ -340,22 +441,47 @@ class TTableModel(QAbstractTableModel):
         return Qt.ItemIsEditable | super().flags(index)
 
     def rowCount(self, parent: QModelIndex=None):
+        if not self.tdata:
+            return 0
         return len(self.tdata)
 
     def columnCount(self, parent: QModelIndex=None):
-        return len(self.tdata[0]) if self.tdata[0] else 0
+        if not self.tdata or not self.tdata[0]:
+            return 0
+        return 4
 
-    def data(self, index: QModelIndex=None, role: int=Qt.DisplayRole):
+    def data(
+        self
+        , index: QModelIndex=None
+        , role : int=Qt.DisplayRole
+    ) -> QVariant:
 
         if not index.isValid():
             return QVariant()
 
         if role == Qt.DisplayRole:
-            return self.tdata[index.row()][index.column()]
+            return self.data_display_role(index)
         if role == Qt.FontRole:
             return Typography.font('Quicksand-Medium', 12)
 
         return QVariant()
+
+    def data_display_role(self, index: QModelIndex) -> QVariant:
+
+        if not index.isValid():
+            return QVariant()
+
+        fst_ind, lst_ind = 1, 2
+        row, col = index.row(), index.column()
+
+        if col == 0:
+            return self.tdata[row][col]
+        elif col in [fst_ind, lst_ind]:
+            value = self.tdata[row][col]
+            return '{: >2d}:{:0>2d}'.format(value.hour, value.minute)
+        elif col == 3:
+            period = self.tdata[row][lst_ind] - self.tdata[row][fst_ind]
+            return seconds_to_str(int(period.total_seconds()))
 
     def setData(
         self
@@ -367,9 +493,18 @@ class TTableModel(QAbstractTableModel):
         if role != Qt.EditRole:
             return False
 
-        self.tdata[index.row()][index.column()] = value
+        row, col = index.row(), index.column()
+
+        if col == 0:
+            self.tdata[row][col] = value
+        elif col in range(1, 3):
+            old_value = self.tdata[row][col]
+            hour, minute = map(int, value.split(':'))
+            new_value = old_value.set(hour=hour, minute=minute)
+            self.tdata[row][col] = new_value
 
         return True
+
 
 class TTableView(QTableView):
 
@@ -379,10 +514,22 @@ class TTableView(QTableView):
 
         self.table_delegate = TTableDelegate(self)
 
-        self.setItemDelegate(self.table_delegate)
+        # self.setItemDelegate(self.table_delegate)
 
-        # self.verticalHeader().hide()
-        # self.horizontalHeader().hide()
+        self.setFont(Typography.font('Quicksand-Medium', 12))
+
+        self.verticalHeader().hide()
+        self.horizontalHeader().hide()
+
+
+class TTimerTable(QWidget):
+    '''
+    Combine a table of time slots and a header with date and total time
+    '''
+
+    def __init__(self, parent: QWidget=None) -> None:
+
+        super().__init__(parent)
 
 
 class TCentralWidget(QWidget):
@@ -401,6 +548,7 @@ class TCentralWidget(QWidget):
         self.layout = QVBoxLayout()
 
         self.layout.addWidget(self.timer_view)
+        self.layout.addSpacing(64)
         self.layout.addWidget(self.table_view)
 
         self.layout.addStretch(1)

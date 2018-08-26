@@ -14,10 +14,10 @@ from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
 from PyQt5.QtGui import QFont, QIcon, QPainter, QValidator
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QApplication, QCompleter, QFrame, QHBoxLayout,
-                             QItemEditorFactory, QLineEdit, QListView,
-                             QMainWindow, QPushButton, QStyledItemDelegate,
-                             QStyleOptionViewItem, QTableView, QTimeEdit,
-                             QVBoxLayout, QWidget)
+                             QHeaderView, QItemEditorFactory, QLineEdit,
+                             QListView, QMainWindow, QPushButton, QSizePolicy,
+                             QStyledItemDelegate, QStyleOptionViewItem,
+                             QTableView, QTimeEdit, QVBoxLayout, QWidget)
 
 
 def logged(foo, logger=logging.getLogger('tslot')):
@@ -506,6 +506,51 @@ class TTableModel(QAbstractTableModel):
         return True
 
 
+class TTableHeaderView(QHeaderView):
+    '''
+    Control size/resize of headers
+
+    Note:
+        https://stackoverflow.com/q/48361795/1269892
+    '''
+
+    def __init__(
+            self
+            , orientation: Qt.Orientation=Qt.Horizontal
+            , parent     : QWidget=None
+    ):
+        super().__init__(orientation, parent)
+
+        self.logger = logging.getLogger('tslot')
+
+        self.section_resize_modes = [
+            QHeaderView.Stretch # name of task
+            , QHeaderView.ResizeToContents # start time
+            , QHeaderView.ResizeToContents # finish time
+            , QHeaderView.ResizeToContents # elapsed time
+        ]
+
+    @logged
+    def setModel(self, model: QAbstractItemModel=None):
+        '''
+        Set the underlying data model
+
+        Fine-grained resizing of individual sections requires calling
+        setSectionResizeMode which works only when you've set the model.
+        '''
+        if model is None:
+            raise RuntimeError('Must provide a model')
+
+        super().setModel(model)
+
+        if model.columnCount() != self.count():
+            raise RuntimeError('model.columnCount() != self.count()')
+
+        # The loop below is the only reason why this method exists
+        for i, mode in enumerate(self.section_resize_modes):
+            self.setSectionResizeMode(i, mode)
+
+
 class TTableView(QTableView):
 
     def __init__(self, parent: QWidget=None):
@@ -518,7 +563,24 @@ class TTableView(QTableView):
 
         self.setFont(Typography.font('Quicksand-Medium', 12))
 
+        # self.setShowGrid(False)
+
         self.verticalHeader().hide()
+        self.horizontalHeader().hide()
+
+    def setModel(self, model: QAbstractItemModel):
+
+        super().setModel(model)
+
+        # The code below is the reason why this method is overwritten
+        # It creates a brand new header view, installs and triggers it
+        self.table_header = TTableHeaderView(
+            orientation=Qt.Horizontal, parent=self
+        )
+
+        self.setHorizontalHeader(self.table_header)
+
+        self.table_header.setModel(model)
         self.horizontalHeader().hide()
 
 

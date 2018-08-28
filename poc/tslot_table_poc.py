@@ -11,7 +11,7 @@ from pendulum import datetime
 from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
                           QAbstractTableModel, QLocale, QModelIndex, QObject,
                           QSize, QStringListModel, Qt, QTime, QVariant,
-                          pyqtSlot)
+                          pyqtSlot, QEvent)
 from PyQt5.QtGui import QFont, QIcon, QPainter, QValidator
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QApplication, QCompleter, QFrame, QHBoxLayout,
@@ -34,7 +34,7 @@ def logged(foo, logger=logging.getLogger('poc')):
 
     @wraps(foo)
     def wrapper(*args, **kwargs):
-        logger.debug(f'enter {foo.__qualname__}')
+        logger.debug(f'enter {foo.__qualname__} ({args})')
 
         result = foo(*args, **kwargs)
 
@@ -522,6 +522,8 @@ class TTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             return self.data_display_role(index)
+        if role == Qt.TextAlignmentRole:
+            return self.data_alignment_role(index)
         if role == Qt.FontRole:
             return Typography.font('Quicksand-Medium', 12)
 
@@ -543,6 +545,22 @@ class TTableModel(QAbstractTableModel):
         elif col == 3:
             period = self.tdata[row][lst_ind] - self.tdata[row][fst_ind]
             return seconds_to_str(int(period.total_seconds()))
+
+    def data_alignment_role(self, index: QModelIndex) -> QVariant:
+
+        if not index.isValid():
+            return QVariant()
+
+        col = index.column()
+
+        if col == 0:
+            return Qt.AlignLeft | Qt.AlignVCenter
+        if col in [1, 2]:
+            return Qt.AlignCenter | Qt.AlignVCenter
+        if col == 3:
+            return Qt.AlignRight | Qt.AlignVCenter
+
+        raise RuntimeError('Expected col in [0, 3] for alignment')
 
     def setData(
         self
@@ -594,7 +612,6 @@ class TTableHeaderView(QHeaderView):
 
         self.setFrameShape(QFrame.NoFrame)
 
-    @logged
     def setModel(self, model: QAbstractItemModel=None):
         '''
         Set the underlying data model
@@ -620,6 +637,34 @@ class TTableHeaderView(QHeaderView):
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
 
+    @logged
+    def length(self):
+        return super().length()
+
+    @logged
+    def sectionSize(self, index: int):
+        return super().sectionSize(index)
+
+    @logged
+    def sectionSizeHint(self, index: int):
+        return super().sectionSizeHint(index)
+
+    @logged
+    def minimumSectionSize(self) -> int:
+        return super().minimumSectionSize()
+
+    @logged
+    def maximumSectionSize(self) -> int:
+        return super().maximumSectionSize()
+
+    @logged
+    def sectionResizeMode(self, index):
+        return super().sectionResizeMode()
+
+    @logged
+    def resizeSection(self, index: int, size: int) -> None:
+        super().resizeSection(index, size)
+
 
 class TTableView(QTableView):
 
@@ -627,6 +672,8 @@ class TTableView(QTableView):
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent)
+
+        self.logger = logging.getLogger('poc')
 
         self.table_dgt = TTableDelegate(self)
         self.table_hdr = TTableHeaderView(Qt.Horizontal, self)
@@ -641,6 +688,10 @@ class TTableView(QTableView):
         self.setFrameShape(QFrame.NoFrame)
         self.verticalHeader().hide()
         self.horizontalHeader().hide()
+
+    @logged
+    def event(self, event: QEvent):
+        return super().event(event)
 
     @logged
     def setModel(self, model: QAbstractItemModel):
@@ -669,8 +720,38 @@ class TTableView(QTableView):
 
         return QSize(size_hint.width(), height)
 
+    @logged
     def minimumSizeHint(self):
         return self.sizeHint()
+
+    @logged
+    def columnWidth(self, index: int) -> int:
+        return super().columnWidth(index)
+
+    @logged
+    def setColumnWidth(self, index: int, width: int) -> None:
+        super().setColumnWidth(index, width)
+
+    @logged
+    def rowHeight(self, index: int) -> int:
+        return super().rowHeight(index)
+
+    @logged
+    def setRowHeight(self, index: int, width: int) -> None:
+        super().setRowHeight(index, width)
+
+    # @logged
+    def sizeHintForColumn(self, col: int) -> int:
+        self.logger.warning(self.getContentsMargins())
+        return int(1.5 * super().sizeHintForColumn(col))
+
+    @logged
+    def sizeHintForRow(self, row: int) -> int:
+        return super().sizeHintForRow(row)
+
+    @logged
+    def viewportSizeHint(self) -> QSize:
+        return super().viewportSizeHint()
 
 
 class TTimerTable(QWidget):

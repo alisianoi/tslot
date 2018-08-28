@@ -594,7 +594,6 @@ class TTableHeaderView(QHeaderView):
 
         self.setFrameShape(QFrame.NoFrame)
 
-    @logged
     def setModel(self, model: QAbstractItemModel=None):
         '''
         Set the underlying data model
@@ -619,6 +618,34 @@ class TTableHeaderView(QHeaderView):
         # The loop below is the only reason why this method exists
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
+
+    @logged
+    def length(self):
+        return super().length()
+
+    @logged
+    def sectionSize(self, index: int):
+        return super().sectionSize(index)
+
+    @logged
+    def sectionSizeHint(self, index: int):
+        return super().sectionSizeHint(index)
+
+    @logged
+    def minimumSectionSize(self) -> int:
+        return super().minimumSectionSize()
+
+    @logged
+    def maximumSectionSize(self) -> int:
+        return super().maximumSectionSize()
+
+    @logged
+    def sectionResizeMode(self, index):
+        return super().sectionResizeMode()
+
+    @logged
+    def resizeSection(self, index: int, size: int) -> None:
+        super().resizeSection(index, size)
 
 
 class TTableView(QTableView):
@@ -669,8 +696,37 @@ class TTableView(QTableView):
 
         return QSize(size_hint.width(), height)
 
+    @logged
     def minimumSizeHint(self):
         return self.sizeHint()
+
+    @logged
+    def columnWidth(self, index: int) -> int:
+        return super().columnWidth(index)
+
+    @logged
+    def setColumnWidth(self, index: int, width: int) -> None:
+        super().setColumnWidth(index, width)
+
+    @logged
+    def rowHeight(self, index: int) -> int:
+        return super().rowHeight(index)
+
+    @logged
+    def setRowHeight(self, index: int, width: int) -> None:
+        super().setRowHeight(index, width)
+
+    @logged
+    def sizeHintForColumn(self, col: int) -> int:
+        return super().sizeHintForColumn(col)
+
+    @logged
+    def sizeHintForRow(self, row: int) -> int:
+        return super().sizeHintForRow(row)
+
+    @logged
+    def viewportSizeHint(self) -> QSize:
+        return super().viewportSizeHint()
 
 
 class TTimerTable(QWidget):

@@ -15,10 +15,11 @@ from PyQt5.QtCore import (QAbstractItemModel, QAbstractListModel,
 from PyQt5.QtGui import QFont, QIcon, QPainter, QValidator
 from PyQt5.QtWidgets import (QAbstractItemDelegate, QAbstractItemView,
                              QApplication, QCompleter, QFrame, QHBoxLayout,
-                             QHeaderView, QItemEditorFactory, QLineEdit,
-                             QListView, QMainWindow, QPushButton, QSizePolicy,
-                             QStyledItemDelegate, QStyleOptionViewItem,
-                             QTableView, QTimeEdit, QVBoxLayout, QWidget)
+                             QHeaderView, QItemEditorFactory, QLabel,
+                             QLineEdit, QListView, QMainWindow, QPushButton,
+                             QSizePolicy, QStyledItemDelegate,
+                             QStyleOptionViewItem, QTableView, QTimeEdit,
+                             QVBoxLayout, QWidget)
 
 
 def logged(foo, logger=logging.getLogger('poc')):
@@ -138,16 +139,14 @@ class TTimerPopupDelegate(QStyledItemDelegate):
 
         super().setItemEditorFactory(factory)
 
-    def paint(
-        self
-        , painter: QPainter
-        , option : QStyleOptionViewItem
-        , index  : QModelIndex
-    ) -> None:
-
-        print('delegate.paint()')
-
-        super().paint(painter, option, index)
+    # def paint(
+    #     self
+    #     , painter: QPainter
+    #     , option : QStyleOptionViewItem
+    #     , index  : QModelIndex
+    # ) -> None:
+    #
+    #     super().paint(painter, option, index)
 
     def sizeHint(
         self
@@ -155,10 +154,9 @@ class TTimerPopupDelegate(QStyledItemDelegate):
         , index : QModelIndex
     ) -> QSize:
 
-        size = super().sizeHint(option, index)
+        size_hint = super().sizeHint(option, index)
 
-        return QSize(size.width(), 64)
-        # return super().sizeHint(option, index)
+        return QSize(size_hint.width(), 64)
 
     def createEditor(
         self
@@ -167,9 +165,8 @@ class TTimerPopupDelegate(QStyledItemDelegate):
         , index  : QModelIndex
     ) -> QWidget:
 
-        print('delegate.createEditor')
-
         editor = QLineEdit(parent)
+
         editor.setText(index.data())
         editor.setFont(Typography.font('Quicksand-Medium', 12))
 
@@ -177,21 +174,15 @@ class TTimerPopupDelegate(QStyledItemDelegate):
 
     def setEditorData(self, editor: QWidget, index : QModelIndex) -> None:
 
-        print(f'delegate.setEditorData')
-
         editor.setText(index.data())
 
-    def setModelData(self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex) -> None:
+    # def setModelData(self, editor: QWidget, model: QAbstractItemModel, index: QModelIndex) -> None:
+    #
+    #     super().setModelData(editor, model, index)
 
-        print('delegate.setModelData')
-
-        super().setModelData(editor, model, index)
-
-    def updateEditorGeometry(self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> None:
-
-        print('delegate.updateEditorGeometry')
-
-        super().updateEditorGeometry(editor, option, index)
+    # def updateEditorGeometry(self, editor: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> None:
+    #
+    #     super().updateEditorGeometry(editor, option, index)
 
 
 class TTimerPopupView(QListView):
@@ -266,6 +257,30 @@ class TTimerPushButton(QPushButton):
     pass
 
 
+class TTimerElapsedLabel(QLabel):
+
+    def __init__(self, parent: QWidget=None):
+
+        super().__init__(parent)
+
+        self.setFont(Typography.font('Quicksand-Medium', 12))
+
+        self.setMargin(16)
+
+        self.setText('00:00:00')
+
+
+class TTimerTrashButton(QPushButton):
+
+    def __init__(self, parent: QWidget=None):
+
+        super().__init__(parent)
+
+        self.icon = Typography.icon('Fontawesome-Solid', 'trash-alt.svg')
+
+        self.setIcon(self.icon)
+
+
 class TTimerView(QWidget):
     '''
     Combine a timer line edit with a timer push button and current timer value
@@ -295,6 +310,12 @@ class TTimerView(QWidget):
         self.timer_btn.setMinimumSize(64, 64)
         self.timer_btn.setFlat(True)
 
+        self.timer_lbl = TTimerElapsedLabel(self)
+
+        self.timer_trash_btn = TTimerTrashButton(self)
+        self.timer_trash_btn.setMinimumSize(64, 64)
+        self.timer_trash_btn.setFlat(True)
+
         self.layout = QHBoxLayout()
 
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -302,6 +323,8 @@ class TTimerView(QWidget):
 
         self.layout.addWidget(self.timer_ldt)
         self.layout.addWidget(self.timer_btn)
+        self.layout.addWidget(self.timer_lbl)
+        self.layout.addWidget(self.timer_trash_btn)
 
         self.setLayout(self.layout)
 
@@ -327,28 +350,63 @@ class TTimerTableTimeValidator(QValidator):
 
     def validate(
         self
-        , input: str
-        , pos  : int
+        , txt: str
+        , pos: int
     ) -> Tuple[QValidator.State, str, int]:
 
-        print(f'validator.validate({input}, {pos})')
+        if not txt:
+            return (QValidator.Intermediate, txt, pos)
 
-        values = input.split(':')
+        values = txt.split(':')
 
-        if len(values) != 2:
-            return (QValidator.Intermediate, input, pos)
+        if len(values) == 1:
+            return self.validate_one(txt, pos)
+        if len(values) == 2:
+            return self.validate_two(txt, pos)
 
-        hour, minute = values
+        return (QValidator.Invalid, txt, pos)
+
+    def validate_one(
+        self
+        , txt: str
+        , pos: int
+    ) -> Tuple[QValidator.State, str, int]:
+
+        h = txt.split(':')[0]
+
+        if not h:
+            return (QValidator.Intermediate, txt, pos)
 
         try:
-            hour, minute = int(hour), int(minute)
+            hour = int(h)
         except ValueError:
-            return (QValidator.Invalid, input, pos)
+            return (QValidator.Invalid, txt, pos)
+
+        if hour not in range(0, 24):
+            return (QValidator.Invalid, txt, pos)
+
+        return (QValidator.Intermediate, txt, pos)
+
+    def validate_two(
+        self
+        , txt: str
+        , pos: int
+    ) -> Tuple[QValidator.State, str, int]:
+
+        h, m = txt.split(':')
+
+        if not h or not m:
+            return (QValidator.Intermediate, txt, pos)
+
+        try:
+            hour, minute = int(h), int(m)
+        except ValueError:
+            return (QValidator.Invalid, txt, pos)
 
         if hour not in range(0, 24) or minute not in range(0, 60):
-            return (QValidator.Invalid, input, pos)
+            return (QValidator.Invalid, txt, pos)
 
-        return (QValidator.Acceptable, input, pos)
+        return (QValidator.Acceptable, txt, pos)
 
 
 class TTableDelegate(QStyledItemDelegate):
@@ -414,8 +472,6 @@ class TTableDelegate(QStyledItemDelegate):
         , index : QModelIndex
     ) -> QSize:
 
-        print('table delegate: sizeHint')
-
         return super().sizeHint(option, index)
 
 
@@ -455,7 +511,6 @@ class TTableModel(QAbstractTableModel):
             return 0
         return 4
 
-    @logged
     def data(
         self
         , index: QModelIndex=None
@@ -576,9 +631,10 @@ class TTableView(QTableView):
         self.table_dgt = TTableDelegate(self)
         self.table_hdr = TTableHeaderView(Qt.Horizontal, self)
 
-        # self.setItemDelegate(self.table_delegate)
+        self.setItemDelegate(self.table_dgt)
 
         self.setFont(Typography.font('Quicksand-Medium', 12))
+        # self.setStyleSheet('margin-right: 32')
 
         # self.setShowGrid(False)
 

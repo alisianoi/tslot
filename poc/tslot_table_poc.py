@@ -522,6 +522,8 @@ class TTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             return self.data_display_role(index)
+        if role == Qt.TextAlignmentRole:
+            return self.data_alignment_role(index)
         if role == Qt.FontRole:
             return Typography.font('Quicksand-Medium', 12)
 
@@ -543,6 +545,22 @@ class TTableModel(QAbstractTableModel):
         elif col == 3:
             period = self.tdata[row][lst_ind] - self.tdata[row][fst_ind]
             return seconds_to_str(int(period.total_seconds()))
+
+    def data_alignment_role(self, index: QModelIndex) -> QVariant:
+
+        if not index.isValid():
+            return QVariant()
+
+        col = index.column()
+
+        if col == 0:
+            return Qt.AlignLeft | Qt.AlignVCenter
+        if col in [1, 2]:
+            return Qt.AlignCenter | Qt.AlignVCenter
+        if col == 3:
+            return Qt.AlignRight | Qt.AlignVCenter
+
+        raise RuntimeError('Expected col in [0, 3] for alignment')
 
     def setData(
         self
@@ -718,7 +736,7 @@ class TTableView(QTableView):
 
     @logged
     def sizeHintForColumn(self, col: int) -> int:
-        return super().sizeHintForColumn(col)
+        return int(1.5 * super().sizeHintForColumn(col))
 
     @logged
     def sizeHintForRow(self, row: int) -> int:

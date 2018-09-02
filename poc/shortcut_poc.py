@@ -2,9 +2,9 @@
 
 import sys
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QApplication, QMainWindow, QShortcut, QWidget
 
 
 class MyMainWidget(QWidget):

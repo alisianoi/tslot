@@ -6,7 +6,8 @@ import sys
 import time
 from functools import wraps
 
-from PyQt5.QtCore import QObject, QPoint, QRect, QSize, Qt, QTimer, pyqtSlot
+from PyQt5.QtCore import (QObject, QPoint, QRect, QSize, Qt, QTimer,
+                          pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QBrush, QCloseEvent, QColor, QGuiApplication,
                          QHideEvent, QKeySequence, QMoveEvent, QPainter,
                          QPaintEvent, QResizeEvent, QScreen, QShowEvent)
@@ -59,65 +60,69 @@ def logged(logger=logging.getLogger('poc'), disabled=False):
     return logged_decorator
 
 
-class TCentralWidget(QWidget):
+class TRequest:
 
-    def __init__(self, parent: QWidget=None):
+    pass
 
-        super().__init__(parent)
+class TSideRequest(TRequest):
 
-        self.logger = logging.getLogger('poc')
+    def __init__(self, payload: str) -> None:
 
-        self.popup_btn = QPushButton('Click for a popup')
+        self.payload = payload
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.popup_btn)
-        self.setLayout(self.layout)
+class TResponse:
 
-        self.setStyleSheet('background-color: #8B0000')
+    pass
 
-        self.logger.debug(self.parent())
-        self.popup_btn.clicked.connect(self.parent().handle_shortcut_new_pop)
+class TUndoResponse(TResponse):
 
-    @logged(disabled=True)
-    def paintEvent(self, event: QPaintEvent) -> None:
+    def __init__(self, wgt: QWidget):
 
-        self.logger.debug(f'{event.rect()} and {event.region()}')
+        self.wgt = wgt
 
-        super().paintEvent(event)
+class TCloseResponse(TResponse):
 
-    @logged(disabled=True)
-    def resizeEvent(self, event: QResizeEvent):
+    def __init__(self, wgt: QWidget):
 
-        parent = self.parentWidget()
-        if parent is None:
-            self.logger.debug('has no parent')
-        else:
-            self.logger.debug(f'parent.geometry: {parent.geometry()}')
-
-        self.logger.debug(f'{event.oldSize()} -> {event.size()}')
-
-        super().resizeEvent(event)
+        self.wgt = wgt
 
 
 class TSideWidget(QWidget):
 
-    def __init__(self, parent: QWidget=None):
+    responded = pyqtSignal(TResponse)
+
+    def __init__(self, txt: str, parent: QWidget=None):
 
         super().__init__(parent)
 
         self.logger = logging.getLogger('poc')
 
-        self.label = QLabel('Click this: ')
-        self.woops = QPushButton('Undo')
-        self.close = QPushButton('Close')
+        self.label = QLabel(txt)
+        self.undo_btn = QPushButton('Undo')
+        self.close_btn = QPushButton('Close')
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.label)
-        self.layout.addWidget(self.woops)
-        self.layout.addWidget(self.close)
+        self.layout.addWidget(self.undo_btn)
+        self.layout.addWidget(self.close_btn)
         self.setLayout(self.layout)
 
         self.setWindowFlags(Qt.Popup)
+
+        self.undo_btn.clicked.connect(self.handle_undo)
+        self.close_btn.clicked.connect(self.handle_close)
+
+    @pyqtSlot()
+    def handle_undo(self):
+        self.responded.emit(TUndoResponse(self))
+
+        self.close()
+
+    @pyqtSlot()
+    def handle_close(self):
+        self.responded.emit(TCloseResponse(self))
+
+        self.close()
 
     def __del__(self) -> None:
 
@@ -165,11 +170,117 @@ class TSideWidget(QWidget):
 
         self.logger.debug(f'{event.oldSize()} -> {event.size()}')
 
+    @logged(disabled=False)
     def deleteLater(self) -> None:
 
         super().deleteLater()
 
         self.logger.debug('delete later')
+
+
+class TSideService(QObject):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.active = {}
+
+    def notify(self, parent: QWidget, txt: str) -> None:
+
+        if parent not in self.active:
+            self.active[parent] = []
+
+        widget = TSideWidget(txt, parent)
+        widget.setStyleSheet('background-color: #008B00')
+        widget.responded.connect(self.handle_side_widget)
+
+        self.active[parent].append(widget)
+
+        widget.show()
+
+    @pyqtSlot(TResponse)
+    def handle_side_widget(self, response: TResponse) -> None:
+
+        if isinstance(response, TUndoResponse):
+            return self.handle_side_widget_undo(response)
+        if isinstance(response, TCloseResponse):
+            return self.handle_side_widget_close(response)
+
+        raise RuntimeError(f'Unknown response: {response}')
+
+    def handle_side_widget_undo(self, response: TUndoResponse) -> None:
+
+        self.unregister_widget(response)
+
+    def handle_side_widget_close(self, response: TCloseResponse) -> None:
+
+        self.unregister_widget(response)
+
+    def unregister_widget(self, response: TResponse) -> None:
+        widget, parent = response.wgt, response.wgt.parent()
+
+        if parent not in self.active:
+            raise RuntimeError('Cannot find the widget to unregister')
+
+        for i, w in enumerate(self.active[parent]):
+            if w is widget:
+                self.active[parent].pop(i)
+
+                break
+        else:
+            # the side widget was not found when it should have been, so raise
+            raise RuntimeError('Cannot find the widget to unregister')
+
+
+class TCentralWidget(QWidget):
+
+    requested = pyqtSignal(TRequest)
+
+    def __init__(self, parent: QWidget=None):
+
+        super().__init__(parent)
+
+        self.logger = logging.getLogger('poc')
+
+        self.popup_btn = QPushButton('Click for a popup')
+        self.popup_clicks = 0
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.popup_btn)
+        self.setLayout(self.layout)
+
+        self.setStyleSheet('background-color: #8B0000')
+
+        self.logger.debug(self.parent())
+        self.popup_btn.clicked.connect(self.handle_popup_clicked)
+
+    @pyqtSlot()
+    def handle_popup_clicked(self):
+        self.requested.emit(
+            TSideRequest(str('Popup ' + str(self.popup_clicks)))
+        )
+        self.popup_clicks += 1
+
+    @logged(disabled=True)
+    def paintEvent(self, event: QPaintEvent) -> None:
+
+        self.logger.debug(f'{event.rect()} and {event.region()}')
+
+        super().paintEvent(event)
+
+    @logged(disabled=True)
+    def resizeEvent(self, event: QResizeEvent):
+
+        parent = self.parentWidget()
+        if parent is None:
+            self.logger.debug('has no parent')
+        else:
+            self.logger.debug(f'parent.geometry: {parent.geometry()}')
+
+        self.logger.debug(f'{event.oldSize()} -> {event.size()}')
+
+        super().resizeEvent(event)
 
 
 class TMainWindow(QMainWindow):
@@ -180,39 +291,27 @@ class TMainWindow(QMainWindow):
 
         self.logger = logging.getLogger('poc')
 
-        self.sidepop_widget = None
+        self.total_popups = 0
+        self.popup_service = TSideService()
 
         self.central_widget = TCentralWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        self.shortcut_new_pop = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_N), self)
-        self.shortcut_new_wgt = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_P), self)
-
-        self.shortcut_new_pop.activated.connect(self.handle_shortcut_new_pop)
-        self.shortcut_new_wgt.activated.connect(self.handle_shortcut_new_wgt)
-
         self.setStyleSheet('background-color: #00008B')
 
-    @logged()
-    @pyqtSlot()
-    def handle_shortcut_new_pop(self):
+        self.central_widget.requested.connect(self.handle_central_widget_requested)
 
-        if self.sidepop_widget is None:
-            self.sidepop_widget = TSideWidget()
-            self.sidepop_widget.show()
-        else:
-            self.sidepop_widget.hide()
-            self.sidepop_widget.deleteLater()
-            self.sidepop_widget = None
+    @pyqtSlot(TRequest)
+    def handle_central_widget_requested(self, request: TRequest) -> None:
 
-    def handle_shortcut_new_wgt(self):
+        if isinstance(request, TSideRequest):
+            return self.handle_central_widget_side_request(request)
 
-        self.logger.debug('handle shortcut new wgt')
+        raise RuntimeError('Unknown request from central widget')
 
-        if (self.central_widget.isHidden()):
-            self.central_widget.show()
-        else:
-            self.central_widget.hide()
+    def handle_central_widget_side_request(self, request: TSideRequest) -> None:
+
+        self.popup_service.notify(self, request.payload)
 
     @logged(disabled=True)
     def paintEvent(self, event: QPaintEvent) -> None:

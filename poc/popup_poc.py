@@ -168,6 +168,14 @@ class TSideWidget(QWidget):
 
         super().resizeEvent(event)
 
+        old_size = event.oldSize()
+
+        if old_size.width() == -1 and old_size.height() == -1:
+            # The window manager has just decided on the size of this widget. It
+            # means the widget is being shown for the first time. Take it as an
+            # opportunity to properly position this notification widget.
+            self.logger.debug('looks like a brand new widget')
+
         self.logger.debug(f'{event.oldSize()} -> {event.size()}')
 
     @logged(disabled=True)
@@ -180,31 +188,49 @@ class TSideWidget(QWidget):
 
 class TSideService(QObject):
 
-    def __init__(self):
+    def __init__(self, gap: int=10):
 
         super().__init__()
 
         self.logger = logging.getLogger('poc')
 
+        self.gap = gap
         self.active = {}
 
+    @logged(disabled=False)
     def notify(self, parent: QWidget, txt: str) -> None:
 
         if parent not in self.active:
             self.active[parent] = []
 
-        self.logger.debug(parent.geometry())
-        self.logger.debug(parent.frameGeometry())
+        self.logger.debug(f'parent.size: {parent.size()}')
+        self.logger.debug(f'parent.sizeHint: {parent.sizeHint()}')
+        self.logger.debug(f'parent.geometry: {parent.geometry()}')
+        self.logger.debug(f'parent.frameGeometry: {parent.frameGeometry()}')
+        self.logger.debug(f'parent.normalGeometry: {parent.normalGeometry()}')
 
         widget = TSideWidget(txt, parent)
         widget.setStyleSheet('background-color: #008B00')
         widget.responded.connect(self.handle_side_widget)
 
-        self.logger.debug(widget.size())
+        self.logger.debug(f'widget.size: {widget.size()}')
+        self.logger.debug(f'widget.sizeHint: {widget.sizeHint()}')
+        self.logger.debug(f'widget.geometry: {widget.geometry()}')
+        self.logger.debug(f'widget.frameGeometry: {widget.frameGeometry()}')
+        self.logger.debug(f'widget.normalGeometry: {widget.normalGeometry()}')
 
         self.active[parent].append(widget)
 
+        self.move_widget(widget)
+
         widget.show()
+
+        self.logger.debug(f'widget.size: {widget.size()}')
+        self.logger.debug(f'widget.sizeHint: {widget.sizeHint()}')
+        self.logger.debug(f'widget.geometry: {widget.geometry()}')
+        self.logger.debug(f'widget.frameGeometry: {widget.frameGeometry()}')
+        self.logger.debug(f'widget.normalGeometry: {widget.normalGeometry()}')
+
 
     @pyqtSlot(TResponse)
     def handle_side_widget(self, response: TResponse) -> None:
@@ -227,17 +253,30 @@ class TSideService(QObject):
     def unregister_widget(self, response: TResponse) -> None:
         widget, parent = response.wgt, response.wgt.parent()
 
-        if parent not in self.active:
-            raise RuntimeError('Cannot find the widget to unregister')
+        self.active[parent].pop(self.find_index(widget))
 
-        for i, w in enumerate(self.active[parent]):
+    def move_widget(self, widget) -> None:
+        parent = widget.parent()
+
+        wpg, wsh = parent.geometry(), widget.sizeHint()
+
+        x = wpg.x() + wpg.width() - wsh.width() - self.gap
+        y = wpg.y() + wpg.height() - wsh.height() - self.gap
+
+        for w in self.active[parent]:
             if w is widget:
-                self.active[parent].pop(i)
-
                 break
-        else:
-            # the side widget was not found when it should have been, so raise
-            raise RuntimeError('Cannot find the widget to unregister')
+
+            y = y - w.height() - self.gap
+
+        widget.move(x, y)
+
+    def find_index(self, widget: QWidget) -> int:
+        for i, w in enumerate(self.active[widget.parent()]):
+            if w is widget:
+                return i
+
+        raise RuntimeError('This notification widget has disappeared')
 
 
 class TCentralWidget(QWidget):
@@ -259,7 +298,6 @@ class TCentralWidget(QWidget):
 
         self.setStyleSheet('background-color: #8B0000')
 
-        self.logger.debug(self.parent())
         self.popup_btn.clicked.connect(self.handle_popup_clicked)
 
     @pyqtSlot()
@@ -269,12 +307,12 @@ class TCentralWidget(QWidget):
         )
         self.popup_clicks += 1
 
-    @logged()
+    @logged(disabled=True)
     def showEvent(self, event: QShowEvent) -> None:
 
         super().showEvent(event)
 
-    @logged()
+    @logged(disabled=True)
     def hideEvent(self, event: QHideEvent) -> None:
 
         super().hideEvent(event)

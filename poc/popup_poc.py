@@ -107,7 +107,7 @@ class TSideWidget(QWidget):
         self.layout.addWidget(self.close_btn)
         self.setLayout(self.layout)
 
-        self.setWindowFlags(Qt.Popup)
+        self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
 
         self.undo_btn.clicked.connect(self.handle_undo)
         self.close_btn.clicked.connect(self.handle_close)
@@ -128,35 +128,35 @@ class TSideWidget(QWidget):
 
         self.logger.debug('__del__')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def showEvent(self, event: QShowEvent) -> None:
 
         super().showEvent(event)
 
         self.logger.debug(f'showEvent: {event.spontaneous()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def hideEvent(self, event: QHideEvent) -> None:
 
         super().hideEvent(event)
 
         self.logger.debug(f'hideEvent: {event.spontaneous()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def moveEvent(self, event: QMoveEvent) -> None:
 
         super().moveEvent(event)
 
         self.logger.debug(f'{event.oldPos()} -> {event.pos()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def paintEvent(self, event: QPaintEvent) -> None:
 
         super().paintEvent(event)
 
         self.logger.debug(f'event.rect(): {event.rect()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def closeEvent(self, event: QCloseEvent) -> None:
 
         super().closeEvent(event)
@@ -170,7 +170,7 @@ class TSideWidget(QWidget):
 
         self.logger.debug(f'{event.oldSize()} -> {event.size()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def deleteLater(self) -> None:
 
         super().deleteLater()
@@ -184,6 +184,8 @@ class TSideService(QObject):
 
         super().__init__()
 
+        self.logger = logging.getLogger('poc')
+
         self.active = {}
 
     def notify(self, parent: QWidget, txt: str) -> None:
@@ -191,9 +193,14 @@ class TSideService(QObject):
         if parent not in self.active:
             self.active[parent] = []
 
+        self.logger.debug(parent.geometry())
+        self.logger.debug(parent.frameGeometry())
+
         widget = TSideWidget(txt, parent)
         widget.setStyleSheet('background-color: #008B00')
         widget.responded.connect(self.handle_side_widget)
+
+        self.logger.debug(widget.size())
 
         self.active[parent].append(widget)
 
@@ -261,6 +268,16 @@ class TCentralWidget(QWidget):
             TSideRequest(str('Popup ' + str(self.popup_clicks)))
         )
         self.popup_clicks += 1
+
+    @logged()
+    def showEvent(self, event: QShowEvent) -> None:
+
+        super().showEvent(event)
+
+    @logged()
+    def hideEvent(self, event: QHideEvent) -> None:
+
+        super().hideEvent(event)
 
     @logged(disabled=True)
     def paintEvent(self, event: QPaintEvent) -> None:

@@ -41,8 +41,8 @@ def logged(logger=logging.getLogger('poc'), disabled=False):
             # If the logger was not already disabled by something else, see if
             # it should be disabled by us. Important effect: if foo uses the
             # same logger, then any inner logging will be disabled as well.
-            if not was_disabled:
-                logger.disabled = disabled
+
+            logger.disabled = disabled
 
             logger.debug(f'enter {foo.__qualname__}')
 
@@ -87,7 +87,7 @@ class TCloseResponse(TResponse):
         self.wgt = wgt
 
 
-class TSideWidget(QWidget):
+class TPopupWidget(QWidget):
 
     responded = pyqtSignal(TResponse)
 
@@ -163,7 +163,7 @@ class TSideWidget(QWidget):
 
         self.logger.debug(f'closeEvent(): {event.spontaneous()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def resizeEvent(self, event: QResizeEvent) -> None:
 
         super().resizeEvent(event)
@@ -186,97 +186,81 @@ class TSideWidget(QWidget):
         self.logger.debug('delete later')
 
 
-class TSideService(QObject):
+class TPopupService(QObject):
 
-    def __init__(self, gap: int=10):
+    def __init__(self, parent: QWidget=None, xgap: int=10, ygap: int=10):
 
         super().__init__()
 
         self.logger = logging.getLogger('poc')
 
-        self.gap = gap
-        self.active = {}
+        self.parent = parent
+        self.popups = []
+        self.xgap = xgap
+        self.ygap = ygap
+
+    @logged(disabled=True)
+    def notify(self, txt: str) -> None:
+
+        popup = TPopupWidget(txt, self.parent)
+        popup.responded.connect(self.handle_popup)
+
+        self.enlist(popup)
 
     @logged(disabled=False)
-    def notify(self, parent: QWidget, txt: str) -> None:
+    def enlist(self, popup: QWidget) -> None:
 
-        if parent not in self.active:
-            self.active[parent] = []
+        x, y = -1, -1
 
-        self.logger.debug(f'parent.size: {parent.size()}')
-        self.logger.debug(f'parent.sizeHint: {parent.sizeHint()}')
-        self.logger.debug(f'parent.geometry: {parent.geometry()}')
-        self.logger.debug(f'parent.frameGeometry: {parent.frameGeometry()}')
-        self.logger.debug(f'parent.normalGeometry: {parent.normalGeometry()}')
+        parent = self.parent
+        xgap, ygap = self.xgap, self.ygap
+        pshw, pshh = popup.sizeHint().width(), popup.sizeHint().height()
 
-        widget = TSideWidget(txt, parent)
-        widget.setStyleSheet('background-color: #008B00')
-        widget.responded.connect(self.handle_side_widget)
+        if not self.popups:
+            x = parent.x() + parent.width() - xgap - pshw
+            y = parent.y() + parent.height() - ygap - pshh
+        else:
+            x = parent.x() + parent.width() - xgap - pshw
+            y = self.popups[-1].y() - ygap - pshh
 
-        self.logger.debug(f'widget.size: {widget.size()}')
-        self.logger.debug(f'widget.sizeHint: {widget.sizeHint()}')
-        self.logger.debug(f'widget.geometry: {widget.geometry()}')
-        self.logger.debug(f'widget.frameGeometry: {widget.frameGeometry()}')
-        self.logger.debug(f'widget.normalGeometry: {widget.normalGeometry()}')
+        popup.setStyleSheet('background-color: #008B00')
 
-        self.active[parent].append(widget)
+        self.popups.append(popup)
 
-        self.move_widget(widget)
+        popup.move(x, y)
 
-        widget.show()
+        if x > parent.x() and y > parent.y():
+            popup.show()
 
-        self.logger.debug(f'widget.size: {widget.size()}')
-        self.logger.debug(f'widget.sizeHint: {widget.sizeHint()}')
-        self.logger.debug(f'widget.geometry: {widget.geometry()}')
-        self.logger.debug(f'widget.frameGeometry: {widget.frameGeometry()}')
-        self.logger.debug(f'widget.normalGeometry: {widget.normalGeometry()}')
+        self.logger.debug(f'coordinates after move: {(popup.x(), popup.y())}')
 
+    def delist(self, popup: QWidget) -> None:
+
+        for i, widget in enumerate(self.popups):
+            if widget is popup:
+                self.popups.pop(i)
+
+                break
+        else:
+            raise RuntimeError('Cannot delist popup')
 
     @pyqtSlot(TResponse)
-    def handle_side_widget(self, response: TResponse) -> None:
+    def handle_popup(self, response: TResponse) -> None:
 
         if isinstance(response, TUndoResponse):
-            return self.handle_side_widget_undo(response)
+            return self.handle_popup_undo(response)
         if isinstance(response, TCloseResponse):
-            return self.handle_side_widget_close(response)
+            return self.handle_popup_close(response)
 
         raise RuntimeError(f'Unknown response: {response}')
 
-    def handle_side_widget_undo(self, response: TUndoResponse) -> None:
+    def handle_popup_undo(self, response: TUndoResponse) -> None:
 
-        self.unregister_widget(response)
+        self.delist(response.wgt)
 
-    def handle_side_widget_close(self, response: TCloseResponse) -> None:
+    def handle_popup_close(self, response: TCloseResponse) -> None:
 
-        self.unregister_widget(response)
-
-    def unregister_widget(self, response: TResponse) -> None:
-        widget, parent = response.wgt, response.wgt.parent()
-
-        self.active[parent].pop(self.find_index(widget))
-
-    def move_widget(self, widget) -> None:
-        parent = widget.parent()
-
-        wpg, wsh = parent.geometry(), widget.sizeHint()
-
-        x = wpg.x() + wpg.width() - wsh.width() - self.gap
-        y = wpg.y() + wpg.height() - wsh.height() - self.gap
-
-        for w in self.active[parent]:
-            if w is widget:
-                break
-
-            y = y - w.height() - self.gap
-
-        widget.move(x, y)
-
-    def find_index(self, widget: QWidget) -> int:
-        for i, w in enumerate(self.active[widget.parent()]):
-            if w is widget:
-                return i
-
-        raise RuntimeError('This notification widget has disappeared')
+        self.delist(response.wgt)
 
 
 class TCentralWidget(QWidget):
@@ -347,7 +331,7 @@ class TMainWindow(QMainWindow):
         self.logger = logging.getLogger('poc')
 
         self.total_popups = 0
-        self.popup_service = TSideService()
+        self.popup_service = TPopupService(self)
 
         self.central_widget = TCentralWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -366,7 +350,7 @@ class TMainWindow(QMainWindow):
 
     def handle_central_widget_side_request(self, request: TSideRequest) -> None:
 
-        self.popup_service.notify(self, request.payload)
+        self.popup_service.notify(request.payload)
 
     @logged(disabled=True)
     def paintEvent(self, event: QPaintEvent) -> None:

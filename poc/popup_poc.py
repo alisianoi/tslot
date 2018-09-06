@@ -6,13 +6,15 @@ import sys
 import time
 from functools import wraps
 
-from PyQt5.QtCore import (QObject, QPoint, QRect, QSize, Qt, QTimer,
-                          pyqtSignal, pyqtSlot)
+from PyQt5.QtCore import (QEasingCurve, QObject, QPoint, QPropertyAnimation,
+                          QRect, QSize, Qt, QTimer, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QBrush, QCloseEvent, QColor, QGuiApplication,
                          QHideEvent, QKeySequence, QMoveEvent, QPainter,
                          QPaintEvent, QResizeEvent, QScreen, QShowEvent)
-from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QLabel, QMainWindow,
-                             QPushButton, QShortcut, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QApplication, QGraphicsEffect,
+                             QGraphicsOpacityEffect, QHBoxLayout, QLabel,
+                             QMainWindow, QPushButton, QShortcut, QStyle,
+                             QStyleOption, QVBoxLayout, QWidget)
 
 
 def logged(logger=logging.getLogger('poc'), disabled=False):
@@ -108,6 +110,7 @@ class TPopupWidget(QWidget):
         self.setLayout(self.layout)
 
         self.setWindowFlags(Qt.Tool | Qt.FramelessWindowHint)
+        self.setAutoFillBackground(True)
 
         self.undo_btn.clicked.connect(self.handle_undo)
         self.close_btn.clicked.connect(self.handle_close)
@@ -151,6 +154,13 @@ class TPopupWidget(QWidget):
 
     @logged(disabled=True)
     def paintEvent(self, event: QPaintEvent) -> None:
+
+        painter = QPainter(self)
+        style, style_option = self.style(), QStyleOption()
+
+        style_option.initFrom(self)
+
+        style.drawPrimitive(QStyle.PE_Widget, style_option, painter, self)
 
         super().paintEvent(event)
 
@@ -196,6 +206,10 @@ class TPopupService(QObject):
 
         self.parent = parent
         self.popups = []
+
+        self.effects = {}
+        self.animations = {}
+
         self.xgap = xgap
         self.ygap = ygap
 
@@ -212,37 +226,65 @@ class TPopupService(QObject):
 
         x, y = -1, -1
 
-        parent = self.parent
         xgap, ygap = self.xgap, self.ygap
-        pshw, pshh = popup.sizeHint().width(), popup.sizeHint().height()
+
+        parent = self.parent
+        px, py = parent.x(), parent.y()
+        pw, ph = parent.width(), parent.height()
+
+        shw, shh = popup.sizeHint().width(), popup.sizeHint().height()
+
+        x = px + pw - xgap - shw
 
         if not self.popups:
-            x = parent.x() + parent.width() - xgap - pshw
-            y = parent.y() + parent.height() - ygap - pshh
+            y = py + ph - ygap - shh
         else:
-            x = parent.x() + parent.width() - xgap - pshw
-            y = self.popups[-1].y() - ygap - pshh
-
-        popup.setStyleSheet('background-color: #008B00')
+            y = self.popups[-1].y() - ygap - shh
 
         self.popups.append(popup)
 
         popup.move(x, y)
 
         if x > parent.x() and y > parent.y():
+
+            effect = QGraphicsOpacityEffect()
+            animation = QPropertyAnimation(effect, b'opacity')
+
+            animation.setDuration(10000)
+            animation.setEasingCurve(QEasingCurve.OutExpo)
+            animation.setStartValue(0.0)
+            animation.setEndValue(1.0)
+
+            self.effects[popup] = effect
+            self.animations[popup] = animation
+
+            popup.setGraphicsEffect(effect)
+            # popup.label.setGraphicsEffect(effect)
+            # popup.undo_btn.setGraphicsEffect(effect)
+            # popup.close_btn.setGraphicsEffect(effect)
+            popup.setStyleSheet('background-color: #8F0000')
             popup.show()
+
+            animation.start() # maybe start before show?
+        else:
+            # there are too many popups displayed right now
+            pass
 
         self.logger.debug(f'coordinates after move: {(popup.x(), popup.y())}')
 
     def delist(self, popup: QWidget) -> None:
 
-        for i, widget in enumerate(self.popups):
-            if widget is popup:
-                self.popups.pop(i)
+        index = self.popups.index(popup)
 
-                break
-        else:
-            raise RuntimeError('Cannot delist popup')
+        # TODO: maybe the order is important
+        del self.effects[popup]
+        del self.animations[popup]
+
+        self.popups.pop(index)
+
+        while index != len(self.popups):
+            # update coordinates of subsequent popups
+            index += 1
 
     @pyqtSlot(TResponse)
     def handle_popup(self, response: TResponse) -> None:
@@ -273,14 +315,14 @@ class TCentralWidget(QWidget):
 
         self.logger = logging.getLogger('poc')
 
+        self.some_lbl = QLabel('Hello, animations!')
         self.popup_btn = QPushButton('Click for a popup')
         self.popup_clicks = 0
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.popup_btn)
+        self.layout.addWidget(self.some_lbl)
         self.setLayout(self.layout)
-
-        self.setStyleSheet('background-color: #8B0000')
 
         self.popup_btn.clicked.connect(self.handle_popup_clicked)
 
@@ -335,8 +377,6 @@ class TMainWindow(QMainWindow):
 
         self.central_widget = TCentralWidget(self)
         self.setCentralWidget(self.central_widget)
-
-        self.setStyleSheet('background-color: #00008B')
 
         self.central_widget.requested.connect(self.handle_central_widget_requested)
 

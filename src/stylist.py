@@ -5,12 +5,7 @@ from PyQt5.QtCore import QObject
 
 
 class Stylist(QObject):
-    '''
-    Loads and stores files that contain Qt Style Sheets
-
-    Note:
-        See DataBroker as somewhat similar class
-    '''
+    """Load and store files that contain Qt Style Sheets"""
 
     def __init__(self, path: Path=None, parent: QObject=None):
 

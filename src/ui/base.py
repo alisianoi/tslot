@@ -1,25 +1,21 @@
 import logging
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QDockWidget, QWidget
 
-from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.base import TFailure, TRequest, TResponse
 
+# TODO: consider overriding paintEvent with the custom painting as described in:
+# https://wiki.qt.io/How_to_Change_the_Background_Color_of_QWidget
 
 # PyQt has some limitations when it comes to multiple inheritance. So, in order
 # to have a common set of signals, slots and methods on the custom widgets, it
 # is necessary to write some duplicated code. So here goes:
 
+
 class TWidget(QWidget):
     """
     Base class for all widgets used by TimeSlot
-
-    Supports the request-response-trigger protocol
-    TODO: link to documentation
-
-    Supports the kickstart protocol
-    TODO: link to documentation
     """
 
     requested = pyqtSignal(TRequest)
@@ -50,12 +46,6 @@ class TWidget(QWidget):
 class TDockWidget(QDockWidget):
     """
     Base class for all dock widgets used by TimeSlot
-
-    Supports the request-response-trigger protocol
-    TODO: link to documentation
-
-    Supports the kickstart protocol
-    TODO: link to documentation
     """
 
     requested = pyqtSignal(TRequest)

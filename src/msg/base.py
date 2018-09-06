@@ -2,7 +2,17 @@ import logging
 
 
 class TMessage:
-    """Base class for all messages"""
+    """
+    Base class for all messages
+
+    Messages are an integral part of the request-response-trigger protocol.
+    TODO: link to documentation
+
+    Messages are passed primarily between graphical widgets and backend
+    services. For example, a widget could issue a request to fetch time slots.
+    The request message would be received by a backend service that would
+    eventually ask the database for the required data.
+    """
 
     def __init__(self):
 

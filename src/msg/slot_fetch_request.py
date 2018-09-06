@@ -5,6 +5,7 @@ from pendulum import Date
 from src.msg.fetch import TFetchRequest
 from src.msg.utils import LOAD_DIRECTIONS
 
+
 class TSlotFetchRequest(TFetchRequest):
     """
     Ask for previously recorded time slots

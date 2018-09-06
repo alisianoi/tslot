@@ -10,7 +10,7 @@ class TTimerControlsDockWidget(TDockWidget):
     """
     Provide the top-level timer area
 
-    Although this area is dockable, its docking behaviors are disabled. The
+    Although this area is dockable, its docking behavior is disabled. The
     inheritance from dockable is used to let QT control the positioning of
     several docks + main area.
     """

@@ -8,18 +8,19 @@ from src.utils import logged
 
 
 class THeaderView(QHeaderView):
-    '''
+    """
     Control size/resize of headers for the SlotTableView
 
     Note:
+        There is trouble if .setModel is called at the wrong moment, more here:
         https://stackoverflow.com/q/48361795/1269892
-    '''
+    """
 
     def __init__(
-            self
-            , orientation: Qt.Orientation=Qt.Horizontal
-            , parent     : QWidget=None
-    ):
+        self
+        , orientation: Qt.Orientation=Qt.Horizontal
+        , parent     : QWidget=None
+    ) -> None:
         super().__init__(orientation, parent)
 
         self.logger = logging.getLogger('tslot')
@@ -37,20 +38,26 @@ class THeaderView(QHeaderView):
 
     @logged
     def setModel(self, model: QAbstractItemModel=None):
-        '''
+        """
         Set the underlying data model
 
         Fine-grained resizing of individual sections requires calling
         setSectionResizeMode which works only when you've set the model.
-        '''
+        """
+
         if model is None:
             raise RuntimeError('Must provide a model')
 
         super().setModel(model)
 
-        if model.columnCount() != self.count():
-            raise RuntimeError('model.columnCount() != self.count()')
+        if self.count() == 0:
+            return # if the model is empty, there is nothing to adjust here
 
-        # The loop below is the only reason why this method exists
+        if self.count() != model.columnCount():
+            raise RuntimeError('model.columnCount() != self.count()')
+        if self.count() != len(self.section_resize_modes):
+            raise RuntimeError('self.count() != len(self.section_resize_modes)')
+
+        # The loop below is the only reason why this method has been overridden
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)

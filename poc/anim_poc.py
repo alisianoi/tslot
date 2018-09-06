@@ -2,11 +2,10 @@
 import sys
 
 from PyQt5.QtCore import (QEasingCurve, QParallelAnimationGroup,
-                          QPropertyAnimation, QRect, QSize, pyqtSlot)
+                          QPropertyAnimation, QRect, QSize, QTimer, pyqtSlot)
 from PyQt5.QtWidgets import (QApplication, QGraphicsOpacityEffect, QLabel,
                              QLineEdit, QMainWindow, QPushButton, QVBoxLayout,
                              QWidget)
-
 
 class TLineEdit(QLineEdit):
 

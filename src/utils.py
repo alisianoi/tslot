@@ -85,27 +85,45 @@ def pendulum2str(pnd: pendulum.DateTime) -> str:
 
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
-def logged(foo, logger=logging.getLogger('tslot')):
-    '''
-    Decorate a function and surround its call with enter/leave logs
 
-    Produces logging output of the form:
-    > enter foo
-      ...
-    > leave foo (returned value)
-    '''
+def logged(logger=logging.getLogger('tslot'), disabled=False):
+    """
+    Create a configured decorator that controls logging output of a function
 
-    @wraps(foo)
-    def wrapper(*args, **kwargs):
-        logger.debug(f'enter {foo.__qualname__}')
+    :param logger: the logger to send output to
+    :param disabled: True if the logger should be disabled, False otherwise
+    """
 
-        result = foo(*args, **kwargs)
+    def logged_decorator(foo):
+        """
+        Decorate a function and surround its call with enter/leave logs
 
-        logger.debug(f'leave {foo.__qualname__} ({result})')
+        Produce logging output of the form:
+        > enter foo
+          ...
+        > leave foo (returned value)
+        """
 
-        return result
+        @wraps(foo)
+        def wrapper(*args, **kwargs):
 
-    return wrapper
+            was_disabled = logger.disabled
+
+            logger.disabled = disabled
+
+            logger.debug(f'enter {foo.__qualname__}')
+
+            result = foo(*args, **kwargs)
+
+            logger.debug(f'leave {foo.__qualname__} ({result})')
+
+            logger.disabled = was_disabled
+
+            return result
+
+        return wrapper
+
+    return logged_decorator
 
 
 def configure_logging():
@@ -141,7 +159,7 @@ def configure_logging():
         'loggers': {
             'tslot': {
                 'handlers': ['console', 'file']
-                , 'level': 'INFO',
+                , 'level': 'DEBUG',
             }
         }
     })

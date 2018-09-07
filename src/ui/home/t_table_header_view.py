@@ -25,18 +25,17 @@ class THeaderView(QHeaderView):
 
         self.logger = logging.getLogger('tslot')
 
-        Stretch = QHeaderView.Stretch
-        ResizeToContents = QHeaderView.ResizeToContents
-
         self.section_resize_modes = [
-            Stretch # name of task
-            , Stretch # list of tags
-            , ResizeToContents # start time
-            , ResizeToContents # finish time
-            , ResizeToContents # elapsed time
+            QHeaderView.Stretch # name of task
+            , QHeaderView.Stretch # list of tags
+            , QHeaderView.ResizeToContents # start time
+            , QHeaderView.ResizeToContents # finish time
+            , QHeaderView.ResizeToContents # elapsed time
         ]
 
-    @logged
+        # self.hide()
+
+    @logged(disabled=False)
     def setModel(self, model: QAbstractItemModel=None):
         """
         Set the underlying data model

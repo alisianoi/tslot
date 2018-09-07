@@ -66,7 +66,6 @@ class TVaultBroker(TObject):
 
         self.threadpool.waitForDone()
 
-    @logged
     @pyqtSlot(TRequest)
     def handle_requested(self, request: TRequest) -> None:
         """Find a suitable handler for the request to the database"""
@@ -109,14 +108,14 @@ class TVaultBroker(TObject):
     def handle_timer_stash_request(self, request: TTimerStashRequest) -> None:
         self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
-    @logged
+    @logged(disabled=True)
     def handle_ray_slot_fetch(
         self, request: TRaySlotFetchRequest
     ) -> None:
 
         self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
-    @logged
+    @logged(disabled=True)
     def handle_ray_slot_with_tag_fetch(
         self, request: TRaySlotWithTagFetchRequest
     ) -> None:
@@ -125,7 +124,7 @@ class TVaultBroker(TObject):
             TRaySlotWithTagReader(request, self.path, parent=self)
         )
 
-    @logged
+    @logged(disabled=True)
     def dispatch_reader(self, reader: TReader):
         """Dispatch a given reader into a separate thread"""
 
@@ -133,7 +132,7 @@ class TVaultBroker(TObject):
 
         self.dispatch_worker(reader)
 
-    @logged
+    @logged(disabled=True)
     def dispatch_writer(self, writer: TWriter):
         """Dispatch a given writer into a separate thread"""
 
@@ -141,7 +140,7 @@ class TVaultBroker(TObject):
 
         self.dispatch_worker(writer)
 
-    @logged
+    @logged(disabled=True)
     def dispatch_worker(self, worker: TWorker):
         """
         Dispatch a given worker into a separate thread
@@ -160,7 +159,7 @@ class TVaultBroker(TObject):
 
         self.threadpool.start(DataRunnable(worker))
 
-    @logged
+    @logged(disabled=True)
     @pyqtSlot()
     def fn_started(self):
         self.logger.debug('Default fn_started')

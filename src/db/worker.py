@@ -59,6 +59,7 @@ class TWorker(QObject):
             TFailure('Failed to load anything: default work method')
         )
 
+    @logged(disabled=True)
     def create_session(self):
         """Open a brand new SQLite/SQLAlchemy database session"""
 

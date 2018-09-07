@@ -60,13 +60,10 @@ class TScrollWidget(TWidget):
             , slice_lst = slice_lst
         )
 
-        self.logger.info(request)
-
         self.requested.emit(request)
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse):
-        self.logger.info(response)
 
         if isinstance(response, TRaySlotFetchResponse):
             return self.handle_ray_slot_fetch(response)

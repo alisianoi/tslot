@@ -1,17 +1,19 @@
 import logging
-
 from pathlib import Path
 
 from PyQt5.QtGui import *
 
+from src.utils import logged
 
+
+@logged(disabled=True)
 def initialize_font_databse(path: Path=None):
-    '''
+    """
     Add custom fonts into the Qt's system font database
 
     The database itself is a singleton and a thread-safe class, so you
     could initialize/update it at any point and then use anywhere.
-    '''
+    """
 
     logger = logging.getLogger('tslot')
 

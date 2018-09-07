@@ -4,7 +4,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import logged
 from src.utils import pendulum2str, timedelta2str
 
 
@@ -18,7 +17,6 @@ class TTableModel(QAbstractTableModel):
 
         self.items = items
 
-    @logged
     def headerData(
         self
         , section    : int
@@ -34,7 +32,6 @@ class TTableModel(QAbstractTableModel):
 
         return super().headerData(section, orientation, role)
 
-    @logged
     def headerDataDisplayRole(self, section: int):
         if section == 0:
             return 'Task'
@@ -55,7 +52,6 @@ class TTableModel(QAbstractTableModel):
     def columnCount(self, parent: QModelIndex=QModelIndex()):
         return 5
 
-    @logged
     def data(
         self
         , index: QModelIndex=QModelIndex()

@@ -1,19 +1,19 @@
 import operator
-
 from pathlib import Path
 
 import pendulum
-
-from sqlalchemy import func
 from PyQt5.QtCore import QObject
+from sqlalchemy import func
 
-from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.slot_fetch_request import TSlotFetchRequest, TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
-from src.msg.slot_fetch_response import TRaySlotFetchResponseFactory
-from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponseFactory
-
+from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
-from src.db.model import SlotModel, TaskModel, TagModel
+from src.msg.base import TFailure, TRequest, TResponse
+from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
+                                        TRaySlotWithTagFetchRequest,
+                                        TSlotFetchRequest)
+from src.msg.slot_fetch_response import (TRaySlotFetchResponseFactory,
+                                         TRaySlotWithTagFetchResponseFactory)
+from src.utils import logged
 
 
 class TSlotReader(TReader):
@@ -114,6 +114,7 @@ class TRaySlotReader(TSlotReader):
         self.dt_offset = request.dt_offset
         self.direction = request.direction
 
+    @logged(disabled=True)
     def work(self):
 
         if self.direction == 'past_to_future':
@@ -189,6 +190,7 @@ class TRaySlotWithTagReader(TSlotReader):
         self.dt_offset = request.dt_offset
         self.direction = request.direction
 
+    @logged(disabled=True)
     def work(self):
 
         if self.direction == 'past_to_future':

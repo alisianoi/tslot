@@ -135,7 +135,7 @@ def configure_logging():
         'version': 1,
         'formatters': {
             'verbose': {
-                'format': '%(asctime)22s %(levelname)7s %(module)10s %(process)6d %(thread)15d %(message)s'
+                'format': '%(asctime)22s %(levelname)7s %(module)20s %(process)6d %(thread)15d %(message)s'
             }
             , 'simple': {
                 'format': '%(levelname)s %(message)s'

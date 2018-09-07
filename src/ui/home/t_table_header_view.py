@@ -33,7 +33,7 @@ class THeaderView(QHeaderView):
             , QHeaderView.ResizeToContents # elapsed time
         ]
 
-        # self.hide()
+        self.hide()
 
     @logged(disabled=False)
     def setModel(self, model: QAbstractItemModel=None):

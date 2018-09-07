@@ -36,14 +36,6 @@ class TCentralWidget(TWidget):
         self.setLayout(self.layout)
 
         # TODO: move this into a thread
-        self.stylist = Stylist(
-            parent=self, path=Path(Path.cwd(), Path('css'), Path('tslot.css'))
-        )
-
-        for style in self.stylist.styles:
-            self.setStyleSheet(self.stylist.styles[style])
-
-        # TODO: move this into a thread
         initialize_font_databse()
 
         # Experiment with shortcuts:
@@ -113,9 +105,9 @@ class TMainWindow(QMainWindow):
         )
 
         # Connect some more signals/slots between different widgets
-        self.timer.widget().menu_btn.clicked.connect(
-            self.menu.toggle_menu
-        )
+        # self.timer.widget().menu_btn.clicked.connect(
+        #     self.menu.toggle_menu
+        # )
 
         # Kickstart all widgets (signals/slots are connected now)
         self.kickstart()
@@ -131,6 +123,10 @@ if __name__ == '__main__':
     configure_logging()
 
     app = QApplication(sys.argv)
+
+    stylist = Stylist(path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
+
+    app.setStyleSheet(stylist.styles['tslot'])
 
     main_window = TMainWindow()
     main_window.show()

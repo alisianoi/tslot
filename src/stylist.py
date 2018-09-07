@@ -24,4 +24,4 @@ class Stylist(QObject):
             return
 
         with open(path) as src:
-            self.styles[path] = src.read()
+            self.styles['tslot'] = src.read()

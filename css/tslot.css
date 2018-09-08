@@ -1,7 +1,9 @@
 TTimerWidget QLabel {
     font-family: quicksand;
-    font-weight: 400;
+    font-weight: 800;
     font-size: 28px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 TTimerControlsWidget QLineEdit {
@@ -9,10 +11,27 @@ TTimerControlsWidget QLineEdit {
     font-weight: 800;
     font-size: 28px;
     border: 0px;
+    height: 64px;
+    min-height: 64px;
+    max-height: 64px;
 }
 
 TTimerControlsWidget QPushButton {
-    font-family: quicksand;
-    font-weight: 800;
-    font-size: 28px;
+    border: 0px;
+    width: 64px;
+    max-width: 64px;
+    min-width: 64px;
+    height: 64px;
+    max-height: 64px;
+    min-height: 64px;
+}
+
+QPushButton#t_timer_controls_push_btn {
+    qproperty-icon:
+        url("font/fontawesome/svgs/solid/play.svg") off
+        , url("font/fontawesome/svgs/solid/stop.svg") on;
+}
+
+QPushButton#t_timer_controls_nuke_btn {
+    qproperty-icon: url("font/fontawesome/svgs/solid/trash-alt.svg")
 }

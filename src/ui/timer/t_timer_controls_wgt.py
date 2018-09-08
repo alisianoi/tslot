@@ -25,19 +25,22 @@ class TTimerControlsWidget(TWidget):
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
         self.push_btn = QPushButton()
+        self.nuke_btn = QPushButton()
+
+        self.push_btn.setObjectName('t_timer_controls_push_btn')
+        self.nuke_btn.setObjectName('t_timer_controls_nuke_btn')
 
         self.layout = QHBoxLayout()
         self.layout.setContentsMargins(10, 0, 10, 0)
 
-        # The numbers at the end are stretch factors; How to do better?
-        self.layout.addWidget(self.task_ldt, 7)
-        self.layout.addWidget(self.timer_wgt, 1)
-        self.layout.addWidget(self.push_btn, 1)
+        self.layout.addWidget(self.task_ldt)
+        self.layout.addWidget(self.push_btn)
+        self.layout.addWidget(self.timer_wgt)
+        self.layout.addWidget(self.nuke_btn)
 
         self.setLayout(self.layout)
 
         self.task_ldt.setPlaceholderText('Type task/project')
-        self.push_btn.setText('Start')
 
         self.push_btn.clicked.connect(self.toggle_timer)
 

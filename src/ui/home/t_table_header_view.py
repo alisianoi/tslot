@@ -35,7 +35,7 @@ class THeaderView(QHeaderView):
 
         self.hide()
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def setModel(self, model: QAbstractItemModel=None):
         """
         Set the underlying data model

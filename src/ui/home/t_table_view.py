@@ -28,16 +28,16 @@ class TTableView(QTableView):
 
         self.setFont(QFont('Quicksand-Medium', 12))
 
-        self.setShowGrid(False)
+        # self.setShowGrid(False)
         self.setAlternatingRowColors(True)
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
 
         self.logger.debug(f'{event.oldSize()} -> {event.size()}')
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def sizeHint(self):
         """Compute the exact required size for the table"""
 
@@ -59,11 +59,11 @@ class TTableView(QTableView):
 
         return QSize(w, h)
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def minimumSizeHint(self):
         return self.sizeHint()
 
-    @logged(disabled=False)
+    @logged(disabled=True)
     def setModel(self, model: QAbstractItemModel):
 
         super().setModel(model)

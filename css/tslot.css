@@ -1,3 +1,18 @@
-TMainWindow {
-    background-color: #8B0000;
+TTimerWidget QLabel {
+    font-family: quicksand;
+    font-weight: 400;
+    font-size: 28px;
+}
+
+TTimerControlsWidget QLineEdit {
+    font-family: quicksand;
+    font-weight: 800;
+    font-size: 28px;
+    border: 0px;
+}
+
+TTimerControlsWidget QPushButton {
+    font-family: quicksand;
+    font-weight: 800;
+    font-size: 28px;
 }

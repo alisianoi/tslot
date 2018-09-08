@@ -4,7 +4,7 @@ from pathlib import Path
 from PyQt5.QtCore import QObject
 
 
-class Stylist(QObject):
+class StyleBroker(QObject):
     """Load and store files that contain Qt Style Sheets"""
 
     def __init__(self, path: Path=None, parent: QObject=None):

@@ -16,7 +16,7 @@ from src.font import initialize_font_databse
 from src.ui.base import TWidget
 from src.ui.menu.t_menu_wgt import TDockMenuWidget
 from src.ui.home.t_scroll_area import TScrollArea
-from src.stylist import Stylist
+from src.style import StyleBroker
 from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
 from src.utils import configure_logging
 
@@ -124,9 +124,9 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    stylist = Stylist(path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
+    style = StyleBroker(path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
 
-    app.setStyleSheet(stylist.styles['tslot'])
+    app.setStyleSheet(style.styles['tslot'])
 
     main_window = TMainWindow()
     main_window.show()

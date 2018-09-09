@@ -65,17 +65,12 @@ class TMainWindow(QMainWindow):
         self.vault = TVaultBroker(parent=self)
         self.cache = TCacheBroker(parent=self)
 
-        self.menu = TDockMenuWidget(parent=self)
         self.timer = TTimerControlsDockWidget(parent=self)
         self.widget = TCentralWidget(parent=self)
 
         self.setCentralWidget(self.widget)
 
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.menu)
         self.addDockWidget(Qt.TopDockWidgetArea, self.timer)
-
-        # TODO: look into font selection
-        self.setFont(QFont('Quicksand-Medium', 12))
 
         # Connect database vault broker and memory cache broker:
         self.vault.responded.connect(self.cache.handle_responded)
@@ -104,11 +99,6 @@ class TMainWindow(QMainWindow):
             self.cache.handle_requested
         )
 
-        # Connect some more signals/slots between different widgets
-        # self.timer.widget().menu_btn.clicked.connect(
-        #     self.menu.toggle_menu
-        # )
-
         # Kickstart all widgets (signals/slots are connected now)
         self.kickstart()
 
@@ -119,7 +109,6 @@ class TMainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
-    # TODO: add parameters to allow log silencing
     configure_logging()
 
     app = QApplication(sys.argv)

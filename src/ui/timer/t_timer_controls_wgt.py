@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import pendulum
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton
 
 from src.ai.model import TEntryModel, TSlotModel
@@ -11,16 +13,17 @@ from src.ui.timer.t_timer_wgt import TTimerWidget
 
 
 class TTimerControlsWidget(TWidget):
-    """
-    Add basic controls to start/stop time tracking for a task
-
-    Contains a line edit to name the current task and a push button to toggle
-    its timer. Also holds a timer widget and a menu toggle button.
-    """
+    """Add basic controls to start/stop time tracking for a task"""
 
     def __init__(self, parent: TWidget=None):
 
         super().__init__(parent)
+
+        path_svgs_solid = Path('font', 'fontawesome', 'svgs', 'solid')
+
+        self.play_icon = QIcon(str(Path(path_svgs_solid, 'play.svg')))
+        self.stop_icon = QIcon(str(Path(path_svgs_solid, 'stop.svg')))
+        self.nuke_icon = QIcon(str(Path(path_svgs_solid, 'trash-alt.svg')))
 
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
@@ -29,8 +32,11 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.setObjectName('t_timer_controls_push_btn')
         self.nuke_btn.setObjectName('t_timer_controls_nuke_btn')
+        self.push_btn.setIcon(self.play_icon)
+        self.nuke_btn.setIcon(self.nuke_icon)
 
         self.layout = QHBoxLayout()
+        self.layout.setSpacing(0)
         self.layout.setContentsMargins(10, 0, 10, 0)
 
         self.layout.addWidget(self.task_ldt)
@@ -51,10 +57,10 @@ class TTimerControlsWidget(TWidget):
     def toggle_timer(self):
         self.push_btn.setDisabled(True)
 
-        if self.timer_wgt.isActive():
-            self.stop_timer()
-        else:
+        if not self.timer_wgt.isActive():
             self.start_timer()
+        else:
+            self.stop_timer()
 
         self.push_btn.setDisabled(False)
 
@@ -62,15 +68,8 @@ class TTimerControlsWidget(TWidget):
         """
         Start the timer
 
-        Optionally, use the provided initial value as timer offset. Also, use
-        custom timer sleep value if required. Finally, when restarting a timer
-        from the past, use its model.
-
         Make sure that there is no other timer already running. When creating a
         brand new timer, make sure to save it to the database.
-
-        :param value: initial time value
-        :param sleep: sleep interval (milliseconds)
         """
 
         if self.timer_wgt.isActive():
@@ -82,14 +81,15 @@ class TTimerControlsWidget(TWidget):
             value = self.start_old_timer(tdata)
 
         self.timer_wgt.start_timer(value, sleep)
-        self.push_btn.setText('Stop')
+
+        self.push_btn.setIcon(self.stop_icon)
 
     def start_new_timer(self) -> int:
         tslot = TSlotModel(fst=pendulum.now(tz='UTC'))
 
         self.tdata = TEntryModel(slot=tslot)
 
-        self.requested.emit(TTimerStashRequest(self.tdata))
+        # self.requested.emit(TTimerStashRequest(self.tdata))
 
         return 0 # zero seconds of running new timer
 
@@ -110,9 +110,9 @@ class TTimerControlsWidget(TWidget):
 
         self.tdata.slot.lst = pendulum.now(tz='UTC')
 
-        self.requested.emit(TTimerStashRequest(self.tdata))
+        # self.requested.emit(TTimerStashRequest(self.tdata))
 
-        self.push_btn.setText('Start')
+        self.push_btn.setIcon(self.play_icon)
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse) -> None:

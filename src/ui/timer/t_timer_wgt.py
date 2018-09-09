@@ -69,8 +69,5 @@ class TTimerWidget(TWidget):
 
         return value
 
-    def setFont(self, font: QFont):
-        self.tick_lbl.setFont(font)
-
     def isActive(self) -> bool:
         return self.timer.isActive()

@@ -15,7 +15,7 @@ from src.db.broker import TVaultBroker
 from src.font import initialize_font_databse
 from src.ui.base import TWidget
 from src.ui.menu.t_menu_wgt import TDockMenuWidget
-from src.ui.home.t_scroll_area import TScrollArea
+from src.ui.home.t_scroll_area import THomeScrollArea
 from src.style import StyleBroker
 from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
 from src.utils import configure_logging
@@ -27,7 +27,7 @@ class TCentralWidget(TWidget):
 
         super().__init__(parent)
 
-        self.scroll = TScrollArea(parent=self)
+        self.scroll = THomeScrollArea(parent=self)
 
         self.layout = QVBoxLayout()
 

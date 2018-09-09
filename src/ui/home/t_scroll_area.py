@@ -4,24 +4,21 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from src.ui.base import TScrollArea
 from src.ui.home.t_scroll_wgt import TScrollWidget
 
 
-class TScrollArea(QScrollArea):
-    """Provide the top-level scroll-enabled area"""
+class THomeScrollArea(TScrollArea):
+    """Show several tables that contain time slots"""
 
     def __init__(self, parent: QWidget=None):
 
         super().__init__(parent=parent)
 
-        self.name = self.__class__.__name__
-        self.logger = logging.getLogger('tslot')
-
         # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setWidget(TScrollWidget())
         self.setWidgetResizable(True)
-
 
     @pyqtSlot()
     def handle_show_next_shortcut(self):

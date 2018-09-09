@@ -1,15 +1,27 @@
 from pathlib import Path
 
 import pendulum
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import QSize, pyqtSlot
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 from src.ai.model import TEntryModel, TSlotModel
 from src.msg.base import TResponse
 from src.msg.timer import TTimerRequest, TTimerResponse, TTimerStashRequest
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
+
+
+class TNukeButton(QPushButton):
+
+    def __init__(self, parent: QWidget=None) -> None:
+
+        super().__init__(parent)
+
+        sp = self.sizePolicy()
+        sp.setRetainSizeWhenHidden(True)
+
+        self.setSizePolicy(sp)
 
 
 class TTimerControlsWidget(TWidget):
@@ -28,12 +40,13 @@ class TTimerControlsWidget(TWidget):
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
         self.push_btn = QPushButton()
-        self.nuke_btn = QPushButton()
+        self.nuke_btn = TNukeButton()
 
         self.push_btn.setObjectName('t_timer_controls_push_btn')
         self.nuke_btn.setObjectName('t_timer_controls_nuke_btn')
         self.push_btn.setIcon(self.play_icon)
         self.nuke_btn.setIcon(self.nuke_icon)
+        self.nuke_btn.hide()
 
         self.layout = QHBoxLayout()
         self.layout.setSpacing(0)
@@ -83,6 +96,7 @@ class TTimerControlsWidget(TWidget):
         self.timer_wgt.start_timer(value, sleep)
 
         self.push_btn.setIcon(self.stop_icon)
+        self.nuke_btn.show()
 
     def start_new_timer(self) -> int:
         tslot = TSlotModel(fst=pendulum.now(tz='UTC'))
@@ -113,6 +127,7 @@ class TTimerControlsWidget(TWidget):
         # self.requested.emit(TTimerStashRequest(self.tdata))
 
         self.push_btn.setIcon(self.play_icon)
+        self.nuke_btn.hide()
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse) -> None:

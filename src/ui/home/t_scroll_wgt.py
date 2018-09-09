@@ -1,25 +1,25 @@
 import logging
 
 import pendulum
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.msg.base import TRequest, TResponse, TFailure
-from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
-from src.msg.slot_fetch_response import TRaySlotFetchResponse, TRaySlotWithTagFetchResponse
-
+from src.msg.base import TFailure, TRequest, TResponse
+from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
+                                        TRaySlotWithTagFetchRequest)
+from src.msg.slot_fetch_response import (TRaySlotFetchResponse,
+                                         TRaySlotWithTagFetchResponse)
 from src.ui.base import TWidget
-from src.ui.home.t_table_view import TTableView
 from src.ui.home.t_table_model import TTableModel
+from src.ui.home.t_table_view import THomeTableView
 
 
 class TScrollWidget(TWidget):
     """
     Provide the top-level widget for the scroll-enabled area
 
-    This widget should add/remove incoming SlotTableView's, effectively
+    This widget should add/remove incoming SloTHomeTableView's, effectively
     implementing infinite scroll for a series of tables of slots.
     """
 
@@ -92,7 +92,7 @@ class TScrollWidget(TWidget):
         for day in response.break_by_date():
             fst_slot, lst_slot = day
 
-            view = TTableView(self)
+            view = THomeTableView(self)
             model = TTableModel(response.items[fst_slot:lst_slot])
 
             view.setModel(model)
@@ -125,7 +125,7 @@ class TScrollWidget(TWidget):
         for day in response.break_by_date():
             fst_slot, lst_slot = day
 
-            view = TTableView(self)
+            view = THomeTableView(self)
             model = TTableModel(response.items[fst_slot:lst_slot])
 
             view.setModel(model)
@@ -137,7 +137,7 @@ class TScrollWidget(TWidget):
         if response.slice_lst > self.slice_lst:
             self.slice_lst = response.slice_lst
 
-    def show_next(self, view: TTableView):
+    def show_next(self, view: THomeTableView):
 
         # TODO: why does inserting not work?
         # Remove the spacer that props widgets up
@@ -147,7 +147,7 @@ class TScrollWidget(TWidget):
         # Add the spacer back to prop widgets up
         self.layout.addStretch(1)
 
-    def show_prev(self, view: TTableView):
+    def show_prev(self, view: THomeTableView):
         raise NotImplementedError()
 
     @pyqtSlot(TFailure)

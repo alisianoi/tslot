@@ -4,11 +4,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from src.ui.base import TTableView
 from src.ui.home.t_table_header_view import THeaderView
 from src.utils import logged
 
 
-class TTableView(QTableView):
+class THomeTableView(TTableView):
 
     def __init__(self, parent: QObject=None):
 

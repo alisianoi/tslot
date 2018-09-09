@@ -1,7 +1,7 @@
 import logging
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QDockWidget, QScrollArea, QWidget
+from PyQt5.QtWidgets import QDockWidget, QScrollArea, QTableView, QWidget
 
 from src.msg.base import TFailure, TRequest, TResponse
 
@@ -75,7 +75,37 @@ class TDockWidget(QDockWidget):
 
 class TScrollArea(QScrollArea):
     """
-    Base class for all dock widgets used by TimeSlot
+    Base class for all scroll areas used by TimeSlot
+    """
+
+    requested = pyqtSignal(TRequest)
+    responded = pyqtSignal(TResponse)
+    triggered = pyqtSignal(TFailure)
+
+    def __init__(self, parent: QWidget=None) -> None:
+        super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
+
+    def kickstart(self) -> None:
+        pass
+
+    @pyqtSlot(TRequest)
+    def handle_requested(self, signal: TRequest) -> None:
+        self.requested.emit(signal)
+
+    @pyqtSlot(TResponse)
+    def handle_responded(self, signal: TResponse) -> None:
+        self.responded.emit(signal)
+
+    @pyqtSlot(TFailure)
+    def handle_triggered(self, signal: TFailure) -> None:
+        self.triggered.emit(signal)
+
+
+class TTableView(QTableView):
+    """
+    Base class for all table views used by TimeSlot
     """
 
     requested = pyqtSignal(TRequest)

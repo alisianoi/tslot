@@ -6,4 +6,4 @@ pytest-qt==3.0.0
 pytest-cov==2.5.1
 pytest-xvfb==1.1.0
 pytest-repeat==0.6.0
-pytest-xdist==1.22.5
+pytest-xdist==1.23.2

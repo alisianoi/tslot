@@ -30,3 +30,13 @@ TTimerControlsWidget QPushButton {
 QPushButton#t_timer_controls_nuke_btn {
     qproperty-icon: url("font/fontawesome/svgs/solid/trash-alt.svg")
 }
+
+THomeScrollArea {
+    border: none;
+}
+
+THomeTableView {
+    margin-right: 64px;
+    font: quicksand;
+    font-size: 28px;
+}

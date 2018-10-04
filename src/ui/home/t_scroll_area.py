@@ -13,9 +13,9 @@ class THomeScrollArea(TScrollArea):
 
     def __init__(self, parent: QWidget=None):
 
-        super().__init__(parent=parent)
+        super().__init__(parent)
 
-        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setWidget(TScrollWidget())
         self.setWidgetResizable(True)

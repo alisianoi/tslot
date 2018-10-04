@@ -31,6 +31,7 @@ class THeaderView(QHeaderView):
             , QHeaderView.ResizeToContents # start time
             , QHeaderView.ResizeToContents # finish time
             , QHeaderView.ResizeToContents # elapsed time
+            , QHeaderView.ResizeToContents # nuke button
         ]
 
         self.hide()
@@ -60,3 +61,18 @@ class THeaderView(QHeaderView):
         # The loop below is the only reason why this method has been overridden
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
+
+    @logged(disabled=False)
+    def sectionSizeHint(self, logical_index: int) -> int:
+
+        return super().sectionSizeHint(logical_index)
+
+    @logged(disabled=False)
+    def minimumSectionSize(self) -> int:
+
+        return super().minimumSectionSize()
+
+    @logged(disabled=False)
+    def maximumSectionSize(self) -> int:
+
+        return super().maximumSectionSize()

@@ -1,17 +1,28 @@
 import datetime
 import logging.config
+from functools import wraps
+from typing import List
+
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QStyleOption
 
 import pendulum
 
-from typing import List
-from functools import wraps
 
-from PyQt5.QtCore import *
+def style_option_as_str(option: QStyleOption) -> str:
 
+    if option == 1:
+        return 'SO_FocusRect'
+    elif option == 2:
+        return 'SO_Button'
+    elif option == 10:
+        return 'SO_ViewItem'
+
+    raise RuntimeError(f'Unknown style option type {type}')
 
 def orient2str(orientation: Qt.Orientation):
     if orientation == 0x1 and orientation == Qt.Horizontal:
-        return 'Qt.Horizontal'
+        return 'Qt.Hhttp://doc.qt.io/qt-5/qsize.html#detailsorizontal'
     elif orientation == 0x2 and orientation == Qt.Vertical:
         return 'Qt.Vertical'
 

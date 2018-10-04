@@ -3,10 +3,78 @@ import logging
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QStyleOptionButton
 
 from src.ui.base import TTableView
 from src.ui.home.t_table_header_view import THeaderView
-from src.utils import logged
+from src.utils import logged, style_option_as_str
+
+
+class TNukeStyleDelegate(QStyledItemDelegate):
+    """Draw a push button instead of a table cell."""
+
+    def __init__(self, parent: QWidget=None) -> None:
+
+        super().__init__(parent)
+
+        self.logger = logging.getLogger('tslot')
+
+    @logged(disabled=False)
+    def createEditor(
+        self
+        , parent: QWidget
+        , option: QStyleOptionViewItem
+        , index: QModelIndex
+    ) -> QWidget:
+
+        editor = QPushButton(parent)
+
+        editor.setText('trash')
+
+        return editor
+
+    @logged(disabled=True)
+    def paint(
+        self
+        , painter: QPainter
+        , option : QStyleOptionViewItem
+        , index  : QModelIndex
+    ) -> None:
+
+        self.logger.debug(f'paint: {index}')
+
+        if index.column() != 5:
+            return super().paint(painter, option, index)
+
+        painter.save()
+
+        so_button = QStyleOptionButton()
+        so_button.rect = QRect(option.rect)
+        so_button.text = 'trash'
+        so_button.state = QStyle.State_Enabled
+
+        QApplication.style().drawControl(QStyle.CE_PushButton, so_button, painter)
+
+        painter.restore()
+
+    @logged(disabled=False)
+    def sizeHint(self, item: QStyleOptionViewItem, index: QModelIndex) -> QSize:
+
+        size = super().sizeHint(item, index)
+
+        self.logger.debug(style_option_as_str(item.type))
+        self.logger.debug(f'row: {item.index.row()}, col: {item.index.column()}')
+        self.logger.debug(f'{index.data()}')
+        self.logger.debug(item.text)
+
+        if index in [2, 3, 4]:
+            return size
+
+        return QSize(size.width() + 20, size.height())
+
+        # self.logger.debug(f'column: {index.column()}')
+
+        # return super().sizeHint(item, index)
 
 
 class THomeTableView(TTableView):
@@ -15,7 +83,8 @@ class THomeTableView(TTableView):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
+        self.delegate = TNukeStyleDelegate()
+        self.setItemDelegate(self.delegate)
 
         self.verticalHeader().hide()
         self.horizontalHeader().hide()
@@ -27,9 +96,7 @@ class THomeTableView(TTableView):
         # the table view, let's disable the vertical scrollbar
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.setFont(QFont('Quicksand-Medium', 12))
-
-        # self.setShowGrid(False)
+        self.setShowGrid(False)
         self.setAlternatingRowColors(True)
 
     @logged(disabled=True)
@@ -74,3 +141,13 @@ class THomeTableView(TTableView):
         self.header_view = THeaderView(Qt.Horizontal, self)
 
         self.setHorizontalHeader(self.header_view)
+
+    @logged(disabled=False)
+    def enterEvent(self, event: QEvent) -> None:
+
+        super().enterEvent(event)
+
+    @logged(disabled=False)
+    def leaveEvent(self, event: QEvent) -> None:
+
+        super().leaveEvent(event)

@@ -43,6 +43,8 @@ class TTableModel(QAbstractTableModel):
             return 'Stopped'
         elif section == 4:
             return 'Elapsed'
+        elif section == 5:
+            return 'Nuke button'
 
         raise RuntimeError(f'Fix .headerDataDisplayRole: section {section}')
 
@@ -50,7 +52,7 @@ class TTableModel(QAbstractTableModel):
         return len(self.items)
 
     def columnCount(self, parent: QModelIndex=QModelIndex()):
-        return 5
+        return 6
 
     def data(
         self
@@ -103,7 +105,7 @@ class TTableModel(QAbstractTableModel):
 
     def dataTextAlignmentRole(self, index: QModelIndex=QModelIndex()):
 
-        if index.column() == 4:
-            return Qt.AlignVCenter | Qt.AlignRight
+        if index.column() in [2, 3, 4]:
+            return Qt.AlignCenter
 
         return QVariant()

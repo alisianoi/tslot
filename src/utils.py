@@ -9,6 +9,35 @@ from PyQt5.QtWidgets import QStyleOption
 import pendulum
 
 
+def item_flags_as_str(flags: Qt.ItemFlags) -> str:
+
+    message = ''
+
+    if flags == 0:
+        message = 'NoItemFlags'
+    if flags & Qt.ItemIsSelectable:
+        message += 'ItemIsSelectable '
+    if flags & Qt.ItemIsEditable:
+        message += 'ItemIsEditable '
+    if flags & Qt.ItemIsDragEnabled:
+        message += 'ItemIsDragEnabled '
+    if flags & Qt.ItemIsDropEnabled:
+        message += 'ItemIsDropEnabled '
+    if flags & Qt.ItemIsUserCheckable:
+        message += 'ItemIsUserCheckable '
+    if flags & Qt.ItemIsEnabled:
+        message += 'ItemIsEnabled '
+    if flags & Qt.ItemIsAutoTristate:
+        message += 'ItemIsAutoTristate '
+    if flags & Qt.ItemIsTristate:
+        message += 'ItemIsTristate '
+    if flags & Qt.ItemNeverHasChildren:
+        message += 'ItemNeverHasChildren '
+    if flags & Qt.ItemIsUserTristate:
+        message += 'ItemIsUserTristate '
+
+    return message.strip()
+
 def style_option_as_str(option: QStyleOption) -> str:
 
     if option == 1:

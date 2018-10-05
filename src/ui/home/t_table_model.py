@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import pendulum2str, timedelta2str
+from src.utils import item_flags_as_str, logged, pendulum2str, timedelta2str
 
 
 class TTableModel(QAbstractTableModel):
@@ -17,12 +17,29 @@ class TTableModel(QAbstractTableModel):
 
         self.items = items
 
+    def rowCount(self, parent: QModelIndex=QModelIndex()):
+        return len(self.items)
+
+    def columnCount(self, parent: QModelIndex=QModelIndex()):
+        return 6
+
+    @logged(disabled=False)
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
+
+        return Qt.ItemIsEnabled | Qt.ItemIsEditable
+
+        # flags = super().flags(index)
+        #
+        # self.logger.debug(f'flags: {item_flags_as_str(flags)}')
+        #
+        # return flags
+
     def headerData(
         self
         , section    : int
         , orientation: Qt.Orientation
         , role       : Qt.ItemDataRole=Qt.DisplayRole
-    ):
+    ) -> QVariant:
 
         if orientation == Qt.Vertical:
             return super().headerData(section, orientation, role)
@@ -32,7 +49,7 @@ class TTableModel(QAbstractTableModel):
 
         return super().headerData(section, orientation, role)
 
-    def headerDataDisplayRole(self, section: int):
+    def headerDataDisplayRole(self, section: int) -> QVariant:
         if section == 0:
             return 'Task'
         elif section == 1:
@@ -47,12 +64,6 @@ class TTableModel(QAbstractTableModel):
             return 'Nuke button'
 
         raise RuntimeError(f'Fix .headerDataDisplayRole: section {section}')
-
-    def rowCount(self, parent: QModelIndex=QModelIndex()):
-        return len(self.items)
-
-    def columnCount(self, parent: QModelIndex=QModelIndex()):
-        return 6
 
     def data(
         self

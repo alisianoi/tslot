@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from PyQt5.QtCore import QObject
@@ -8,6 +9,7 @@ from src.db.reader_for_timer import TSlotModel, TTaskModel
 from src.db.worker import TWriter
 from src.msg.base import TFailure
 from src.msg.timer import TTimerStashRequest
+from src.utils import logged
 
 
 class TTimerWriter(TWriter):
@@ -23,6 +25,7 @@ class TTimerWriter(TWriter):
 
         self.tdata = request.tdata
 
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self) -> None:
 
         if self.session is None:

@@ -1,13 +1,14 @@
+import logging
 import pprint
-
 from pathlib import Path
 
 from PyQt5.QtCore import QObject
 
 from src.db.model import TagModel, TaskModel
 from src.db.worker import TReader
-
 from src.msg.fetch_tag import TTagFetchResponse
+from src.utils import logged
+
 
 class TTagReader(TReader):
     """Fetch a list of tags when supplied with a list of tasks"""
@@ -23,6 +24,7 @@ class TTagReader(TReader):
 
         self.tasks = tasks
 
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self):
 
         if not isinstance(self.tasks, list):

@@ -1,13 +1,14 @@
-import pendulum
-
+import logging
 from pathlib import Path
 
+import pendulum
 from src.ai.base import TObject
-
-from src.ai.model import TSlotModel, TTaskModel, TTagModel, TEntryModel
+from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel
 from src.db.worker import TReader
 from src.msg.timer import TTimerRequest, TTimerResponse
+from src.utils import logged
+
 
 class TTimerReader(TReader):
 
@@ -19,6 +20,7 @@ class TTimerReader(TReader):
     ) -> None:
         super().__init__(request, path, parent)
 
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self) -> None:
 
         if self.session is None:

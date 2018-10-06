@@ -40,13 +40,14 @@ class TWorker(QObject):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
+        self.logger = logging.getLogger('tslot-data')
 
         self.path = path
         self.query = None
 
         self.session = None
 
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self) -> None:
         """
         Provide the default work method which subclasses should overwrite
@@ -59,7 +60,7 @@ class TWorker(QObject):
             TFailure('Failed to load anything: default work method')
         )
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def create_session(self):
         """Open a brand new SQLite/SQLAlchemy database session"""
 

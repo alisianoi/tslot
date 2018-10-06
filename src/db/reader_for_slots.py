@@ -1,10 +1,11 @@
+import logging
 import operator
 from pathlib import Path
 
-import pendulum
 from PyQt5.QtCore import QObject
 from sqlalchemy import func
 
+import pendulum
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
 from src.msg.base import TFailure, TRequest, TResponse
@@ -114,7 +115,7 @@ class TRaySlotReader(TSlotReader):
         self.dt_offset = request.dt_offset
         self.direction = request.direction
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self):
 
         if self.direction == 'past_to_future':
@@ -190,7 +191,7 @@ class TRaySlotWithTagReader(TSlotReader):
         self.dt_offset = request.dt_offset
         self.direction = request.direction
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self):
 
         if self.direction == 'past_to_future':
@@ -249,7 +250,7 @@ class TRaySlotWithTagReader(TSlotReader):
 
         result = RayDateQuery.all()
 
-        self.logger.debug(result)
+        # self.logger.debug(result)
 
         self.fetched.emit(
             TRaySlotWithTagFetchResponseFactory.from_request(

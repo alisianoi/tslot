@@ -126,7 +126,7 @@ def pendulum2str(pnd: pendulum.DateTime) -> str:
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
 
-def logged(logger=logging.getLogger('tslot'), disabled=False):
+def logged(logger=logging.getLogger('tslot-main'), disabled=False):
     """
     Create a configured decorator that controls logging output of a function
 
@@ -167,9 +167,7 @@ def logged(logger=logging.getLogger('tslot'), disabled=False):
 
 
 def configure_logging():
-    '''
-    Set up loggers/handlers/formatters as well as their logging levels
-    '''
+    """Set up loggers/handlers/formatters as well as their logging levels"""
 
     logging.config.dictConfig({
         'version': 1,
@@ -182,7 +180,17 @@ def configure_logging():
             }
         }
         , 'handlers': {
-            'file': {
+            'console-main': {
+                'level': 'DEBUG'
+                , 'class': 'logging.StreamHandler'
+                , 'formatter': 'verbose'
+            }
+            , 'console-data': {
+                'level': 'DEBUG'
+                , 'class': 'logging.StreamHandler'
+                , 'formatter': 'verbose'
+            }
+            , 'file': {
                 'level': 'DEBUG'
                 , 'class': 'logging.handlers.RotatingFileHandler'
                 , 'formatter': 'verbose'
@@ -190,19 +198,24 @@ def configure_logging():
                 , 'maxBytes': 10485760 # 10 MiB
                 , 'backupCount': 3
             }
-            , 'console': {
-                'level': 'DEBUG'
-                , 'class': 'logging.StreamHandler'
-                , 'formatter': 'verbose'
-            }
         },
         'loggers': {
-            'tslot': {
-                'handlers': ['console', 'file']
-                , 'level': 'DEBUG',
+            'tslot-main': {
+                'handlers': ['console-main', 'file']
+                , 'level': 'DEBUG'
+            }
+            , 'tslot-data': {
+                'handlers': ['console-data']
+                , 'level': 'DEBUG'
             }
         }
     })
 
-    logger = logging.getLogger('tslot')
-    logger.debug('tslot logger is online')
+    # The reason there are two loggers is because there is the gui (main) thread
+    # and a database (data) thread. If both threads use the same logger, it all
+    # becomes messy quite quickly (messages go missing or pop up when disabled)
+    logger = logging.getLogger('tslot-main')
+    logger.debug('tslot-main logger is online')
+
+    logger = logging.getLogger('tslot-data')
+    logger.debug('tslot-data logger is online')

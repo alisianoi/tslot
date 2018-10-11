@@ -248,13 +248,11 @@ class TRaySlotWithTagReader(TSlotReader):
             tags_order
         )
 
-        result = RayDateQuery.all()
-
-        # self.logger.debug(result)
+        items = RayDateQuery.all()
 
         self.fetched.emit(
             TRaySlotWithTagFetchResponseFactory.from_request(
-                items=result, request=self.request
+                items=items, request=self.request
             )
         )
 

@@ -1,10 +1,10 @@
 import logging
 
-import pendulum
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import pendulum
 from src.msg.base import TFailure, TRequest, TResponse
 from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest)
@@ -13,13 +13,14 @@ from src.msg.slot_fetch_response import (TRaySlotFetchResponse,
 from src.ui.base import TWidget
 from src.ui.home.t_table_model import TTableModel
 from src.ui.home.t_table_view import THomeTableView
+from src.utils import logged
 
 
 class TScrollWidget(TWidget):
     """
     Provide the top-level widget for the scroll-enabled area
 
-    This widget should add/remove incoming SloTHomeTableView's, effectively
+    This widget should add/remove incoming THomeTableView's, effectively
     implementing infinite scroll for a series of tables of slots.
     """
 
@@ -44,10 +45,9 @@ class TScrollWidget(TWidget):
 
         self.request(0, 1)
 
+    @logged(logger=logging.getLogger('tslot-main'), disabled=False)
     def request_next(self):
-        self.logger.info('request_next enter')
         self.request(self.slice_lst, self.slice_lst + 1)
-        self.logger.info('request_next leave')
 
     def request(self, slice_fst: int, slice_lst: int):
 

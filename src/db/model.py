@@ -37,8 +37,26 @@ class TagModel(Base):
     def __eq__(self, other):
         return self.name == other.name
 
+    def __lt__(self, other):
+        if self.name == other.name:
+            return self.id < other.id
+        else:
+            return self.name < other.name
+
+    def __gt__(self, other):
+        if self.name == other.name:
+            return self.id > other.id
+        else:
+            return self.name > other.name
+
+    def __le__(self, other):
+        return self.name <= other.name
+
+    def __ge__(self, other):
+        return self.name >= other.name
+
     def __hash__(self):
-        return hash(self.name)
+        return hash((self.id, self.name))
 
 
 class TaskModel(Base):
@@ -62,7 +80,7 @@ class TaskModel(Base):
         return self.name == other.name
 
     def __hash__(self):
-        return hash(self.name)
+        return hash((self.id, self.name))
 
 
 class SlotModel(Base):
@@ -120,4 +138,4 @@ class SlotModel(Base):
         return False
 
     def __hash__(self):
-        return hash((self.fst, self.lst))
+        return hash((self.id, self.fst, self.lst))

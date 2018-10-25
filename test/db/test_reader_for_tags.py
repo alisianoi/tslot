@@ -1,7 +1,10 @@
+import pytest
 import pprint
 
 from src.db.model import TagModel, TaskModel
-from src.db.reader_for_tags import TTagReader
+from src.db.reader_for_tags import TTagReader, TTagsByNameReader
+from src.msg.tag_fetch_request import TTagsByNameFetchRequest
+from src.msg.tag_fetch_response import TTagsByNameFetchResponse
 
 
 def setup_one_tag_one_task(session):
@@ -80,6 +83,139 @@ def test_tag_reader_1(session, qtbot):
 
             assert tag in task.tags
             assert task in tag.tasks
+
+    def handle_alerted(reason):
+        assert False, reason
+
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
+
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
+
+        worker.work()
+
+
+@pytest.mark.parametrize('exact', [True, False])
+def test_tag_reader_2(session, qtbot, exact):
+    """
+    Create a single tag and fetch it using its exact name.
+
+    Use both exact=True and exact=False in the request, it should produce the
+    same result since there is only one tag in the database.
+    """
+
+    tag, task = setup_one_tag_one_task(session)
+
+    request = TTagsByNameFetchRequest(name="tag0", exact=exact)
+
+    worker = TTagsByNameReader(request=request)
+
+    worker.session = session
+
+    def handle_fetched(response: TTagsByNameFetchResponse):
+
+        tags = response.tags
+
+        assert len(tags) == 1
+
+        assert tags[0] == tag[0]
+
+    def handle_alerted(reason):
+        assert False, reason
+
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
+
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
+
+        worker.work()
+
+
+def test_tag_reader_3(session, qtbot):
+    """Create a single tag and fetch it using the wrong exact name"""
+
+    tag, task = setup_one_tag_one_task(session)
+
+    # The name of the created tag is "tag0", i.e. with zero at the end
+    request = TTagsByNameFetchRequest(name="tag", exact=True)
+
+    worker = TTagsByNameReader(request=request)
+
+    worker.session = session
+
+    def handle_fetched(response: TTagsByNameFetchResponse):
+
+        tags = response.tags
+
+        assert len(tags) == 0
+
+    def handle_alerted(reason):
+        assert False, reason
+
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
+
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
+
+        worker.work()
+
+
+@pytest.mark.parametrize(
+    'name'
+    , ['tag', 'Tag', 'TAG', 'tAg', 'tAG', 'ag', 'AG', 'aG', '0', 'tag0']
+)
+def test_tag_reader_4(session, qtbot, name):
+    """
+    Create a single tag name and fetch it using an incomplete name.
+
+    Use exact=False in the request, so that the tag is actually found.
+    """
+
+    tag, task = setup_one_tag_one_task(session)
+
+    request = TTagsByNameFetchRequest(name=name, exact=False)
+
+    worker = TTagsByNameReader(request)
+    worker.session = session
+
+    def handle_fetched(response: TTagsByNameFetchResponse):
+
+        assert len(response.tags) == 1
+        assert response.tags == tag
+
+    def handle_alerted(reason):
+        assert False, reason
+
+    worker.fetched.connect(handle_fetched)
+    worker.alerted.connect(handle_alerted)
+
+    with qtbot.waitSignal(worker.fetched, timeout=1000) as blocker:
+        blocker.connect(worker.alerted)
+
+        worker.work()
+
+
+@pytest.mark.parametrize('name', ['hello', 'ga', 'gat', 'at', 't0'])
+def test_tag_reader_5(session, qtbot, name):
+    """
+    Create a single tag and fetch it using the wrong name.
+
+    Even though exact=True is set on the request, the response should be empty.
+    """
+
+    tag, task = setup_one_tag_one_task(session)
+
+    request = TTagsByNameFetchRequest(name=name, exact=False)
+
+    worker = TTagsByNameReader(request)
+    worker.session = session
+
+    def handle_fetched(response: TTagsByNameFetchResponse):
+
+        assert len(response.tags) == 0
 
     def handle_alerted(reason):
         assert False, reason

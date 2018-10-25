@@ -1,12 +1,15 @@
 import logging
 import pprint
 from pathlib import Path
+from typing import List
 
 from PyQt5.QtCore import QObject
 
 from src.db.model import TagModel, TaskModel
 from src.db.worker import TReader
-from src.msg.fetch_tag import TTagFetchResponse
+from src.msg.tag_fetch_request import TTagsByNameFetchRequest
+from src.msg.tag_fetch_response import (TTagFetchResponse,
+                                        TTagsByNameFetchResponse)
 from src.utils import logged
 
 
@@ -53,6 +56,45 @@ class TTagReader(TReader):
         self.logger.debug(result)
 
         self.fetched.emit(TTagFetchResponse(tags=result))
+
+        self.session.close()
+
+        self.stopped.emit()
+
+
+class TTagsByNameReader(TReader):
+
+    def __init__(
+        self
+        , request: TTagsByNameFetchRequest
+        , path   : Path=None
+    ) -> None:
+
+        super().__init__(request=request, path=path)
+
+    @logged(logger=logging.getLogger('tslot-data'), disabled=False)
+    def work(self):
+
+        if self.session is None:
+            self.session = self.create_session()
+
+        if self.request.exact:
+            TagByNameQuery = self.session.query(
+                TagModel
+            ).filter(
+                TagModel.name == f'{self.request.name}'
+            )
+        else:
+            TagByNameQuery = self.session.query(
+                TagModel
+            ).filter(
+                TagModel.name.ilike(f'%{self.request.name}%')
+            )
+
+        tags = TagByNameQuery.all()
+
+        # There could be zero, one or more tags in the response
+        self.fetched.emit(TTagsByNameFetchResponse(tags=tags))
 
         self.session.close()
 

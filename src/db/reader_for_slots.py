@@ -102,6 +102,7 @@ class TSlotReader(TReader):
 
 
 class TRaySlotReader(TSlotReader):
+    """Ask for all slots that are either before or after a certain date."""
 
     def __init__(
         self
@@ -178,6 +179,11 @@ class TRaySlotReader(TSlotReader):
 
 
 class TRaySlotWithTagReader(TSlotReader):
+    """
+    Ask for all slots that are either before or after a certain date.
+
+    Additionally, for every slot ask for the list of its tags.
+    """
 
     def __init__(
         self

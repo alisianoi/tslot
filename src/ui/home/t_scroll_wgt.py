@@ -71,9 +71,7 @@ class TScrollWidget(TWidget):
         if isinstance(response, TRaySlotWithTagFetchResponse):
             return self.handle_ray_slot_with_tag_fetch(response)
 
-    def handle_ray_slot_fetch(
-            self, response: TRaySlotFetchResponse
-    ) -> None:
+    def handle_ray_slot_fetch(self, response: TRaySlotFetchResponse) -> None:
 
         if response.is_empty():
             return

@@ -4,7 +4,7 @@ from pendulum import DateTime
 
 from src.db.model import SlotModel, TaskModel, TagModel
 
-# Q: Why do these models (almost) replicete the ones from src/db/models.py?
+# Q: Why do these models (almost) replicate the ones from src/db/models.py?
 # A: Currently, connecting to the database works roughly like this:
 #    1. A specific reader or writer instance is tasked with a request
 #    2. It opens a brand-new session to connect to the database

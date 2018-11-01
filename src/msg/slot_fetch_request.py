@@ -45,9 +45,7 @@ class TSlotFetchRequest(TFetchRequest):
             )
 
         if slice_fst > slice_lst:
-            raise RuntimeError(
-                'Expected slice_fst <= slice_lst, but was >'
-            )
+            raise RuntimeError('Expected slice_fst <= slice_lst, but was >')
 
         self.dates_dir = dates_dir
         self.times_dir = times_dir
@@ -135,7 +133,9 @@ class TRaySlotWithTagFetchRequest(TSlotFetchRequest):
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
-            raise RuntimeError(f'Expected direction from {LOAD_DIRECTION}, was {direction}')
+            raise RuntimeError(
+                f'Expected direction from {LOAD_DIRECTION}, was {direction}'
+            )
 
         self.dt_offset = dt_offset
         self.direction = direction

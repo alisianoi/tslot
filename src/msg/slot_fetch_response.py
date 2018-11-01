@@ -3,8 +3,12 @@ import pendulum
 from pendulum import Date
 from pendulum.tz.timezone import Timezone
 
+from typing import List, Tuple
+
 from src.msg.fetch import TFetchResponse
 from src.msg.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+
+from src.ai.model import TEntryModel
 
 
 class TSlotFetchResponse(TFetchResponse):
@@ -26,7 +30,7 @@ class TSlotFetchResponse(TFetchResponse):
 
     def __init__(
         self
-        , items: list
+        , items: List[TEntryModel]
         , dates_dir: str
         , times_dir: str
         , slice_fst: int
@@ -54,7 +58,7 @@ class TSlotFetchResponse(TFetchResponse):
         """
 
         for i, item in enumerate(self.items):
-            slot = item[0]
+            slot = item.slot
 
             slot.fst = pendulum.instance(slot.fst).in_timezone(tz)
             slot.lst = pendulum.instance(slot.lst).in_timezone(tz)
@@ -100,17 +104,17 @@ class TSlotFetchResponse(TFetchResponse):
 
         self.times_dir = old_times_dir
 
-    def break_by_date(self):
+    def break_by_date(self) -> List[Tuple[int, int]]:
         """Regroup the supplied list of time slots by date"""
 
         i, j = 0, 0
         result = []
 
         while i != len(self.items):
-            fst_slot = self.items[i][0]
+            fst_slot = self.items[i].slot
 
             while j != len(self.items):
-                lst_slot = self.items[j][0]
+                lst_slot = self.items[j].slot
 
                 if fst_slot.fst.date() != lst_slot.fst.date():
                     break
@@ -154,6 +158,7 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
         # (i.e. TSlotFetchResponse) will call self.in_timezone, which will call
         # this class'es .in_timezone due to the way super() works. In turn, this
         # .in_timezone expects self.dt_offset to be set, so here we are.
+        # TODO: remove this awful design decision ASAP; super must be on top!
         super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
 
     def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
@@ -173,7 +178,7 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
     def __init__(
         self
-        , items: list
+        , items: List[TEntryModel]
         , dt_offset: Date
         , direction: str
         , dates_dir: str
@@ -193,35 +198,80 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
             self.condense_tags()
 
     def condense_tags(self):
+        """
+        Condense all the tags that belong to the same task into one list
 
-        i, j = 0, 1
+        By default the list of items that come from the database has this form:
+        [TEntryModel(slot0, task0, [tag0]), TEntryModel(slot0, task0, [tag1])]
+
+        After `condense_tags`, the tags should become condensed like so:
+        [TEntryModel(slot0, task0, [tag0, tag1])]
+        """
+
+        fst, lst = 0, 1
 
         items, self.items = self.items, []
 
-        while i != len(items):
+        while fst != len(items):
 
-            slot0, task0, tag0 = items[i]
+            lst = self.find_next_entry(items, fst)
 
-            tags = [tag0]
+            self.check_entry_segment(items, fst, lst)
 
-            while j != len(items):
+            self.items.append(
+                TEntryModel(
+                    items[fst].slot
+                    , items[fst].task
+                    , [tag for item in items[fst : lst] for tag in item.tags]
+                )
+            )
 
-                slot1, task1, tag1 = items[j]
+            fst = lst
 
-                if slot0 != slot1:
-                    break
+    def find_next_entry(self, items: List[TEntryModel], fst: int) -> int:
+        """Find the next entry with a different task or slot"""
 
-                if task0 != task1:
-                    raise RuntimeError('Inconsistency: slots are the same but the tasks are not')
+        if not (0 <= fst and fst < len(items)):
+            raise RuntimeError('Expecting index to be within [0, len(items))')
 
-                tags.append(tag1)
+        for i in range(fst, len(items)):
+            if items[i].slot != items[fst].slot:
+                return i
 
-                j += 1
+        return len(items)
 
-            i, j = j, j + 1
+    def check_entry_segment(
+        self
+        , items: List[TEntryModel]
+        , fst: int
+        , lst: int
+    ) -> None:
+        """
+        Check that the segments meets certain expectations
 
-            self.items.append((slot0, task0, tags))
+        1. All the elements should belong to the same slot and task
+        2. All the tags should be distinct and one (or none) tag per entry
+        """
 
+        tags = []
+
+        for i in range(fst, lst):
+            if items[i].slot != items[fst].slot:
+                raise RuntimeError('Expecting all slots to be equal')
+            if items[i].task != items[fst].task:
+                raise RuntimeError('Expecting all tasks to be equal')
+            if len(items[i].tags) > 1:
+                raise RuntimeError('Expecting no more than one tag per entry')
+
+            tags.extend(items[i].tags)
+
+        tags.sort()
+
+        for i in range(1, len(tags)):
+            if tags[i] == tags[i - 1]:
+                raise RuntimeError('Expecting no tag duplicates')
+
+        # All checks have passed
 
 class TRaySlotFetchResponseFactory:
     """
@@ -284,7 +334,7 @@ class TRaySlotWithTagFetchResponseFactory:
     @classmethod
     def from_params(
         cls
-        , items: list
+        , items: List[TEntryModel]
         , dt_offset: Date
         , direction: str
         , dates_dir: str

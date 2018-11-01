@@ -6,6 +6,7 @@ from PyQt5.QtCore import QObject
 from sqlalchemy import func
 
 import pendulum
+from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
 from src.msg.base import TFailure, TRequest, TResponse
@@ -254,7 +255,12 @@ class TRaySlotWithTagReader(TSlotReader):
             tags_order
         )
 
-        items = RayDateQuery.all()
+        # Must convert to TEntryModel because once the session is closed, the
+        # result of the query will become unreachable.
+        items = [
+            TEntryModel(TSlotModel(slot), TTaskModel(task), [TTagModel(tag)])
+            for (slot, task, tag) in RayDateQuery.all()
+        ]
 
         self.fetched.emit(
             TRaySlotWithTagFetchResponseFactory.from_request(

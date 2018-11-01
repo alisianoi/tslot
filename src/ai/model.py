@@ -56,10 +56,8 @@ class TTagModel:
     def __lt__(self, other):
 
         if not isinstance(other, TTagModel):
-            raise RuntimeError('Expecting comparison against another tag model')
+            raise RuntimeError('Must compare against another tag model')
 
-        if self.id == other.id:
-            return False
         if self.name < other.name:
             return True
 
@@ -68,10 +66,8 @@ class TTagModel:
     def __le__(self, other):
 
         if not isinstance(other, TTagModel):
-            raise RuntimeError('Expecting comparison against another tag model')
+            raise RuntimeError('Must compare against another tag model')
 
-        if self.id == other.id:
-            return True
         if self.name <= other.name:
             return True
 
@@ -103,6 +99,26 @@ class TTaskModel:
             return False
 
         return True
+
+    def __lt__(self, other):
+
+        if not isinstance(other, TTaskModel):
+            raise RuntimeError('Must compare against another task model')
+
+        if self.name < other.name:
+            return True
+
+        return False
+
+    def __le__(self, other):
+
+        if not isinstance(other, TTagModel):
+            raise RuntimeError('Must compare against another task model')
+
+        if self.name <= other.name:
+            return True
+
+        return False
 
 
 class TSlotModel:

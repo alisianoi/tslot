@@ -258,8 +258,11 @@ class TRaySlotWithTagReader(TSlotReader):
         # Must convert to TEntryModel because once the session is closed, the
         # result of the query will become unreachable.
         items = [
-            TEntryModel(TSlotModel(slot), TTaskModel(task), [TTagModel(tag)])
-            for (slot, task, tag) in RayDateQuery.all()
+            TEntryModel(
+                TSlotModel.from_model(slot)
+                , TTaskModel.from_model(task)
+                , [TTagModel.from_model(tag)]
+            ) for (slot, task, tag) in RayDateQuery.all()
         ]
 
         self.fetched.emit(

@@ -29,7 +29,7 @@ from src.db.model import SlotModel, TaskModel, TagModel
 
 class TTagModel:
 
-    def __init__(self, name: str=None, id: int=None) -> None:
+    def __init__(self, name: str, id: int=None) -> None:
 
         self.id, self.name = id, name
 
@@ -76,7 +76,7 @@ class TTagModel:
 
 class TTaskModel:
 
-    def __init__(self, name: str=None, id: int=None) -> None:
+    def __init__(self, name: str, id: int=None) -> None:
 
         self.id, self.name = id, name
 
@@ -112,7 +112,7 @@ class TTaskModel:
 
     def __le__(self, other):
 
-        if not isinstance(other, TTagModel):
+        if not isinstance(other, TTaskModel):
             raise RuntimeError('Must compare against another task model')
 
         if self.name <= other.name:
@@ -125,7 +125,7 @@ class TSlotModel:
 
     def __init__(
         self
-        , fst: DateTime=None
+        , fst: DateTime
         , lst: DateTime=None
         , id : int=None
     ) -> None:
@@ -143,7 +143,7 @@ class TSlotModel:
     def __eq__(self, other):
 
         if not isinstance(other, TSlotModel):
-            return False
+            raise RuntimeError('Must compare against another slot model')
 
         if self.id != other.id:
             return False

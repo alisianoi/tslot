@@ -14,7 +14,7 @@ from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest,
                                         TSlotFetchRequest)
 from src.msg.slot_fetch_response import TRaySlotFetchResponse
-from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponseFactory
+from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponse
 from src.utils import logged
 
 
@@ -271,9 +271,7 @@ class TRaySlotWithTagReader(TSlotReader):
         ]
 
         self.fetched.emit(
-            TRaySlotWithTagFetchResponseFactory.from_request(
-                items=items, request=self.request
-            )
+            TRaySlotWithTagFetchResponse.from_request(items, self.request)
         )
 
         self.session.close()

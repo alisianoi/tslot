@@ -142,7 +142,7 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
 
     def __init__(
         self
-        , items: list
+        , items: List[TEntryModel]
         , dt_offset: Date
         , direction: str
         , dates_dir: str
@@ -160,6 +160,43 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
         # .in_timezone expects self.dt_offset to be set, so here we are.
         # TODO: remove this awful design decision ASAP; super must be on top!
         super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
+
+    @classmethod
+    def from_params(
+        cls
+        , items: List[TEntryModel]
+        , dt_offset: Date
+        , direction: str
+        , dates_dir: str
+        , times_dir: str
+        , slice_fst: int
+        , slice_lst: int
+    ):
+        return cls(
+            items
+            , dt_offset
+            , direction
+            , dates_dir
+            , times_dir
+            , slice_fst
+            , slice_lst
+        )
+
+    @classmethod
+    def from_request(
+        cls
+        , items: List[TEntryModel]
+        , request: TRaySlotFetchRequest
+    ):
+        return cls(
+            items
+            , request.dt_offset
+            , request.direction
+            , request.dates_dir
+            , request.times_dir
+            , request.slice_fst
+            , request.slice_lst
+        )
 
     def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
         """
@@ -272,52 +309,6 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
                 raise RuntimeError('Expecting no tag duplicates')
 
         # All checks have passed
-
-class TRaySlotFetchResponseFactory:
-    """
-    Construct a TRaySlotFetchResponse
-
-    There are at least two ways to get the necessary parameters to construct the
-    response. Firstly, the parameters could be coming directly from the request
-    (i.e. the original request is known). Secondly, the parameters could have
-    been modified or provided directly, in which case the original request could
-    not be available.
-    """
-
-    @classmethod
-    def from_params(
-        cls
-        , items: list
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , slice_fst: int
-        , slice_lst: int
-    ) -> TRaySlotFetchResponse:
-
-        return TRaySlotFetchResponse(
-            items
-            , dt_offset
-            , direction
-            , dates_dir
-            , times_dir
-            , slice_fst
-            , slice_lst
-        )
-
-    @classmethod
-    def from_request(cls, items: list, request: TRaySlotFetchRequest):
-
-        return TRaySlotFetchResponseFactory.from_params(
-            items
-            , request.dt_offset
-            , request.direction
-            , request.dates_dir
-            , request.times_dir
-            , request.slice_fst
-            , request.slice_lst
-        )
 
 
 class TRaySlotWithTagFetchResponseFactory:

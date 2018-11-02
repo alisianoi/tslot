@@ -13,8 +13,8 @@ from src.msg.base import TFailure, TRequest, TResponse
 from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest,
                                         TSlotFetchRequest)
-from src.msg.slot_fetch_response import (TRaySlotFetchResponseFactory,
-                                         TRaySlotWithTagFetchResponseFactory)
+from src.msg.slot_fetch_response import TRaySlotFetchResponse
+from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponseFactory
 from src.utils import logged
 
 
@@ -166,12 +166,17 @@ class TRaySlotReader(TSlotReader):
             , SlotModel.task_id == TaskModel.id
         ).order_by(dates_order).order_by(times_order)
 
-        result = RayDateQuery.all()
-
-        self.logger.debug(result)
+        # Must convert to TEntryModel because once the session is closed, the
+        # result of the query will become unreachable.
+        items = [
+            TEntryModel(
+                TSlotModel.from_model(slot)
+                , TTaskModel.from_model(task)
+            ) for (slot, task) in RayDateQuery.all()
+        ]
 
         self.fetched.emit(
-            TRaySlotFetchResponseFactory.from_request(result, self.request)
+            TRaySlotFetchResponse.from_request(items, self.request)
         )
 
         self.session.close()

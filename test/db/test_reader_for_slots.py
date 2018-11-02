@@ -228,8 +228,8 @@ def test_ray_date_loader_times_dir_0(
             slots.reverse()
 
         for entry, slot in zip(entries, slots):
-            assert entry[0].fst == slot[0]
-            assert entry[0].lst == slot[1]
+            assert entry.slot.fst == slot[0]
+            assert entry.slot.lst == slot[1]
 
     worker.fetched.connect(handle_fetched)
 
@@ -269,8 +269,8 @@ def test_ray_date_loader_times_dir_1(
             slots.reverse()
 
         for entry, slot in zip(entries, slots):
-            assert entry[0].fst == slot[0]
-            assert entry[0].lst == slot[1]
+            assert entry.slot.fst == slot[0]
+            assert entry.slot.lst == slot[1]
 
     worker.fetched.connect(handle_fetched)
 
@@ -310,8 +310,8 @@ def test_ray_date_loader_dates_dir_0(
             slots.reverse()
 
         for entry, slot in zip(entries, slots):
-            assert entry[0].fst == slot[0]
-            assert entry[0].lst == slot[1]
+            assert entry.slot.fst == slot[0]
+            assert entry.slot.lst == slot[1]
 
     worker.fetched.connect(handle_fetched)
 
@@ -351,8 +351,8 @@ def test_ray_date_loader_dates_dir_1(
             slots.reverse()
 
         for entry, slot in zip(entries, slots):
-            assert entry[0].fst == slot[0]
-            assert entry[0].lst == slot[1]
+            assert entry.slot.fst == slot[0]
+            assert entry.slot.lst == slot[1]
 
     worker.fetched.connect(handle_fetched)
 

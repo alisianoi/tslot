@@ -71,8 +71,6 @@ class TWorker(QObject):
 
         self.logger.debug(f'Will create db session to {self.path}')
 
-        # TODO: think about making SessionMaker a lot more global
-        # See: http://docs.sqlalchemy.org/en/latest/orm/session_basics.html#when-do-i-make-a-sessionmaker
         engine = create_engine(f'sqlite:///{self.path}')
         SessionMaker = sessionmaker(bind=engine)
 

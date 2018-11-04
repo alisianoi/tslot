@@ -10,13 +10,9 @@ Welcome to TimeSlot's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. note::
-
-   If you are not a developer, please read user documnetations [TODO: link].
-
-#. Installing (for developers)
-#. Running unit tests
-
+   src/architecture.rst
+   src/doodle.rst
+   src/vocab.rst
 
 Indices and tables
 ==================

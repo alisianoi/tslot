@@ -41,6 +41,7 @@ release = ''
 extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    'sphinxcontrib.tikz'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -158,3 +159,7 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+
+#
+tikz_latex_preamble = '\usepackage{tikz-uml}'
+tikz_tikzlibraries = 'positioning'

@@ -75,8 +75,13 @@ class TTagModel:
 
 
 class TTaskModel:
+    """
+    Represent a task that the user is doing/has done.
 
-    def __init__(self, name: str, id: int=None) -> None:
+    The name is optional because the timer could be started on a blank task.
+    """
+
+    def __init__(self, name: str=None, id: int=None) -> None:
 
         self.id, self.name = id, name
 
@@ -160,7 +165,7 @@ class TEntryModel:
     def __init__(
         self
         , slot: TSlotModel
-        , task: TTaskModel=None
+        , task: TTaskModel=TTaskModel()
         , tags: List[TTagModel]=None
     ) -> None:
 

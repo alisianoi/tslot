@@ -3,14 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to TimeSlot's documentation!
-====================================
+Documentation for TimeSlot
+==========================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   src/architecture.rst
+   src/msg/messages.rst
+   src/msg/requests_fetch.rst
+   src/msg/requests_stash.rst
+   src/msg/responses_fetch.rst
+   src/msg/responses_stash.rst
    src/doodle.rst
    src/vocab.rst
 

@@ -24,7 +24,6 @@ class TSlotFetchResponse(TFetchResponse):
         slice_fst: the index of the first element to return
         slice_lst: the index of the first element *not* to return
 
-    TODO: describe the format of :code:`items`
     TODO: think why there is no super call/think about architecture
     """
 
@@ -43,9 +42,6 @@ class TSlotFetchResponse(TFetchResponse):
         self.times_dir = times_dir
         self.slice_fst = slice_fst
         self.slice_lst = slice_lst
-
-        # Convert from UTC+00:00 to local timezone
-        self.in_timezone(tz=pendulum.local_timezone())
 
     def is_empty(self) -> bool:
         return True if not self.items else False
@@ -136,8 +132,6 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
     the recipient of this response know how the data from this response could be
     used. Duplicating the request parameters also removes the need to maintain a
     record of requests made by the recipient.
-
-    TODO: describe the format of the elements from :code:`items`
     """
 
     def __init__(
@@ -151,15 +145,21 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
         , slice_lst: int
     ) -> None:
 
+        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
+
         self.dt_offset = dt_offset
         self.direction = direction
 
-        # NOTE: the super() call is made last here for a reason. The superclass
-        # (i.e. TSlotFetchResponse) will call self.in_timezone, which will call
-        # this class'es .in_timezone due to the way super() works. In turn, this
-        # .in_timezone expects self.dt_offset to be set, so here we are.
-        # TODO: remove this awful design decision ASAP; super must be on top!
-        super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
+    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+        """
+        Convert all the time slots into the supplied timezone
+
+        :param tz: the supplied timezone
+        """
+
+        self.dt_offset = self.dt_offset.in_timezone(tz)
+
+        super().in_timezone(tz)
 
     @classmethod
     def from_params(
@@ -198,17 +198,6 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
             , request.slice_lst
         )
 
-    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
-        """
-        Convert all the time slots into the supplied timezone
-
-        :param tz: the supplied timezone
-        """
-
-        self.dt_offset = self.dt_offset.in_timezone(tz)
-
-        super().in_timezone(tz)
-
 
 class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
     """Return time slots for a ray slot fetch with tags request"""
@@ -233,6 +222,59 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         if not self.flat_tags:
             self.condense_tags()
+
+    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+        """
+        Convert all the time slots into the supplied timezone
+
+        :param tz: the supplied timezone
+        """
+
+        self.dt_offset = self.dt_offset.in_timezone(tz)
+
+        super().in_timezone(tz)
+
+    @classmethod
+    def from_params(
+        cls
+        , items: List[TEntryModel]
+        , dt_offset: Date
+        , direction: str
+        , dates_dir: str
+        , times_dir: str
+        , flat_tags: bool
+        , slice_fst: int
+        , slice_lst: int
+    ):
+
+        return cls(
+            items
+            , dt_offset
+            , direction
+            , dates_dir
+            , times_dir
+            , flat_tags
+            , slice_fst
+            , slice_lst
+        )
+
+    @classmethod
+    def from_request(
+        cls
+        , items: List[TEntryModel]
+        , request: TRaySlotWithTagFetchRequest
+    ):
+
+        return cls(
+            items
+            , request.dt_offset
+            , request.direction
+            , request.dates_dir
+            , request.times_dir
+            , request.flat_tags
+            , request.slice_fst
+            , request.slice_lst
+        )
 
     def condense_tags(self):
         """
@@ -309,55 +351,3 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
                 raise RuntimeError('Expecting no tag duplicates')
 
         # All checks have passed
-
-
-class TRaySlotWithTagFetchResponseFactory:
-    """
-    Construct a TRaySlotWithTagFetchResponse
-
-    There are at least two ways to get the necessary parameters to construct the
-    response. Firstly, the parameters could be coming directly from the request
-    (i.e. the original request is known). Secondly, the parameters could have
-    been modified or provided directly, in which case the original request could
-    not be available.
-    """
-
-    @classmethod
-    def from_params(
-        cls
-        , items: List[TEntryModel]
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , flat_tags: bool
-        , slice_fst: int
-        , slice_lst: int
-    ) -> TRaySlotWithTagFetchResponse:
-
-        return TRaySlotWithTagFetchResponse(
-            items
-            , dt_offset
-            , direction
-            , dates_dir
-            , times_dir
-            , flat_tags
-            , slice_fst
-            , slice_lst
-        )
-
-    @classmethod
-    def from_request(
-        cls, items: list, request: TRaySlotWithTagFetchRequest
-    ) -> TRaySlotWithTagFetchRequest:
-
-        return TRaySlotWithTagFetchResponseFactory.from_params(
-            items
-            , request.dt_offset
-            , request.direction
-            , request.dates_dir
-            , request.times_dir
-            , request.flat_tags
-            , request.slice_fst
-            , request.slice_lst
-        )

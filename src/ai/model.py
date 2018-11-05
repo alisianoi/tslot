@@ -1,6 +1,10 @@
+import pendulum
+
 from typing import List
 
 from pendulum import DateTime
+from pendulum.tz.timezone import Timezone
+
 
 from src.db.model import SlotModel, TaskModel, TagModel
 
@@ -128,17 +132,21 @@ class TTaskModel:
 
 class TSlotModel:
 
-    def __init__(
-        self
-        , fst: DateTime
-        , lst: DateTime=None
-        , id : int=None
-    ) -> None:
+    def __init__(self, fst: DateTime, lst: DateTime=None, id : int=None):
 
         self.id, self.fst, self.lst = id, fst, lst
 
+        self.in_timezone()
+
+    def in_timezone(self, tz: Timezone=pendulum.tz.UTC):
+
+        if self.fst:
+            self.fst = pendulum.instance(self.fst).in_timezone(tz)
+        if self.lst:
+            self.lst = pendulum.instance(self.lst).in_timezone(tz)
+
     @classmethod
-    def from_params(cls, fst: DateTime=None, lst: DateTime=None, id: int=None):
+    def from_params(cls, fst: DateTime, lst: DateTime=None, id: int=None):
         return cls(fst, lst, id)
 
     @classmethod

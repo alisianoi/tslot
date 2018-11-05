@@ -91,9 +91,7 @@ def setup_two_slots_two_dates(session, dt=None):
     slots = []
 
     for day in [10, 20]:
-        slots.extend(
-            setup_one_slot_one_date(session, dt.replace(day=day))
-        )
+        slots.extend(setup_one_slot_one_date(session, dt.replace(day=day)))
 
     return slots
 

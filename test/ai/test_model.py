@@ -69,67 +69,66 @@ def test_tag_model_8():
 
 def test_task_model_0():
 
+    task = TTaskModel()
+
+    assert task.id is None
+    assert task.name is None
+
+def test_task_model_1():
+
     task = TTaskModel(name='task')
 
     assert task.id is None
     assert task.name == 'task'
 
-def test_task_model_1():
+def test_task_model_2():
 
     task = TTaskModel(name='task', id=42)
 
     assert task.id == 42
     assert task.name == 'task'
 
-def test_task_model_2():
+def test_task_model_3():
 
     task0 = TTaskModel(name='task')
     task1 = TTaskModel(name='task')
 
     assert task0 == task1
 
-def test_task_model_3():
+def test_task_model_4():
 
     task0 = TTaskModel(name='task', id=42)
     task1 = TTaskModel(name='task', id=42)
 
     assert task0 == task1
 
-def test_task_model_4():
+def test_task_model_5():
 
     task0 = TTaskModel(name='task', id=42)
     task1 = TTaskModel(name='task')
 
     assert task0 != task1
 
-def test_task_model_5():
-
-    task0 = TTaskModel(name='task0')
-    task1 = TTaskModel(name='task1')
-
-    assert task0 < task1
-
 def test_task_model_6():
 
-    task0 = TTaskModel(name='task0', id=42)
+    task0 = TTaskModel(name='task0')
     task1 = TTaskModel(name='task1')
 
     assert task0 < task1
 
 def test_task_model_7():
 
+    task0 = TTaskModel(name='task0', id=42)
+    task1 = TTaskModel(name='task1')
+
+    assert task0 < task1
+
+def test_task_model_8():
+
     task0 = TTaskModel(name='task0')
     task1 = TTaskModel(name='task0')
 
     assert task0 <= task1
-
-def test_task_model_8():
-
-    with pytest.raises(TypeError) as error:
-        tag = TTaskModel()
-
-    assert "missing 1 required positional argument: 'name'" in str(error.value)
-
 
 def test_slot_model_0():
 
@@ -221,7 +220,7 @@ def test_entry_model_0():
     entry = TEntryModel(slot=slot)
 
     assert entry.slot == slot
-    assert entry.task is None
+    assert entry.task == TTaskModel()
     assert entry.tags == []
 
 def test_entry_model_1():

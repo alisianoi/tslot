@@ -12,18 +12,6 @@ from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
 
 
-class TNukeButton(QPushButton):
-
-    def __init__(self, parent: QWidget=None) -> None:
-
-        super().__init__(parent)
-
-        sp = self.sizePolicy()
-        sp.setRetainSizeWhenHidden(True)
-
-        self.setSizePolicy(sp)
-
-
 class TTimerControlsWidget(TWidget):
     """Add basic controls to start/stop time tracking for a task"""
 
@@ -40,12 +28,13 @@ class TTimerControlsWidget(TWidget):
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
         self.push_btn = QPushButton()
-        self.nuke_btn = TNukeButton()
+        self.nuke_btn = QPushButton()
 
         self.push_btn.setObjectName('t_timer_controls_push_btn')
         self.nuke_btn.setObjectName('t_timer_controls_nuke_btn')
         self.push_btn.setIcon(self.play_icon)
         self.nuke_btn.setIcon(self.nuke_icon)
+
         self.nuke_btn.hide()
 
         self.layout = QHBoxLayout()
@@ -53,9 +42,9 @@ class TTimerControlsWidget(TWidget):
         self.layout.setContentsMargins(10, 0, 10, 0)
 
         self.layout.addWidget(self.task_ldt)
+        self.layout.addWidget(self.nuke_btn)
         self.layout.addWidget(self.push_btn)
         self.layout.addWidget(self.timer_wgt)
-        self.layout.addWidget(self.nuke_btn)
 
         self.setLayout(self.layout)
 

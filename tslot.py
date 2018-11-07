@@ -1,24 +1,36 @@
 #!/usr/bin/env python
 
 import logging
-import pendulum
 import sys
-
+from argparse import ArgumentParser
 from pathlib import Path
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import pendulum
 from src.cache import TCacheBroker
 from src.db.broker import TVaultBroker
 from src.font import initialize_font_databse
-from src.ui.base import TWidget
-from src.ui.menu.t_menu_wgt import TDockMenuWidget
-from src.ui.home.t_scroll_area import THomeScrollArea
 from src.style import StyleBroker
+from src.ui.base import TWidget
+from src.ui.home.t_scroll_area import THomeScrollArea
+from src.ui.menu.t_menu_wgt import TDockMenuWidget
 from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
 from src.utils import configure_logging
+
+
+class TDefaults:
+    """Hold various default configuration parameters"""
+
+    config_path = str(Path(Path.home(), '.config', 'tslot'))
+    config_file = str(Path(config_path, 'config.yml'))
+
+
+class TSettings:
+
+    pass
 
 
 class TCentralWidget(TWidget):
@@ -109,6 +121,46 @@ class TMainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
+    ap = ArgumentParser(description="Make time-driven decision")
+
+    ap.add_argument(
+        "--profile"
+        , type=str
+        , nargs="?"
+        , choices=["personal", "developer"]
+        , default="personal"
+        , help=
+        """
+            Select developer profile to use default config and database. This
+            does not change your personal data.
+        """
+    )
+
+    ap.add_argument(
+        "--config", "--config-file"
+        , type=str
+        , nargs="?"
+        , default=TDefaults.config_file
+        , help="Path to your configuration file."
+    )
+
+    ap.add_argument(
+        "-v", "--verbose"
+        , action="count"
+        , default=0
+        , dest="verbose"
+        , help="Write more output to console."
+    )
+
+    ap.add_argument(
+        "--silent"
+        , action="store_true"
+        , default=False
+        , help="Silence all console output."
+    )
+
+    args = ap.parse_args()
+
     configure_logging()
 
     app = QApplication(sys.argv)

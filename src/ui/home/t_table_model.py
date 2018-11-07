@@ -95,7 +95,9 @@ class TTableModel(QAbstractTableModel):
 
         row, column = index.row(), index.column()
 
-        slot, task, tags = self.items[row]
+        entry = self.items[row]
+
+        slot, task, tags = entry.slot, entry.task, entry.tags
 
         if column == 0:
             return task.name

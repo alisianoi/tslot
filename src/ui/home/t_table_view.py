@@ -19,7 +19,7 @@ class TNukeStyleDelegate(QStyledItemDelegate):
 
         self.logger = logging.getLogger('tslot')
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def createEditor(
         self
         , parent: QWidget
@@ -57,7 +57,7 @@ class TNukeStyleDelegate(QStyledItemDelegate):
 
         painter.restore()
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def sizeHint(self, item: QStyleOptionViewItem, index: QModelIndex) -> QSize:
 
         size = super().sizeHint(item, index)

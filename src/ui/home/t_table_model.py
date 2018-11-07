@@ -23,7 +23,7 @@ class TTableModel(QAbstractTableModel):
     def columnCount(self, parent: QModelIndex=QModelIndex()):
         return 6
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
 
         return Qt.ItemIsEnabled | Qt.ItemIsEditable

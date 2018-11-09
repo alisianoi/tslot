@@ -9,8 +9,8 @@ from src.msg.tag_fetch_response import TTagsByNameFetchResponse
 
 def setup_one_tag_one_task(session):
 
-    tag_model = TagModel(name='tag0')
-    task_model = TaskModel(name='task0')
+    tag_model = TagModel(name="tag0")
+    task_model = TaskModel(name="task0")
 
     tag_model.tasks = [task_model]
     task_model.tags = [tag_model]
@@ -20,12 +20,13 @@ def setup_one_tag_one_task(session):
 
     return [tag_model], [task_model]
 
+
 def setup_two_tags_one_task(session):
 
-    tag_model0 = TagModel(name='tag0')
-    tag_model1 = TagModel(name='tag1')
+    tag_model0 = TagModel(name="tag0")
+    tag_model1 = TagModel(name="tag1")
 
-    task_model0 = TaskModel(name='task0')
+    task_model0 = TaskModel(name="task0")
 
     task_model0.tags = [tag_model0, tag_model1]
 
@@ -33,6 +34,7 @@ def setup_two_tags_one_task(session):
     session.commit()
 
     return [tag_model0, tag_model1], [task_model0]
+
 
 def test_tag_reader_0(session, qtbot):
 
@@ -63,6 +65,7 @@ def test_tag_reader_0(session, qtbot):
         blocker.connect(worker.alerted)
 
         worker.work()
+
 
 def test_tag_reader_1(session, qtbot):
 
@@ -96,7 +99,7 @@ def test_tag_reader_1(session, qtbot):
         worker.work()
 
 
-@pytest.mark.parametrize('exact', [True, False])
+@pytest.mark.parametrize("exact", [True, False])
 def test_tag_reader_2(session, qtbot, exact):
     """
     Create a single tag and fetch it using its exact name.
@@ -164,8 +167,7 @@ def test_tag_reader_3(session, qtbot):
 
 
 @pytest.mark.parametrize(
-    'name'
-    , ['tag', 'Tag', 'TAG', 'tAg', 'tAG', 'ag', 'AG', 'aG', '0', 'tag0']
+    "name", ["tag", "Tag", "TAG", "tAg", "tAG", "ag", "AG", "aG", "0", "tag0"]
 )
 def test_tag_reader_4(session, qtbot, name):
     """
@@ -198,7 +200,7 @@ def test_tag_reader_4(session, qtbot, name):
         worker.work()
 
 
-@pytest.mark.parametrize('name', ['hello', 'ga', 'gat', 'at', 't0'])
+@pytest.mark.parametrize("name", ["hello", "ga", "gat", "at", "t0"])
 def test_tag_reader_5(session, qtbot, name):
     """
     Create a single tag and fetch it using the wrong name.

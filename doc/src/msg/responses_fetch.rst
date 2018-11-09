@@ -6,8 +6,8 @@ Fetch Responses
     \umlsimpleclass[x = 0, y = 0]{TFetchResponse}
     \umlclass
         [above left = 1.5em and 1.5 em of TFetchResponse.north]
-        {TTimerResponse}
-        {entry: TEntryModel}
+        {TTimerFetchResponse}
+        {timer: TEntryModel}
         {}
     \umlclass
         [above right = 1.5em and 1.5em of TFetchResponse.north]
@@ -34,7 +34,7 @@ Fetch Responses
         {in\_timezone \\ from\_model \\ from\_params \\ condense\_tags}
 
     \umlinherit[geometry=|-]{TSlotFetchResponse}{TFetchResponse}
-    \umlinherit[geometry=-|]{TTimerResponse}{TFetchResponse}
+    \umlinherit[geometry=-|]{TTimerFetchResponse}{TFetchResponse}
     \umlinherit[geometry=|-]{TTagFetchResponse}{TFetchResponse}
     \umlinherit[geometry=--]{TTagsByNameFetchResponse}{TTagFetchResponse}
     \umlinherit[geometry=|-]{TRaySlotFetchResponse}{TSlotFetchResponse}

@@ -12,7 +12,7 @@ Fetch Requests
         {TTagFetchRequest}
     \umlsimpleclass
         [above left = 3.5em and 1.5em of TFetchRequest.south]
-        {TTimerRequest}
+        {TTimerFetchRequest}
     \umlsimpleclass
         [below left = 3.5em and 1.5em of TSlotFetchRequest.north]
         {TRaySlotFetchRequest}
@@ -27,7 +27,7 @@ Fetch Requests
 
     \umlinherit[geometry=|-]{TSlotFetchRequest}{TFetchRequest}
     \umlinherit[geometry=|-]{TTagFetchRequest}{TFetchRequest}
-    \umlinherit[geometry=-|]{TTimerRequest}{TFetchRequest}
+    \umlinherit[geometry=-|]{TTimerFetchRequest}{TFetchRequest}
     \umlinherit[geometry=|-]{TRaySlotFetchRequest}{TSlotFetchRequest}
     \umlinherit[geometry=|-]{TRaySlotWithTagFetchRequest}{TSlotFetchRequest}
     \umlinherit[geometry=--]{TTagsByNameFetchRequest}{TTagFetchRequest}

@@ -13,7 +13,8 @@ from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest)
 from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.timer import TTimerRequest, TTimerStashRequest
+from src.msg.timer_fetch_request import TTimerFetchRequest
+from src.msg.timer import TTimerStashRequest
 from src.utils import logged
 
 
@@ -70,8 +71,8 @@ class TVaultBroker(TObject):
     def handle_requested(self, request: TRequest) -> None:
         """Find a suitable handler for the request to the database"""
 
-        if isinstance(request, TTimerRequest):
-            return self.handle_timer_request(request)
+        if isinstance(request, TTimerFetchRequest):
+            return self.handle_timer_fetch_request(request)
 
         if isinstance(request, TTimerStashRequest):
             return self.handle_timer_stash_request(request)
@@ -102,20 +103,22 @@ class TVaultBroker(TObject):
 
         self.triggered.emit(failure)
 
-    def handle_timer_request(self, request: TTimerRequest) -> None:
+    # @logged(logger=logging.getLogger('tslot-main'), disabled=False)
+    def handle_timer_fetch_request(self, request: TTimerFetchRequest) -> None:
         self.dispatch_reader(TTimerReader(request, self.path, parent=self))
 
+    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_timer_stash_request(self, request: TTimerStashRequest) -> None:
         self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
-    @logged(disabled=True)
+    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_ray_slot_fetch(
         self, request: TRaySlotFetchRequest
     ) -> None:
 
         self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
-    @logged(disabled=True)
+    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_ray_slot_with_tag_fetch(
         self, request: TRaySlotWithTagFetchRequest
     ) -> None:

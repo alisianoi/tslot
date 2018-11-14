@@ -15,11 +15,11 @@ class TEntryWriter(TWriter):
     def __init__(
         self
         , request: TEntryStashRequest
-        , path   : Path=None
-        , parent : QObject=None
+        , path   : Path = None
+        , parent : QObject = None
     ):
 
-        super().__init__(path, parent)
+        super().__init__(request, path, parent)
 
         self.items = request.items
 
@@ -32,8 +32,6 @@ class TEntryWriter(TWriter):
 
         if self.session is None:
             self.session = self.create_session()
-
-        self.check_item(item)
 
         slot = self.choose_old_or_new_slot(item.slot)
         task = self.choose_old_or_new_task(item.task)
@@ -103,14 +101,6 @@ class TEntryWriter(TWriter):
         )
 
         self.session.close()
-
-    def check_item(self, item: TEntryModel):
-        """Check the entry model for sanity, no database checks"""
-
-        if item.slot.fst is None:
-            raise RuntimeError('When you save a slot, it must start somewhere')
-        if item.slot.lst is not None and item.slot.lst <= item.slot.fst:
-            raise RuntimeError('First slot time point must be before its last')
 
     def choose_old_or_new_slot(self, item: TSlotModel) -> SlotModel:
 

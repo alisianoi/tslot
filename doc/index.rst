@@ -15,6 +15,7 @@ Documentation for TimeSlot
    src/msg/requests_stash.rst
    src/msg/responses_fetch.rst
    src/msg/responses_stash.rst
+   src/db/worker.rst
    src/doodle.rst
    src/vocab.rst
 

@@ -1,17 +1,15 @@
 import datetime
 import logging
 import operator
-
 from pathlib import Path
 
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.msg.base import TRequest, TResponse, TFailure
+from src.msg.base import TFailure, TRequest, TResponse
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
 from src.utils import logged
@@ -34,8 +32,8 @@ class TWorker(QObject):
         Initialize a database worker
 
         Args:
-            path   : path to the SQLite database file
-            parent : parent object if Qt ownership is required
+            path  : path to the SQLite database file
+            parent: parent object if Qt ownership is required
         """
 
         super().__init__(parent)
@@ -106,6 +104,13 @@ class TWriter(TWorker):
 
     stashed = pyqtSignal(TStashResponse)
 
-    def __init__(self, path: Path=None, parent: QObject=None):
+    def __init__(
+        self,
+        request: TStashRequest,
+        path: Path=None,
+        parent: QObject=None
+    ):
 
         super().__init__(path, parent)
+
+        self.request = request

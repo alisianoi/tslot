@@ -14,9 +14,7 @@ from src.msg.base import TFailure, TRequest, TResponse
 
 
 class TWidget(QWidget):
-    """
-    Base class for all widgets used by TimeSlot
-    """
+    """Base class for all widgets used by TimeSlot."""
 
     requested = pyqtSignal(TRequest)
     responded = pyqtSignal(TResponse)
@@ -25,7 +23,7 @@ class TWidget(QWidget):
     def __init__(self, parent: QWidget=None) -> None:
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
+        self.logger = logging.getLogger('tslot-main')
 
     def kickstart(self) -> None:
         pass

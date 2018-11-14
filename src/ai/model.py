@@ -31,14 +31,14 @@ from src.db.model import SlotModel, TaskModel, TagModel
 #    convenient) and by the GUI layer (and then using separate parameters is
 #    convenient).
 
-class TTagModel:
 
-    def __init__(self, name: str, id: int=None) -> None:
+class TTagModel:
+    def __init__(self, name: str, id: int = None) -> None:
 
         self.id, self.name = id, name
 
     @classmethod
-    def from_params(cls, name: str=None, id: int=None):
+    def from_params(cls, name: str = None, id: int = None):
         return cls(name, id)
 
     @classmethod
@@ -60,7 +60,7 @@ class TTagModel:
     def __lt__(self, other):
 
         if not isinstance(other, TTagModel):
-            raise RuntimeError('Must compare against another tag model')
+            raise RuntimeError("Must compare against another tag model")
 
         if self.name < other.name:
             return True
@@ -70,7 +70,7 @@ class TTagModel:
     def __le__(self, other):
 
         if not isinstance(other, TTagModel):
-            raise RuntimeError('Must compare against another tag model')
+            raise RuntimeError("Must compare against another tag model")
 
         if self.name <= other.name:
             return True
@@ -85,12 +85,12 @@ class TTaskModel:
     The name is optional because the timer could be started on a blank task.
     """
 
-    def __init__(self, name: str=None, id: int=None) -> None:
+    def __init__(self, name: str = None, id: int = None) -> None:
 
         self.id, self.name = id, name
 
     @classmethod
-    def from_params(cls, name: str=None, id: int=None):
+    def from_params(cls, name: str = None, id: int = None):
         return cls(name, id)
 
     @classmethod
@@ -112,7 +112,7 @@ class TTaskModel:
     def __lt__(self, other):
 
         if not isinstance(other, TTaskModel):
-            raise RuntimeError('Must compare against another task model')
+            raise RuntimeError("Must compare against another task model")
 
         if self.name < other.name:
             return True
@@ -122,7 +122,7 @@ class TTaskModel:
     def __le__(self, other):
 
         if not isinstance(other, TTaskModel):
-            raise RuntimeError('Must compare against another task model')
+            raise RuntimeError("Must compare against another task model")
 
         if self.name <= other.name:
             return True
@@ -131,32 +131,59 @@ class TTaskModel:
 
 
 class TSlotModel:
+    """
+    Represents a time interval between first and last time points.
 
-    def __init__(self, fst: DateTime, lst: DateTime=None, id : int=None):
+    The first time point must be known but the last time point might not be.
+    Accepts the time points in whatever time zone they might be, then converts
+    them to UTC.
+    """
 
-        self.id, self.fst, self.lst = id, fst, lst
+    def __init__(self, fst: DateTime, lst: DateTime = None, id: int = None):
+
+        name = self.__class__.__name__
+
+        if not isinstance(fst, DateTime):
+            raise TypeError(f"{name} expects `fst` to be DateTime")
+
+        self.id = id
+        self.fst = fst
+        self.lst = lst
 
         self.in_timezone()
 
-    def in_timezone(self, tz: Timezone=pendulum.tz.UTC):
+        if self.lst is None:
+            return
 
-        if self.fst:
-            self.fst = pendulum.instance(self.fst).in_timezone(tz)
+        if not isinstance(lst, DateTime):
+            raise TypeError(f"{name} expects `lst` to be DateTime")
+        if self.lst <= self.fst:
+            raise ValueError(f"{name} expects `fst` to be earlier than `lst`")
+
+    def in_timezone(self, tz: Timezone = pendulum.tz.UTC):
+
+        self.fst = self.fst.in_timezone(tz)
+
         if self.lst:
-            self.lst = pendulum.instance(self.lst).in_timezone(tz)
+            self.lst = self.lst.in_timezone(tz)
 
     @classmethod
-    def from_params(cls, fst: DateTime, lst: DateTime=None, id: int=None):
+    def from_params(cls, fst: DateTime, lst: DateTime = None, id: int = None):
         return cls(fst, lst, id)
 
     @classmethod
     def from_model(cls, model: SlotModel):
-        return cls(model.fst, model.lst, model.id)
+        fst, lst = pendulum.instance(model.fst).in_timezone("UTC"), None
+
+        if model.lst is not None:
+            lst = pendulum.instance(model.lst).in_timezone("UTC")
+
+        return cls(fst, lst, model.id)
 
     def __eq__(self, other):
 
         if not isinstance(other, TSlotModel):
-            raise RuntimeError('Must compare against another slot model')
+            raise RuntimeError("Must compare against another slot model")
 
         if self.id != other.id:
             return False
@@ -169,12 +196,13 @@ class TSlotModel:
 
 
 class TEntryModel:
+    """Holds together a slot model, a task model and its corresponding tags."""
 
     def __init__(
-        self
-        , slot: TSlotModel
-        , task: TTaskModel=TTaskModel()
-        , tags: List[TTagModel]=None
+        self,
+        slot: TSlotModel,
+        task: TTaskModel = TTaskModel(),
+        tags: List[TTagModel] = None,
     ) -> None:
 
         self.slot = slot

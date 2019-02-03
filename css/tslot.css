@@ -36,7 +36,6 @@ THomeScrollArea {
 }
 
 THomeTableView {
-    margin-right: 64px;
     font: quicksand;
     font-size: 28px;
 }

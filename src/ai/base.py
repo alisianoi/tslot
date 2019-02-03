@@ -25,7 +25,7 @@ class TObject(QObject):
     def __init__(self, parent: QObject=None) -> None:
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
+        self.logger = logging.getLogger("tslot-main")
 
     def kickstart(self) -> None:
         pass

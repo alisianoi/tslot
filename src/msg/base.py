@@ -16,7 +16,7 @@ class TMessage:
 
     def __init__(self):
 
-        self.logger = logging.getLogger('tslot')
+        self.logger = logging.getLogger("tslot-main")
 
     def key_val_or_key_len(self, key, val):
         """Help show (reasonably truncated) key/value pairs to a human"""

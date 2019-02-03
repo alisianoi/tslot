@@ -208,3 +208,6 @@ class TEntryModel:
         self.slot = slot
         self.task = task
         self.tags = [] if tags is None else tags
+
+    def __repr__(self) -> str:
+        return f"{self.task.name}: {self.slot.fst} -- {self.slot.lst}"

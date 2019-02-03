@@ -14,14 +14,11 @@ from src.utils import logged
 class TTimerReader(TReader):
 
     def __init__(
-        self
-        , request: TTimerFetchRequest
-        , path: Path = None
-        , parent: TObject = None
+        self, request: TTimerFetchRequest, path: Path = None, parent: TObject = None
     ):
         super().__init__(request, path, parent)
 
-    @logged(logger=logging.getLogger('tslot-data'), disabled=False)
+    @logged(logger=logging.getLogger("tslot-data"), disabled=False)
     def work(self) -> None:
 
         if self.session is None:
@@ -41,9 +38,9 @@ class TTimerReader(TReader):
             task = slot.task
 
             timer = TEntryModel(
-                slot = TSlotModel.from_model(slot)
-                , task = TTaskModel.from_model(task)
-                , tags = [TTagModel.from_model(tag) for tag in task.tags]
+                slot = TSlotModel.from_model(slot),
+                task = TTaskModel.from_model(task),
+                tags = [TTagModel.from_model(tag) for tag in task.tags]
             )
 
             self.logger.debug(f"One timer found:\n{timer}")

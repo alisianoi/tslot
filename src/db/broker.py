@@ -103,22 +103,18 @@ class TVaultBroker(TObject):
 
         self.triggered.emit(failure)
 
-    # @logged(logger=logging.getLogger('tslot-main'), disabled=False)
     def handle_timer_fetch_request(self, request: TTimerFetchRequest) -> None:
         self.dispatch_reader(TTimerReader(request, self.path, parent=self))
 
-    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_timer_stash_request(self, request: TTimerStashRequest) -> None:
         self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
-    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_ray_slot_fetch(
         self, request: TRaySlotFetchRequest
     ) -> None:
 
         self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
-    # @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def handle_ray_slot_with_tag_fetch(
         self, request: TRaySlotWithTagFetchRequest
     ) -> None:

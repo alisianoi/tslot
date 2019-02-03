@@ -72,7 +72,7 @@ class TTagsByNameReader(TReader):
 
         super().__init__(request=request, path=path)
 
-    @logged(logger=logging.getLogger('tslot-data'), disabled=False)
+    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
     def work(self):
 
         if self.session is None:

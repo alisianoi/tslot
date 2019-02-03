@@ -27,7 +27,7 @@ class TWorker(QObject):
     stopped = pyqtSignal()
     alerted = pyqtSignal(TFailure)
 
-    def __init__(self, path: Path=None, parent: QObject=None) -> None:
+    def __init__(self, path: Path = None, parent: QObject = None) -> None:
         """
         Initialize a database worker
 
@@ -38,14 +38,14 @@ class TWorker(QObject):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot-data')
+        self.logger = logging.getLogger("tslot-data")
 
         self.path = path
         self.query = None
 
         self.session = None
 
-    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
+    @logged(logger=logging.getLogger("tslot-data"), disabled=True)
     def work(self) -> None:
         """
         Provide the default work method which subclasses should overwrite
@@ -55,21 +55,19 @@ class TWorker(QObject):
         """
 
         return self.alerted.emit(
-            TFailure('Failed to load anything: default work method')
+            TFailure("Failed to load anything: default work method")
         )
 
-    @logged(logger=logging.getLogger('tslot-data'), disabled=True)
+    @logged(logger=logging.getLogger("tslot-data"), disabled=True)
     def create_session(self):
         """Open a brand new SQLite/SQLAlchemy database session"""
 
         if not isinstance(self.path, Path) or not self.path.exists():
-            return self.alerted.emit(
-                TFailure(f'Path to database is gone {self.path}')
-            )
+            return self.alerted.emit(TFailure(f"Path to database is gone {self.path}"))
 
-        self.logger.debug(f'Will create db session to {self.path}')
+        self.logger.debug(f"Will create db session to {self.path}")
 
-        engine = create_engine(f'sqlite:///{self.path}')
+        engine = create_engine(f"sqlite:///{self.path}")
         SessionMaker = sessionmaker(bind=engine)
 
         return SessionMaker()
@@ -81,10 +79,7 @@ class TReader(TWorker):
     fetched = pyqtSignal(TFetchResponse)
 
     def __init__(
-        self
-        , request: TFetchRequest
-        , path   : Path=None
-        , parent : QObject=None
+        self, request: TFetchRequest, path: Path = None, parent: QObject = None
     ) -> None:
         """
         Initialize a database reader
@@ -99,16 +94,14 @@ class TReader(TWorker):
 
         self.request = request
 
+
 class TWriter(TWorker):
     """Provides the base class for all different database writers"""
 
     stashed = pyqtSignal(TStashResponse)
 
     def __init__(
-        self,
-        request: TStashRequest,
-        path: Path=None,
-        parent: QObject=None
+        self, request: TStashRequest, path: Path = None, parent: QObject = None
     ):
 
         super().__init__(path, parent)

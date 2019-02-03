@@ -62,17 +62,17 @@ class THeaderView(QHeaderView):
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def sectionSizeHint(self, logical_index: int) -> int:
 
         return super().sectionSizeHint(logical_index)
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def minimumSectionSize(self) -> int:
 
         return super().minimumSectionSize()
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def maximumSectionSize(self) -> int:
 
         return super().maximumSectionSize()

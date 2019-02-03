@@ -126,7 +126,7 @@ def pendulum2str(pnd: pendulum.DateTime) -> str:
     return f'{hh: >2d}:{mm:0>2d}:{ss:0>2d}'
 
 
-def logged(logger=logging.getLogger('tslot-main'), disabled=False):
+def logged(logger=logging.getLogger('tslot-main'), disabled=True):
     """
     Create a configured decorator that controls logging output of a function
 

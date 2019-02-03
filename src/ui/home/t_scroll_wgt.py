@@ -45,7 +45,7 @@ class TScrollWidget(TWidget):
 
         self.request(0, 1)
 
-    @logged(logger=logging.getLogger('tslot-main'), disabled=False)
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def request_next(self):
         self.request(self.slice_lst, self.slice_lst + 1)
 

@@ -1,15 +1,18 @@
+import logging
 from pathlib import Path
 
-import pendulum
 from PyQt5.QtCore import QSize, pyqtSlot
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
+import pendulum
 from src.ai.model import TEntryModel, TSlotModel
 from src.msg.base import TResponse
-from src.msg.timer import TTimerRequest, TTimerResponse, TTimerStashRequest
+from src.msg.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
+from src.msg.timer import TTimerStashRequest
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
+from src.utils import logged
 
 
 class TTimerControlsWidget(TWidget):
@@ -52,8 +55,9 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.clicked.connect(self.toggle_timer)
 
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def kickstart(self):
-        self.requested.emit(TTimerRequest())
+        self.requested.emit(TTimerFetchRequest())
 
     @pyqtSlot()
     def toggle_timer(self):
@@ -66,7 +70,8 @@ class TTimerControlsWidget(TWidget):
 
         self.push_btn.setDisabled(False)
 
-    def start_timer(self, tdata: TEntryModel=None, sleep: int=1000) -> None:
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
+    def start_timer(self, item: TEntryModel=None, sleep: int=1000) -> None:
         """
         Start the timer
 
@@ -75,12 +80,12 @@ class TTimerControlsWidget(TWidget):
         """
 
         if self.timer_wgt.isActive():
-            raise RuntimeError('Cannot start two timers at once')
+            raise RuntimeError("Cannot start two timers at once")
 
-        if tdata is None:
+        if item is None:
             value = self.start_new_timer()
         else:
-            value = self.start_old_timer(tdata)
+            value = self.start_old_timer(item)
 
         self.timer_wgt.start_timer(value, sleep)
 
@@ -88,54 +93,64 @@ class TTimerControlsWidget(TWidget):
         self.nuke_btn.show()
 
     def start_new_timer(self) -> int:
-        tslot = TSlotModel(fst=pendulum.now(tz='UTC'))
+        """Create a new timer, let the database know and return 0 seconds."""
 
-        self.tdata = TEntryModel(slot=tslot)
+        self.item = TEntryModel(slot=TSlotModel(fst=pendulum.now(tz='UTC')))
 
-        # self.requested.emit(TTimerStashRequest(self.tdata))
+        self.requested.emit(TTimerStashRequest(self.item))
 
         return 0 # zero seconds of running new timer
 
-    def start_old_timer(self, tdata: TEntryModel) -> int:
-        self.tdata = tdata
+    def start_old_timer(self, item: TEntryModel) -> int:
+        """Launch an old timer, return its duration in seconds."""
 
-        period = pendulum.now(tz='UTC') - tdata.slot.fst
+        self.item = item
+
+        self.logger.debug(f"Set task_ldt text: {item.task.name}")
+        self.task_ldt.setText(self.item.task.name)
+
+        period = pendulum.now(tz='UTC') - item.slot.fst
 
         # NOTE: .in_seconds() truncates microseconds
         return period.in_seconds()
 
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def stop_timer(self):
+        """Stop the currently running timer and let the database know."""
+
         if not self.timer_wgt.isActive():
             raise RuntimeError('Cannot stop a stopped timer')
 
         # NOTE: ignore the actual value
         self.timer_wgt.stop_timer()
 
-        self.tdata.slot.lst = pendulum.now(tz='UTC')
+        self.item.slot.lst = pendulum.now(tz='UTC')
+        self.item.task.name = self.task_ldt.text()
 
-        # self.requested.emit(TTimerStashRequest(self.tdata))
+        self.requested.emit(TTimerStashRequest(self.item))
 
+        self.task_ldt.clear()
         self.push_btn.setIcon(self.play_icon)
         self.nuke_btn.hide()
 
     @pyqtSlot(TResponse)
     def handle_responded(self, response: TResponse) -> None:
 
-        if isinstance(response, TTimerResponse):
-            self.handle_timer_response(response)
+        if isinstance(response, TTimerFetchResponse):
+            self.handle_timer_fetch_response(response)
 
-    def handle_timer_response(self, response: TTimerResponse):
+    def handle_timer_fetch_response(self, response: TTimerFetchResponse):
 
-        if response.entry is None:
+        if response.timer is None:
             return # database stores no active timer, nothing to do
 
         if self.timer_wgt.isActive():
             raise RuntimeError('Two active timers: one from DB, one from GUI')
 
-        self.task_ldt.setText(response.entry.task.name)
+        self.task_ldt.setText(response.timer.task.name)
 
         self.push_btn.setDisabled(True)
 
-        self.start_timer(response.entry)
+        self.start_timer(response.timer)
 
         self.push_btn.setDisabled(False)

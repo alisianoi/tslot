@@ -17,9 +17,9 @@ class TNukeStyleDelegate(QStyledItemDelegate):
 
         super().__init__(parent)
 
-        self.logger = logging.getLogger('tslot')
+        self.logger = logging.getLogger("tslot-main")
 
-    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
+    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def createEditor(
         self
         , parent: QWidget
@@ -70,11 +70,8 @@ class TNukeStyleDelegate(QStyledItemDelegate):
         if index in [2, 3, 4]:
             return size
 
+        # TODO: +20 is the spacing between columns 2, 3 and 4
         return QSize(size.width() + 20, size.height())
-
-        # self.logger.debug(f'column: {index.column()}')
-
-        # return super().sizeHint(item, index)
 
 
 class THomeTableView(TTableView):
@@ -99,13 +96,13 @@ class THomeTableView(TTableView):
         self.setShowGrid(False)
         self.setAlternatingRowColors(True)
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def resizeEvent(self, event: QResizeEvent) -> None:
         super().resizeEvent(event)
 
         self.logger.debug(f'{event.oldSize()} -> {event.size()}')
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def sizeHint(self):
         """Compute the exact required size for the table"""
 
@@ -127,11 +124,11 @@ class THomeTableView(TTableView):
 
         return QSize(w, h)
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def minimumSizeHint(self):
         return self.sizeHint()
 
-    @logged(disabled=True)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def setModel(self, model: QAbstractItemModel):
 
         super().setModel(model)
@@ -142,12 +139,12 @@ class THomeTableView(TTableView):
 
         self.setHorizontalHeader(self.header_view)
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def enterEvent(self, event: QEvent) -> None:
 
         super().enterEvent(event)
 
-    @logged(disabled=False)
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def leaveEvent(self, event: QEvent) -> None:
 
         super().leaveEvent(event)

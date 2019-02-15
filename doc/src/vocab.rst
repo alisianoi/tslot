@@ -73,7 +73,6 @@ Verbs
 # produce -- produced (7, 8)
 # stumble -- stumbled (7, 8)
 # disable -- disabled (7, 8)
-# produce -- produced (7, 8)
 # capture -- captured (7, 8)
 # release -- released (7, 8)
 

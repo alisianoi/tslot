@@ -18,7 +18,6 @@ from src.ui.base import TWidget
 from src.ui.home.t_scroll_area import THomeScrollArea
 from src.ui.menu.t_menu_wgt import TDockMenuWidget
 from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
-from src.utils import configure_logging
 
 
 class TDefaults:
@@ -160,8 +159,6 @@ if __name__ == '__main__':
     )
 
     args = ap.parse_args()
-
-    configure_logging()
 
     app = QApplication(sys.argv)
 

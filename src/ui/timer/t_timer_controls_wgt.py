@@ -12,7 +12,7 @@ from src.msg.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
 from src.msg.timer import TTimerStashRequest
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TTimerControlsWidget(TWidget):

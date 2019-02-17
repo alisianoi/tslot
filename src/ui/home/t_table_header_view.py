@@ -4,7 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import logged
+from src.common.logger import logged
 
 
 class THeaderView(QHeaderView):

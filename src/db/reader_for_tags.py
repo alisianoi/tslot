@@ -10,7 +10,7 @@ from src.db.worker import TReader
 from src.msg.tag_fetch_request import TTagsByNameFetchRequest
 from src.msg.tag_fetch_response import (TTagFetchResponse,
                                         TTagsByNameFetchResponse)
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TTagReader(TReader):

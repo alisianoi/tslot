@@ -15,7 +15,7 @@ from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
                                         TSlotFetchRequest)
 from src.msg.slot_fetch_response import TRaySlotFetchResponse
 from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponse
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TSlotReader(TReader):

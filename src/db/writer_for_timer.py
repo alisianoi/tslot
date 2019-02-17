@@ -9,7 +9,7 @@ from src.db.reader_for_timer import TSlotModel, TTaskModel
 from src.db.worker import TWriter
 from src.msg.base import TFailure
 from src.msg.timer import TTimerStashRequest
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TTimerWriter(TWriter):

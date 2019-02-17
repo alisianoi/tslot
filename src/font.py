@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PyQt5.QtGui import *
 
-from src.utils import logged
+from src.common.logger import logged
 
 
 @logged(disabled=True)

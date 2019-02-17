@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from src.msg.base import TFailure, TRequest, TResponse
 from src.msg.fetch import TFetchRequest, TFetchResponse
 from src.msg.stash import TStashRequest, TStashResponse
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TWorker(QObject):

@@ -13,7 +13,7 @@ from src.msg.slot_fetch_response import (TRaySlotFetchResponse,
 from src.ui.base import TWidget
 from src.ui.home.t_table_model import TTableModel
 from src.ui.home.t_table_view import THomeTableView
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TScrollWidget(TWidget):

@@ -4,7 +4,6 @@ import pytest
 from pathlib import Path
 
 from src.db.model import Base, SlotModel, TaskModel
-from src.utils import configure_logging
 
 
 def put_one_date(session, fst, lst, name=None):

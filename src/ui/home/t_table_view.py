@@ -7,7 +7,9 @@ from PyQt5.QtWidgets import QStyleOptionButton
 
 from src.ui.base import TTableView
 from src.ui.home.t_table_header_view import THeaderView
-from src.utils import logged, style_option_as_str
+from src.utils import style_option_as_str
+from src.common.logger import logged
+
 
 
 class TNukeStyleDelegate(QStyledItemDelegate):

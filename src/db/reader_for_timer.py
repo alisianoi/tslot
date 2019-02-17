@@ -8,7 +8,7 @@ from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
 from src.msg.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
-from src.utils import logged
+from src.common.logger import logged
 
 
 class TTimerReader(TReader):

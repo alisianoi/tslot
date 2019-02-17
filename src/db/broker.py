@@ -15,7 +15,7 @@ from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
 from src.msg.stash import TStashRequest, TStashResponse
 from src.msg.timer_fetch_request import TTimerFetchRequest
 from src.msg.timer import TTimerStashRequest
-from src.utils import logged
+from src.common.logger import logged
 
 
 class DataRunnable(QRunnable):

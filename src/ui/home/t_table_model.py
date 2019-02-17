@@ -4,7 +4,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import item_flags_as_str, logged, pendulum2str, timedelta2str
+from src.utils import item_flags_as_str, pendulum2str, timedelta2str
+from src.common.logger import logged
 
 
 class TTableModel(QAbstractTableModel):

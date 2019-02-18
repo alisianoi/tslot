@@ -9,7 +9,7 @@ from common.sip_singleton import SipSingleton
 from logger import logged, logger
 
 
-class MyFontService(QObject, metaclass=SipSingleton):
+class TFontService(QObject, metaclass=SipSingleton):
 
     base_height_changed = pyqtSignal()
 

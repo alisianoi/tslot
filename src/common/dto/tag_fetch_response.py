@@ -1,7 +1,7 @@
 from typing import List
 
 from src.db.model import TagModel
-from src.msg.fetch import TFetchResponse
+from src.common.dto.fetch import TFetchResponse
 
 
 class TTagFetchResponse(TFetchResponse):

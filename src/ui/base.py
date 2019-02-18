@@ -3,7 +3,7 @@ import logging
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QDockWidget, QScrollArea, QTableView, QWidget
 
-from src.msg.base import TFailure, TRequest, TResponse
+from src.common.dto.base import TFailure, TRequest, TResponse
 
 # TODO: consider overriding paintEvent with the custom painting as described in:
 # https://wiki.qt.io/How_to_Change_the_Background_Color_of_QWidget

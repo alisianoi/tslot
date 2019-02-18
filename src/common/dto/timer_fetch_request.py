@@ -1,5 +1,5 @@
 from src.ai.model import TEntryModel
-from src.msg.fetch import TFetchRequest, TFetchResponse
+from src.common.dto.fetch import TFetchRequest, TFetchResponse
 
 
 class TTimerFetchRequest(TFetchRequest):

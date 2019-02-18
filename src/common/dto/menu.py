@@ -1,4 +1,4 @@
-from src.msg.base import TMessage
+from src.common.dto.base import TMessage
 
 
 class TMenuRequest(TMessage):

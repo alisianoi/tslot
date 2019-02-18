@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 import pendulum
 from src.ai.model import TEntryModel, TSlotModel
-from src.msg.base import TResponse
-from src.msg.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
-from src.msg.timer import TTimerStashRequest
+from src.common.dto.base import TResponse
+from src.common.dto.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
+from src.common.dto.timer import TTimerStashRequest
 from src.ui.base import TWidget
 from src.ui.timer.t_timer_wgt import TTimerWidget
 from src.common.logger import logged

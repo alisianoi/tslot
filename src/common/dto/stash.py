@@ -1,4 +1,4 @@
-from src.msg.base import TRequest, TResponse
+from src.common.dto.base import TRequest, TResponse
 
 class TStashRequest(TRequest):
     """Provide base class for data stashing requests *StashRequest"""

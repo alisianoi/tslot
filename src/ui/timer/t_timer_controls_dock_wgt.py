@@ -1,7 +1,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.msg.base import TRequest, TResponse, TFailure
+from src.common.dto.base import TRequest, TResponse, TFailure
 from src.ui.base import TWidget, TDockWidget
 from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
 

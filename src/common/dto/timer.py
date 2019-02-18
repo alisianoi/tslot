@@ -1,8 +1,8 @@
 from PyQt5.QtCore import *
 
 from src.ai.model import TEntryModel
-from src.msg.fetch import TFetchRequest, TFetchResponse
-from src.msg.stash import TStashRequest, TStashResponse
+from src.common.dto.fetch import TFetchRequest, TFetchResponse
+from src.common.dto.stash import TStashRequest, TStashResponse
 
 
 class TTimerStashRequest(TStashRequest):

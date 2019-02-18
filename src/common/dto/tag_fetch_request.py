@@ -1,4 +1,4 @@
-from src.msg.fetch import TFetchRequest
+from src.common.dto.fetch import TFetchRequest
 
 
 class TTagFetchRequest(TFetchRequest):

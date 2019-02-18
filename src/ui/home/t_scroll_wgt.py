@@ -5,10 +5,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import pendulum
-from src.msg.base import TFailure, TRequest, TResponse
-from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
+from src.common.dto.base import TFailure, TRequest, TResponse
+from src.common.dto.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest)
-from src.msg.slot_fetch_response import (TRaySlotFetchResponse,
+from src.common.dto.slot_fetch_response import (TRaySlotFetchResponse,
                                          TRaySlotWithTagFetchResponse)
 from src.ui.base import TWidget
 from src.ui.home.t_table_model import TTableModel

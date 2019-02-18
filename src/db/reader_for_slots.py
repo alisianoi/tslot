@@ -9,12 +9,9 @@ import pendulum
 from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
-from src.msg.base import TFailure, TRequest, TResponse
-from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
-                                        TRaySlotWithTagFetchRequest,
-                                        TSlotFetchRequest)
-from src.msg.slot_fetch_response import TRaySlotFetchResponse
-from src.msg.slot_fetch_response import TRaySlotWithTagFetchResponse
+from src.common.dto.base import *
+from src.common.dto.slot_fetch_request import *
+from src.common.dto.slot_fetch_response import *
 from src.common.logger import logged
 
 

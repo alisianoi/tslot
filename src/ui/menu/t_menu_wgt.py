@@ -1,7 +1,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.msg.menu import *
+from src.common.dto.menu import *
 
 
 class TMenuWidget(QWidget):

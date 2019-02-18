@@ -8,13 +8,12 @@ from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 from src.db.reader_for_timer import TTimerReader
 from src.db.worker import TReader, TWorker, TWriter
 from src.db.writer_for_timer import TTimerWriter
-from src.msg.base import TFailure, TRequest, TResponse
-from src.msg.fetch import TFetchRequest, TFetchResponse
-from src.msg.slot_fetch_request import (TRaySlotFetchRequest,
-                                        TRaySlotWithTagFetchRequest)
-from src.msg.stash import TStashRequest, TStashResponse
-from src.msg.timer_fetch_request import TTimerFetchRequest
-from src.msg.timer import TTimerStashRequest
+from src.common.dto.base import TFailure, TRequest, TResponse
+from src.common.dto.fetch import TFetchRequest, TFetchResponse
+from src.common.dto.slot_fetch_request import *
+from src.common.dto.stash import TStashRequest, TStashResponse
+from src.common.dto.timer_fetch_request import TTimerFetchRequest
+from src.common.dto.timer import TTimerStashRequest
 from src.common.logger import logged
 
 

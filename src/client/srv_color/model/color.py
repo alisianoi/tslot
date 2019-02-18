@@ -1,0 +1,93 @@
+class MyColorModel:
+
+    def __init__(self):
+
+        # somewhat purple
+        self.primary_color_0_100 = "#f9cdfe"
+        self.primary_color_0_200 = "#f39cfc"
+        self.primary_color_0_300 = "#ed6afb"
+        self.primary_color_0_400 = "#e738fa"
+        self.primary_color_0_500 = "#e006f9"
+        self.primary_color_0_600 = "#b405c7"
+        self.primary_color_0_700 = "#870495"
+        self.primary_color_0_800 = "#5a0363"
+        self.primary_color_0_900 = "#2d0132"
+
+        # somewhat chemical green
+        self.primary_color_1_100 = "#cdfef9"
+        self.primary_color_1_200 = "#9cfcf3"
+        self.primary_color_1_300 = "#6afbed"
+        self.primary_color_1_400 = "#38fae7"
+        self.primary_color_1_500 = "#06f9e0"
+        self.primary_color_1_600 = "#05c7b4"
+        self.primary_color_1_700 = "#049587"
+        self.primary_color_1_800 = "#03635a"
+        self.primary_color_1_900 = "#01322d"
+
+        # somewhat green
+        self.primary_color_2_100 = "#d2fecd"
+        self.primary_color_2_200 = "#a5fc9c"
+        self.primary_color_2_300 = "#78fb6a"
+        self.primary_color_2_400 = "#4bfa38"
+        self.primary_color_2_500 = "#1ff906"
+        self.primary_color_2_600 = "#18c705"
+        self.primary_color_2_700 = "#129504"
+        self.primary_color_2_800 = "#0c6303"
+        self.primary_color_2_900 = "#063201"
+
+        # somewhat darker red
+        self.primary_color_3_100 = "#fecdd2"
+        self.primary_color_3_200 = "#fc9ca5"
+        self.primary_color_3_300 = "#fb6a78"
+        self.primary_color_3_400 = "#fa384b"
+        self.primary_color_3_500 = "#f9061f"
+        self.primary_color_3_600 = "#c70518"
+        self.primary_color_3_700 = "#950412"
+        self.primary_color_3_800 = "#63030c"
+        self.primary_color_3_900 = "#320106"
+
+        # 2014 Material Design color palette
+
+        self.color_black = "#000000"
+        self.color_white = "#FFFFFF"
+
+        self.color_gray_50 = "#FAFAFA"
+        self.color_gray_100 = "#F5F5F5"
+        self.color_gray_200 = "#EEEEEE"
+        self.color_gray_300 = "#E0E0E0"
+        self.color_gray_400 = "#BDBDBD"
+        self.color_gray_500 = "#9E9E9E"
+        self.color_gray_600 = "#757575"
+        self.color_gray_700 = "#616161"
+        self.color_gray_800 = "#424242"
+        self.color_gray_900 = "#212121"
+
+        self.color_cyan_50 = "#E0F7FA"
+        self.color_cyan_100 = "#B2EBF2"
+        self.color_cyan_200 = "#80DEEA"
+        self.color_cyan_300 = "#4DD0E1"
+        self.color_cyan_400 = "#26C6DA"
+        self.color_cyan_500 = "#00BCD4"
+        self.color_cyan_600 = "#00ACC1"
+        self.color_cyan_700 = "#0097A7"
+        self.color_cyan_800 = "#00838F"
+        self.color_cyan_900 = "#006064"
+        self.color_cyan_A100 = "#84FFFF"
+        self.color_cyan_A200 = "#18FFFF"
+        self.color_cyan_A400 = "#00E5FF"
+        self.color_cyan_A700 = "#00B8D4"
+
+        self.color_red_50 = "#FFEBEE"
+        self.color_red_100 = "#FFCDD2"
+        self.color_red_200 = "#EF9A9A"
+        self.color_red_300 = "#E57373"
+        self.color_red_400 = "#EF5350"
+        self.color_red_500 = "#F44336"
+        self.color_red_600 = "#E53935"
+        self.color_red_700 = "#D32F2F"
+        self.color_red_800 = "#C62828"
+        self.color_red_900 = "#B71C1C"
+        self.color_red_A100 = "#FF8A80"
+        self.color_red_A200 = "#FF5252"
+        self.color_red_A400 = "#FF1744"
+        self.color_red_A700 = "#D50000"

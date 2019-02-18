@@ -1,10 +1,7 @@
-import logging
+from PyQt5.QtCore import QAbstractItemModel, Qt
+from PyQt5.QtWidgets import QHeaderView, QWidget
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
-from src.common.logger import logged
+from src.common.logger import logged, logmain
 
 
 class THeaderView(QHeaderView):
@@ -16,14 +13,8 @@ class THeaderView(QHeaderView):
         https://stackoverflow.com/q/48361795/1269892
     """
 
-    def __init__(
-        self
-        , orientation: Qt.Orientation=Qt.Horizontal
-        , parent     : QWidget=None
-    ) -> None:
-        super().__init__(orientation, parent)
-
-        self.logger = logging.getLogger('tslot')
+    def __init__(self, orientation, **kwargs):
+        super().__init__(orientation, **kwargs)
 
         self.section_resize_modes = [
             QHeaderView.Stretch # name of task
@@ -36,7 +27,7 @@ class THeaderView(QHeaderView):
 
         self.hide()
 
-    @logged(disabled=True)
+    @logged(logger=logmain, disabled=True)
     def setModel(self, model: QAbstractItemModel=None):
         """
         Set the underlying data model
@@ -62,17 +53,14 @@ class THeaderView(QHeaderView):
         for i, mode in enumerate(self.section_resize_modes):
             self.setSectionResizeMode(i, mode)
 
-    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
+    @logged(logger=logmain, disabled=True)
     def sectionSizeHint(self, logical_index: int) -> int:
-
         return super().sectionSizeHint(logical_index)
 
-    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
+    @logged(logger=logmain, disabled=True)
     def minimumSectionSize(self) -> int:
-
         return super().minimumSectionSize()
 
-    @logged(logger=logging.getLogger("tslot-main"), disabled=True)
+    @logged(logger=logmain, disabled=True)
     def maximumSectionSize(self) -> int:
-
         return super().maximumSectionSize()

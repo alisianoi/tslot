@@ -11,12 +11,12 @@ from PyQt5.QtWidgets import *
 
 import pendulum
 from src.cache import TCacheBroker
+from src.client.common.widget import TWidget
+from src.client.wgt_timer import TTimerControlsDockWidget
+from src.client.wgt_timer_table import THomeScrollArea
 from src.db.broker import TVaultBroker
 from src.font import initialize_font_databse
 from src.style import StyleBroker
-from src.client.common.widget import TWidget
-from src.ui.home.t_scroll_area import THomeScrollArea
-from src.client.wgt_timer import TTimerControlsDockWidget
 
 
 class TDefaults:

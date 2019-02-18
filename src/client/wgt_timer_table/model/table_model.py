@@ -2,22 +2,16 @@ import logging
 from typing import List
 
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 
 from src.ai.model import TEntryModel
 from src.common.logger import logged
-from src.utils import item_flags_as_str, pendulum2str, timedelta2str
+from src.utils import pendulum2str, timedelta2str
 
 
 class TTableModel(QAbstractTableModel):
 
-    def __init__(self, items: List[TEntryModel], parent: QObject=None):
-
-        super().__init__(parent)
-
-        self.logger = logging.getLogger("tslot-main")
-
+    def __init__(self, items: List[TEntryModel], **kwargs):
+        super().__init__(**kwargs)
         self.items = items
 
     def rowCount(self, parent: QModelIndex=QModelIndex()):
@@ -64,11 +58,8 @@ class TTableModel(QAbstractTableModel):
 
     @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def data(
-        self
-        , index: QModelIndex=QModelIndex()
-        , role : Qt.ItemDataRole=Qt.DisplayRole
+        self, index: QModelIndex=QModelIndex(), role: Qt.ItemDataRole=Qt.DisplayRole
     ):
-
         if not self.check_index(index):
             raise RuntimeError('data expects an index that makes sense')
 

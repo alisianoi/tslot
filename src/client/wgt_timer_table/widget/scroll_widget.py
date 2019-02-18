@@ -1,18 +1,14 @@
 import logging
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QVBoxLayout
 
 import pendulum
-from src.common.dto.base import TFailure, TRequest, TResponse
-from src.common.dto.slot_fetch_request import (TRaySlotFetchRequest,
-                                        TRaySlotWithTagFetchRequest)
-from src.common.dto.slot_fetch_response import (TRaySlotFetchResponse,
-                                         TRaySlotWithTagFetchResponse)
 from src.client.common.widget import TWidget
-from src.ui.home.t_table_model import TTableModel
-from src.ui.home.t_table_view import THomeTableView
+from src.client.wgt_timer_table.model.table_model import TTableModel
+from src.client.wgt_timer_table.widget.home_table_view import THomeTableView
+from src.common.dto.base import TFailure, TResponse
+from src.common.dto.slot_fetch_response import *
 from src.common.logger import logged
 
 
@@ -24,9 +20,8 @@ class TScrollWidget(TWidget):
     implementing infinite scroll for a series of tables of slots.
     """
 
-    def __init__(self, parent: QWidget=None):
-
-        super().__init__(parent=parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.dt_offset = pendulum.today()
         self.direction = "future_to_past"

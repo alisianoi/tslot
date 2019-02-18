@@ -3,13 +3,11 @@ import logging
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QStyleOptionButton
 
-from src.ui.base import TTableView
+from src.client.common.widget.table_view import TTableView
 from src.ui.home.t_table_header_view import THeaderView
 from src.utils import style_option_as_str
-from src.common.logger import logged
-
+from src.common.logger import logged, logmain
 
 
 class TNukeStyleDelegate(QStyledItemDelegate):
@@ -18,8 +16,6 @@ class TNukeStyleDelegate(QStyledItemDelegate):
     def __init__(self, parent: QWidget=None) -> None:
 
         super().__init__(parent)
-
-        self.logger = logging.getLogger("tslot-main")
 
     @logged(logger=logging.getLogger("tslot-main"), disabled=True)
     def createEditor(
@@ -43,7 +39,7 @@ class TNukeStyleDelegate(QStyledItemDelegate):
         , index  : QModelIndex
     ) -> None:
 
-        self.logger.debug(f'paint: {index}')
+        logmain.debug(f'paint: {index}')
 
         if index.column() != 5:
             return super().paint(painter, option, index)
@@ -64,10 +60,10 @@ class TNukeStyleDelegate(QStyledItemDelegate):
 
         size = super().sizeHint(item, index)
 
-        self.logger.debug(style_option_as_str(item.type))
-        self.logger.debug(f'row: {item.index.row()}, col: {item.index.column()}')
-        self.logger.debug(f'{index.data()}')
-        self.logger.debug(item.text)
+        logmain.debug(style_option_as_str(item.type))
+        logmain.debug(f'row: {item.index.row()}, col: {item.index.column()}')
+        logmain.debug(f'{index.data()}')
+        logmain.debug(item.text)
 
         if index in [2, 3, 4]:
             return size
@@ -78,9 +74,8 @@ class TNukeStyleDelegate(QStyledItemDelegate):
 
 class THomeTableView(TTableView):
 
-    def __init__(self, parent: QObject=None):
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.delegate = TNukeStyleDelegate()
         self.setItemDelegate(self.delegate)
@@ -99,12 +94,6 @@ class THomeTableView(TTableView):
         self.setAlternatingRowColors(True)
 
     @logged(logger=logging.getLogger('tslot-main'), disabled=True)
-    def resizeEvent(self, event: QResizeEvent) -> None:
-        super().resizeEvent(event)
-
-        self.logger.debug(f'{event.oldSize()} -> {event.size()}')
-
-    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def sizeHint(self):
         """Compute the exact required size for the table"""
 
@@ -116,7 +105,7 @@ class THomeTableView(TTableView):
         hheader = self.horizontalHeader()
 
         if not vheader.isHidden():
-            self.logger.warning('Expecting vertical header to be hidden')
+            logmain.warning('Expecting vertical header to be hidden')
         if not hheader.isHidden():
             h += hheader.height()
 

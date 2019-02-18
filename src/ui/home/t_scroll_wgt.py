@@ -10,7 +10,7 @@ from src.common.dto.slot_fetch_request import (TRaySlotFetchRequest,
                                         TRaySlotWithTagFetchRequest)
 from src.common.dto.slot_fetch_response import (TRaySlotFetchResponse,
                                          TRaySlotWithTagFetchResponse)
-from src.ui.base import TWidget
+from src.client.common.widget import TWidget
 from src.ui.home.t_table_model import TTableModel
 from src.ui.home.t_table_view import THomeTableView
 from src.common.logger import logged
@@ -123,7 +123,7 @@ class TScrollWidget(TWidget):
         for day in response.break_by_date():
             fst_slot, lst_slot = day
 
-            view = THomeTableView(self)
+            view = THomeTableView(parent=self)
             model = TTableModel(response.items[fst_slot:lst_slot])
 
             view.setModel(model)

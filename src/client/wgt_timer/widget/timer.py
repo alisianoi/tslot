@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.ui.base import TWidget
+from src.client.common.widget import TWidget
 from src.utils import seconds_to_str
 
 
@@ -20,9 +20,8 @@ class TTimerWidget(TWidget):
 
     TIMER_IS_ZERO = '00:00:00'
 
-    def __init__(self, parent: TWidget=None) -> None:
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.timer = QTimer(self)
 

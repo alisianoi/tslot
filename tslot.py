@@ -14,7 +14,7 @@ from src.cache import TCacheBroker
 from src.db.broker import TVaultBroker
 from src.font import initialize_font_databse
 from src.style import StyleBroker
-from src.ui.base import TWidget
+from src.client.common.widget import TWidget
 from src.ui.home.t_scroll_area import THomeScrollArea
 from src.client.wgt_timer import TTimerControlsDockWidget
 
@@ -33,9 +33,8 @@ class TSettings:
 
 class TCentralWidget(TWidget):
 
-    def __init__(self, parent: QWidget=None):
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.scroll = THomeScrollArea(parent=self)
 

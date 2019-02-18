@@ -4,16 +4,15 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.ui.base import TScrollArea
+from src.client.common.widget.scroll_area import TScrollArea
 from src.ui.home.t_scroll_wgt import TScrollWidget
 
 
 class THomeScrollArea(TScrollArea):
     """Show several tables that contain time slots"""
 
-    def __init__(self, parent: QWidget=None):
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 

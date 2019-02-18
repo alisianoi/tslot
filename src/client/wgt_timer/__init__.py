@@ -2,7 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from src.common.dto.base import TRequest, TResponse, TFailure
-from src.ui.base import TWidget, TDockWidget
+from src.client.common.widget import TWidget
+from src.client.common.widget.dock_widget import TDockWidget
 from src.client.wgt_timer.widget.timer_controls import TTimerControlsWidget
 
 
@@ -15,14 +16,13 @@ class TTimerControlsDockWidget(TDockWidget):
     several docks + main area.
     """
 
-    def __init__(self, parent: TWidget=None) -> None:
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.setFeatures(QDockWidget.NoDockWidgetFeatures)
         self.setAllowedAreas(Qt.TopDockWidgetArea)
 
-        self.timer_controls_wgt = TTimerControlsWidget(self)
+        self.timer_controls_wgt = TTimerControlsWidget(parent=self)
 
         self.setWidget(self.timer_controls_wgt)
 

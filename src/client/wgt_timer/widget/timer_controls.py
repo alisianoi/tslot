@@ -10,17 +10,16 @@ from src.ai.model import TEntryModel, TSlotModel
 from src.common.dto.base import TResponse
 from src.common.dto.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
 from src.common.dto.timer import TTimerStashRequest
-from src.ui.base import TWidget
+from src.client.common.widget import TWidget
 from src.client.wgt_timer.widget.timer import TTimerWidget
-from src.common.logger import logged
+from src.common.logger import logged, logmain
 
 
 class TTimerControlsWidget(TWidget):
     """Add basic controls to start/stop time tracking for a task"""
 
-    def __init__(self, parent: TWidget=None):
-
-        super().__init__(parent)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         path_svgs_solid = Path('font', 'fontawesome', 'svgs', 'solid')
 
@@ -106,7 +105,7 @@ class TTimerControlsWidget(TWidget):
 
         self.item = item
 
-        self.logger.debug(f"Set task_ldt text: {item.task.name}")
+        logmain.debug(f"Set task_ldt text: {item.task.name}")
         self.task_ldt.setText(self.item.task.name)
 
         period = pendulum.now(tz='UTC') - item.slot.fst

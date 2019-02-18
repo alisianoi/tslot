@@ -1,16 +1,18 @@
 import logging
+from typing import List
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from src.utils import item_flags_as_str, pendulum2str, timedelta2str
+from src.ai.model import TEntryModel
 from src.common.logger import logged
+from src.utils import item_flags_as_str, pendulum2str, timedelta2str
 
 
 class TTableModel(QAbstractTableModel):
 
-    def __init__(self, items: list, parent: QObject=None):
+    def __init__(self, items: List[TEntryModel], parent: QObject=None):
 
         super().__init__(parent)
 
@@ -28,12 +30,6 @@ class TTableModel(QAbstractTableModel):
     def flags(self, index: QModelIndex) -> Qt.ItemFlags:
 
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
-
-        # flags = super().flags(index)
-        #
-        # self.logger.debug(f'flags: {item_flags_as_str(flags)}')
-        #
-        # return flags
 
     def headerData(
         self
@@ -66,23 +62,18 @@ class TTableModel(QAbstractTableModel):
 
         raise RuntimeError(f'Fix .headerDataDisplayRole: section {section}')
 
+    @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def data(
         self
         , index: QModelIndex=QModelIndex()
         , role : Qt.ItemDataRole=Qt.DisplayRole
     ):
 
-        if not index.isValid():
-            self.logger.debug('Requested index is not valid')
-            return QVariant()
+        if not self.check_index(index):
+            raise RuntimeError('data expects an index that makes sense')
 
-        if not 0 <= index.row() < self.rowCount():
-            self.logger.debug('Requested row is outside range')
-            return QVariant()
-
-        if not 0 <= index.column() <= self.columnCount():
-            self.logger.debug('Requested column is outside range')
-            return QVariant()
+        if role == Qt.EditRole:
+            return self.dataDisplayRole(index)
 
         if role == Qt.DisplayRole:
             return self.dataDisplayRole(index)
@@ -102,17 +93,13 @@ class TTableModel(QAbstractTableModel):
 
         if column == 0:
             return task.name
-
-        if column == 1:
+        elif column == 1:
             return ' '.join(tag.name for tag in tags)
-
-        if column == 2:
+        elif column == 2:
             return pendulum2str(slot.fst)
-
-        if column == 3:
+        elif column == 3:
             return pendulum2str(slot.lst)
-
-        if column == 4:
+        elif column == 4:
             return timedelta2str(slot.lst - slot.fst)
 
         return QVariant()
@@ -123,3 +110,67 @@ class TTableModel(QAbstractTableModel):
             return Qt.AlignCenter
 
         return QVariant()
+
+    @logged(logger=logging.getLogger('tslot-main'), disabled=False)
+    def setData(
+        self
+        , index: QModelIndex
+        , value: QVariant
+        , role: int=Qt.EditRole
+    ) -> bool:
+
+        if role != Qt.EditRole:
+            return super().setData(index, value, role)
+
+        if not self.check_index(index):
+            raise RuntimeError('setData expects an index that makes sense')
+
+        if index.column() == 0:
+            self.setDataForTask(index, value)
+        elif index.column() == 1:
+            self.setDataForTag(index, value)
+        else:
+            raise RuntimeError(f'setData not implemented for {index.column()}')
+
+        self.dataChanged.emit(index, index, [role])
+
+        return True
+
+    @logged(logger=logging.getLogger('tslot-main'), disabled=False)
+    def setDataForTask(self, index: QModelIndex, value: QVariant) -> None:
+
+        self.items[index.row()].task.name = value
+
+    @logged(logger=logging.getLogger('tslot-main'), disabled=False)
+    def setDataForTag(self, index: QModelIndex, value: QVariant) -> None:
+
+        new_tags, old_tags = [], self.items[index.row()].tags
+
+        for name in value.split(' '):
+            for tag in old_tags:
+                if tag.name == name:
+                    new_tags.append(tag)
+
+                    break
+            else:
+                # It could be a *completely* new tag or an existing tag that was
+                # not used for this task before. Which is it?
+                raise RuntimeError('Need a working tag by name search!')
+
+    def check_index(self, index: QModelIndex) -> bool:
+        """Check if the supplied index makes sense"""
+
+        if not index.isValid():
+            return False
+
+        row = index.row()
+
+        if row < 0 or row >= self.rowCount():
+            return False
+
+        column = index.column()
+
+        if column < 0 or column >= self.columnCount():
+            return False
+
+        return True

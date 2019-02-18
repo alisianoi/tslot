@@ -10,7 +10,7 @@ from src.utils import style_option_as_str
 from src.common.logger import logged, logmain
 
 
-class TNukeStyleDelegate(QStyledItemDelegate):
+class THomeTableStyleDelegate(QStyledItemDelegate):
     """Draw a push button instead of a table cell."""
 
     def __init__(self, parent: QWidget=None) -> None:
@@ -25,11 +25,29 @@ class TNukeStyleDelegate(QStyledItemDelegate):
         , index: QModelIndex
     ) -> QWidget:
 
-        editor = QPushButton(parent)
+        if index.column() not in [0, 1, 2, 3]:
+            raise RuntimeError(f'Editor for column {index.column()}')
 
-        editor.setText('trash')
+        # alternative: return QLineEdit(parent)
+        return super().createEditor(parent, option, index)
 
-        return editor
+    @logged(disabled=False)
+    def setEditorData(self, editor: QWidget, index: QModelIndex) -> None:
+
+        editor.setText(index.data())
+
+    @logged(disabled=False)
+    def setModelData(
+        self
+        , editor: QWidget
+        , model: QAbstractItemModel
+        , index: QModelIndex
+    ) -> None:
+
+        if not isinstance(editor, QLineEdit):
+            raise RuntimeError('Expected editor to be QLineEdit')
+
+        model.setData(index, editor.text())
 
     @logged(disabled=True)
     def paint(
@@ -77,7 +95,7 @@ class THomeTableView(TTableView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.delegate = TNukeStyleDelegate()
+        self.delegate = THomeTableStyleDelegate()
         self.setItemDelegate(self.delegate)
 
         self.verticalHeader().hide()

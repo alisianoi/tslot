@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
 
-from PyQt5.QtCore import QSize, pyqtSlot
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 import pendulum
@@ -11,7 +11,7 @@ from src.common.dto.base import TResponse
 from src.common.dto.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
 from src.common.dto.timer import TTimerStashRequest
 from src.ui.base import TWidget
-from src.ui.timer.t_timer_wgt import TTimerWidget
+from src.client.wgt_timer.widget.timer import TTimerWidget
 from src.common.logger import logged
 
 

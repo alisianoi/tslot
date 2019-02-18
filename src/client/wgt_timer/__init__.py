@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 
 from src.common.dto.base import TRequest, TResponse, TFailure
 from src.ui.base import TWidget, TDockWidget
-from src.ui.timer.t_timer_controls_wgt import TTimerControlsWidget
+from src.client.wgt_timer.widget.timer_controls import TTimerControlsWidget
 
 
 class TTimerControlsDockWidget(TDockWidget):

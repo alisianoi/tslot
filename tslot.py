@@ -16,7 +16,7 @@ from src.font import initialize_font_databse
 from src.style import StyleBroker
 from src.ui.base import TWidget
 from src.ui.home.t_scroll_area import THomeScrollArea
-from src.ui.timer.t_timer_controls_dock_wgt import TTimerControlsDockWidget
+from src.client.wgt_timer import TTimerControlsDockWidget
 
 
 class TDefaults:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PyQt5.QtCore import *
 
-from src.ai.base import TObject
+from src.client.common import TObject
 from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
 from src.db.reader_for_timer import TTimerReader
 from src.db.worker import TReader, TWorker, TWriter
@@ -102,21 +102,17 @@ class TVaultBroker(TObject):
 
         self.triggered.emit(failure)
 
-    def handle_timer_fetch_request(self, request: TTimerFetchRequest) -> None:
+    def handle_timer_fetch_request(self, request: TTimerFetchRequest):
         self.dispatch_reader(TTimerReader(request, self.path, parent=self))
 
-    def handle_timer_stash_request(self, request: TTimerStashRequest) -> None:
+    def handle_timer_stash_request(self, request: TTimerStashRequest):
         self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
-    def handle_ray_slot_fetch(
-        self, request: TRaySlotFetchRequest
-    ) -> None:
+    def handle_ray_slot_fetch(self, request: TRaySlotFetchRequest):
 
         self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
-    def handle_ray_slot_with_tag_fetch(
-        self, request: TRaySlotWithTagFetchRequest
-    ) -> None:
+    def handle_ray_slot_with_tag_fetch(self, request: TRaySlotWithTagFetchRequest):
 
         self.dispatch_reader(
             TRaySlotWithTagReader(request, self.path, parent=self)

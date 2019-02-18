@@ -3,7 +3,7 @@ from typing import List
 
 from PyQt5.QtCore import *
 
-from src.ai.model import TEntryModel
+from src.common.dto.model import TEntryModel
 from src.common.logger import logged
 from src.utils import pendulum2str, timedelta2str
 

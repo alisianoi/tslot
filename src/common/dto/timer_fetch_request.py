@@ -1,4 +1,4 @@
-from src.ai.model import TEntryModel
+from src.common.dto.model import TEntryModel
 from src.common.dto.fetch import TFetchRequest, TFetchResponse
 
 

@@ -1,4 +1,4 @@
-from src.ai.base import TObject
+from src.client.common import TObject
 
 
 class TCacheBroker(TObject):

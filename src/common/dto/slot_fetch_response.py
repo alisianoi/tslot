@@ -8,7 +8,7 @@ from typing import List, Tuple
 from src.common.dto.fetch import TFetchResponse
 from src.common.dto.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
 
-from src.ai.model import TEntryModel
+from src.common.dto.model import TEntryModel
 
 
 class TSlotFetchResponse(TFetchResponse):

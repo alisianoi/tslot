@@ -3,8 +3,8 @@ import pendulum
 
 from pathlib import Path
 
-from src.ai.base import TObject
-from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
+from src.client.common import TObject
+from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
 from src.common.dto.timer_fetch_request import *

@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject
 from sqlalchemy import func
 
 import pendulum
-from src.ai.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
+from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
 from src.common.dto.base import *

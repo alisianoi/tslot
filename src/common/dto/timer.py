@@ -1,6 +1,6 @@
 from PyQt5.QtCore import *
 
-from src.ai.model import TEntryModel
+from src.common.dto.model import TEntryModel
 from src.common.dto.fetch import TFetchRequest, TFetchResponse
 from src.common.dto.stash import TStashRequest, TStashResponse
 

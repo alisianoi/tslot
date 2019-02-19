@@ -4,8 +4,8 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QValidator
 from PyQt5.QtWidgets import QLineEdit, QSizePolicy, QWidget
 
-from logger import logged, logger
-from srv_font.service.font import FontService
+from src.common.logger import logged, logmain
+from src.client.srv_font.service.font import TFontService
 
 
 class MyLineEditValidator(QValidator):
@@ -48,4 +48,4 @@ class MyLineEdit(QLineEdit):
 
     def sizeHint(self):
         size_hint = super().sizeHint()
-        return QSize(size_hint.width(), FontService().base_height)
+        return QSize(size_hint.width(), TFontService().base_height)

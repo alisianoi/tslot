@@ -1,5 +1,6 @@
-from common.widget.spin_box import SpinBox
+from src.client.common.widget.spin_box import TSpinBox
 
-class MySpinBox(SpinBox):
+
+class MySpinBox(TSpinBox):
 
     pass

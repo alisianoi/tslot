@@ -3,11 +3,11 @@ import re
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtGui import QColor
 
-from common.sip_singleton import SipSingleton
-from srv_color.model.color import MyColorModel
+from src.common.sip_singleton import SipSingleton
+from src.client.srv_color.model.color import TColorModel
 
 
-class MyColorService(QObject, metaclass=SipSingleton):
+class TColorService(QObject, metaclass=SipSingleton):
 
     bg_color_fst_changed = pyqtSignal()
     bg_color_fst_lgt_changed = pyqtSignal()
@@ -39,7 +39,7 @@ class MyColorService(QObject, metaclass=SipSingleton):
 
         self.kickstarted = False
 
-        self.colors = MyColorModel()
+        self.colors = TColorModel()
 
         # aka primary color
         self.bg_color_fst = self.colors.color_gray_500

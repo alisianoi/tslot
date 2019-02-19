@@ -1,4 +1,4 @@
-class MyColorModel:
+class TColorModel:
 
     def __init__(self):
 

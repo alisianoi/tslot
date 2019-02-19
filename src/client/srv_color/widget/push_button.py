@@ -1,6 +1,6 @@
-from common.widget.push_button import PushButton
+from src.client.common.widget.push_button import TPushButton
 
 
-class MyPushButton(PushButton):
+class MyPushButton(TPushButton):
 
     pass

@@ -2,10 +2,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QHideEvent, QShowEvent
 from PyQt5.QtWidgets import *
 
-from logger import logged, logger
+from src.common.logger import logged, logmain
 
 
-class AnimatedLabel(QLabel):
+class TAnimatedLabel(QLabel):
 
     enter_animation_played = pyqtSignal()
     leave_animation_played = pyqtSignal()

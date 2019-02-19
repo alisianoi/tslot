@@ -1,8 +1,9 @@
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from src.client.common.widget import TWidget
+from src.client.wgt_timer.widget.label import TTimerLabel
 from src.utils import seconds_to_str
 
 
@@ -18,16 +19,12 @@ class TTimerWidget(TWidget):
     :param sleep: milliseconds between QTimer ticks
     """
 
-    TIMER_IS_ZERO = '00:00:00'
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self.timer = QTimer(self)
 
-        self.tick_lbl = QLabel()
-        self.tick_lbl.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
-        self.tick_lbl.setText(TTimerWidget.TIMER_IS_ZERO)
+        self.tick_lbl = TTimerLabel()
 
         self.layout = QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -64,7 +61,7 @@ class TTimerWidget(TWidget):
 
         value, self.value = self.value, 0
 
-        self.tick_lbl.setText(TTimerWidget.TIMER_IS_ZERO)
+        self.tick_lbl.setText(TTimerLabel.TIMER_IS_ZERO)
 
         return value
 

@@ -5,10 +5,14 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QPushButton
 
+from src.client.common.widget.push_button.color_aware_push_button import \
+    TFailureColorAwarePushButton
+from src.client.common.widget.push_button.font_aware_push_button import \
+    TSquarePushButton
 from src.client.srv_font.service.font import TFontService
 
 
-class TIconAwarePushButton(QPushButton):
+class TIconAwarePushButton(TSquarePushButton):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

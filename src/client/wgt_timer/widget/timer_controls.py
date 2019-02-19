@@ -6,12 +6,14 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 import pendulum
-from src.common.dto.model import TEntryModel, TSlotModel
-from src.common.dto.base import TResponse
-from src.common.dto.timer_fetch_request import TTimerFetchRequest, TTimerFetchResponse
-from src.common.dto.timer import TTimerStashRequest
 from src.client.common.widget import TWidget
+from src.client.wgt_timer.widget.push_button import *
 from src.client.wgt_timer.widget.timer import TTimerWidget
+from src.common.dto.base import TResponse
+from src.common.dto.model import TEntryModel, TSlotModel
+from src.common.dto.timer import TTimerStashRequest
+from src.common.dto.timer_fetch_request import (TTimerFetchRequest,
+                                                TTimerFetchResponse)
 from src.common.logger import logged, logmain
 
 
@@ -21,21 +23,10 @@ class TTimerControlsWidget(TWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        path_svgs_solid = Path('font', 'fontawesome', 'svgs', 'solid')
-
-        self.play_icon = QIcon(str(Path(path_svgs_solid, 'play.svg')))
-        self.stop_icon = QIcon(str(Path(path_svgs_solid, 'stop.svg')))
-        self.nuke_icon = QIcon(str(Path(path_svgs_solid, 'trash-alt.svg')))
-
         self.task_ldt = QLineEdit()
         self.timer_wgt = TTimerWidget()
-        self.push_btn = QPushButton()
-        self.nuke_btn = QPushButton()
-
-        self.push_btn.setObjectName('t_timer_controls_push_btn')
-        self.nuke_btn.setObjectName('t_timer_controls_nuke_btn')
-        self.push_btn.setIcon(self.play_icon)
-        self.nuke_btn.setIcon(self.nuke_icon)
+        self.push_btn = TTimerPushButton()
+        self.nuke_btn = TTimerNukeButton()
 
         self.nuke_btn.hide()
 
@@ -88,7 +79,6 @@ class TTimerControlsWidget(TWidget):
 
         self.timer_wgt.start_timer(value, sleep)
 
-        self.push_btn.setIcon(self.stop_icon)
         self.nuke_btn.show()
 
     def start_new_timer(self) -> int:
@@ -129,7 +119,6 @@ class TTimerControlsWidget(TWidget):
         self.requested.emit(TTimerStashRequest(self.item))
 
         self.task_ldt.clear()
-        self.push_btn.setIcon(self.play_icon)
         self.nuke_btn.hide()
 
     @pyqtSlot(TResponse)

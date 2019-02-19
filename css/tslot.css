@@ -27,10 +27,6 @@ TTimerControlsWidget QPushButton {
     min-height: 64px;
 }
 
-QPushButton#t_timer_controls_nuke_btn {
-    qproperty-icon: url("font/fontawesome/svgs/solid/trash-alt.svg")
-}
-
 THomeScrollArea {
     border: none;
 }

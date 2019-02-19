@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 from PyQt5.QtCore import pyqtSlot
@@ -30,7 +31,6 @@ class TTimerPushButton(TIconAwarePushButton):
 
         self.state = "play"
 
-        self.setObjectName('t_timer_controls_push_btn')
         self.setIcon(self.play_icon)
 
         self.clicked.connect(self._handle_clicked)
@@ -52,5 +52,4 @@ class TTimerNukeButton(TIconAwarePushButton):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.setObjectName('t_timer_controls_nuke_btn')
         self.setIcon(self.nuke_icon)

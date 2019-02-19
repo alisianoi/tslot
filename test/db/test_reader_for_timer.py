@@ -1,7 +1,7 @@
 import pendulum
 
 from src.db.reader_for_timer import TTimerReader
-from src.msg.timer_fetch_request import TTimerFetchRequest
+from src.common.dto.timer_fetch_request import TTimerFetchRequest
 
 from test.db.test_reader import put_one_date
 

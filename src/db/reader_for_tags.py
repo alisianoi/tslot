@@ -7,9 +7,8 @@ from PyQt5.QtCore import QObject
 
 from src.db.model import TagModel, TaskModel
 from src.db.worker import TReader
-from src.msg.tag_fetch_request import TTagsByNameFetchRequest
-from src.msg.tag_fetch_response import (TTagFetchResponse,
-                                        TTagsByNameFetchResponse)
+from src.common.dto.tag_fetch_request import TTagsByNameFetchRequest
+from src.common.dto.tag_fetch_response import TTagFetchResponse, TTagsByNameFetchResponse
 from src.common.logger import logged
 
 

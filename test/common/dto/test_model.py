@@ -1,7 +1,7 @@
 import pytest
 
 from pendulum import DateTime
-from src.ai.model import TSlotModel, TTaskModel, TTagModel, TEntryModel
+from src.common.dto.model import TSlotModel, TTaskModel, TTagModel, TEntryModel
 
 
 def test_tag_model_0():

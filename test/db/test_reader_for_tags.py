@@ -3,8 +3,8 @@ import pprint
 
 from src.db.model import TagModel, TaskModel
 from src.db.reader_for_tags import TTagReader, TTagsByNameReader
-from src.msg.tag_fetch_request import TTagsByNameFetchRequest
-from src.msg.tag_fetch_response import TTagsByNameFetchResponse
+from src.common.dto.tag_fetch_request import TTagsByNameFetchRequest
+from src.common.dto.tag_fetch_response import TTagsByNameFetchResponse
 
 
 def setup_one_tag_one_task(session):

@@ -1,7 +1,7 @@
 from typing import List
 
-from src.ai.model import TEntryModel
-from src.msg.stash import TStashResponse
+from src.common.dto.model import TEntryModel
+from src.common.dto.stash import TStashResponse
 
 
 class TEntryStashResponse(TStashResponse):

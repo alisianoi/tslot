@@ -5,10 +5,10 @@ import pytest
 
 import pendulum
 from pendulum import DateTime
-from src.ai.model import TEntryModel, TSlotModel, TTaskModel
+from src.common.dto.model import TEntryModel, TSlotModel, TTaskModel
 from src.db.writer_for_entry import TEntryWriter
-from src.msg.entry_stash_request import TEntryStashRequest
-from src.msg.entry_stash_response import TEntryStashResponse
+from src.common.dto.entry_stash_request import TEntryStashRequest
+from src.common.dto.entry_stash_response import TEntryStashResponse
 
 
 def test_writer_for_entry_0(session, qtbot):

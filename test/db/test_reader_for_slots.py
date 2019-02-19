@@ -1,7 +1,7 @@
 import pytest
 
 from src.db.reader_for_slots import TRaySlotReader
-from src.msg.slot_fetch_request import TRaySlotFetchRequest
+from src.common.dto.slot_fetch_request import TRaySlotFetchRequest
 
 from test.db.test_reader import setup_one_slot_one_date
 from test.db.test_reader import setup_one_slot_whole_date

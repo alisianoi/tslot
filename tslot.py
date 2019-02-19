@@ -12,10 +12,11 @@ from PyQt5.QtWidgets import *
 import pendulum
 from src.cache import TCacheBroker
 from src.client.common.widget import TWidget
+from src.client.srv_font.service.font import TFontService
+from src.client.wgt_demo_label import TLabelDemo
 from src.client.wgt_timer import TTimerControlsDockWidget
 from src.client.wgt_timer_table import THomeScrollArea
 from src.db.broker import TVaultBroker
-from src.font import initialize_font_databse
 from src.style import StyleBroker
 
 
@@ -36,16 +37,15 @@ class TCentralWidget(TWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.wgt_label_demo = TLabelDemo()
         self.scroll = THomeScrollArea(parent=self)
 
         self.layout = QVBoxLayout()
 
+        self.layout.addWidget(self.wgt_label_demo)
         self.layout.addWidget(self.scroll)
 
         self.setLayout(self.layout)
-
-        # TODO: move this into a thread
-        initialize_font_databse()
 
         # Experiment with shortcuts:
         self.show_next_shortcut = QShortcut(
@@ -159,6 +159,8 @@ if __name__ == '__main__':
     args = ap.parse_args()
 
     app = QApplication(sys.argv)
+
+    TFontService().load_more_fonts()
 
     style = StyleBroker(path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
 

@@ -105,9 +105,12 @@ class TFontService(QObject, metaclass=SipSingleton):
         self.kickstarted = True
 
     def load_more_fonts(self):
-        task = TFontTask(path=Path(Path(__file__).parent.parent, 'asset'))
+        task = TFontTask(path=self.default_font_path())
         task.status.loaded.connect(self._handle_font_task_loaded)
         self.threadpool.start(task)
+
+    def default_font_path(self):
+        return Path(Path(__file__).parent.parent, 'asset')
 
     def _handle_font_task_loaded(self):
         self.font_loaded.emit()

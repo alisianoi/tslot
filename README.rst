@@ -32,26 +32,3 @@ Since this is a *free and open source desktop app*, you can be sure:
 #. You cannot be forced to update to a version you don't like
 #. You can always report bugs/suggest features in open and clear way
 #. You can always inverst some time/effort and fix minor things yourself
-
-Invariants
-##########
-
-Recorded time slots must not overlap
-
-Duration of One Day
-===================
-
-#. One table corresponds to one day
-
-#. Identical tables should be collapsed together by default
-
-   - likely to happen if one slot spans 2 or more days
-   - unlikely: if all of the entries start/stop at very close times
-
-When editing slot times
-=======================
-
-- do not allow new fst to overlap with preceeding lst times
-- suggest preceeding lst time as new value for current fst time
-- do not allow new lst to overlap with subsequent fst times
-- suggest subsequent fst time as new value for current lst time

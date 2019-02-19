@@ -1,21 +1,15 @@
 from PyQt5.QtWidgets import QWidget
 
-from common.widget.spin_box import SpinBox
 from logger import logged
 from srv_font.service.font import MyFontService
 
 
-class MySpinBox(SpinBox):
+class TFontSizeSpinBox(TSpinBox):
 
     pass
 
 
-class MyFontSizeSpinBox(MySpinBox):
-
-    pass
-
-
-class MyBaseHeightSpinBox(MySpinBox):
+class TBaseHeightSpinBox(TSpinBox):
 
     def __init__(self, parent: QWidget = None):
 

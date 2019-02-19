@@ -1,42 +1,28 @@
-import re
-import sys
-from pathlib import Path
-from threading import Thread
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QFontDatabase
-from PyQt5.QtWidgets import (QApplication, QFontComboBox, QGridLayout,
-                             QHBoxLayout, QLabel, QMainWindow, QSpinBox,
-                             QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import *
 
-from common.widget.label import PrimaryLabel
-from logger import logged, logger
-from srv_font.service.font import MyFontService
-from srv_font.widget.combo_box import (MyFontComboBox, MyFontFamilyComboBox,
-                                       MyFontStyleComboBox)
-from srv_font.widget.label import MyLabel
-from srv_font.widget.spin_box import MyBaseHeightSpinBox, MyFontSizeSpinBox
-from srv_font.widget.tree_widget import FontTreeWidget
+from src.common.logger import logged, logmain
+from src.client.common.widget.label.color_aware_label import *
 
 
 class MyFontSettings(QWidget):
 
-    def __init__(self, parent: QWidget = None):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        super().__init__(parent)
-
-        self.service = MyFontService()
+        self.service = TFontService()
 
         # Create widgets
-        self.wgt_font_label = MyLabel("Font:")
+        self.wgt_font_label = TPrimaryColorAwareLabel("Font:")
         self.wgt_font_combo_box = MyFontComboBox()
-        self.wgt_font_family_label = MyLabel("Font family:")
+        self.wgt_font_family_label = TPrimaryColorAwareLabel("Font family:")
         self.wgt_font_family_combo_box = MyFontFamilyComboBox()
-        self.wgt_font_style_label = MyLabel("Font style:")
+        self.wgt_font_style_label = TPrimaryColorAwareLabel("Font style:")
         self.wgt_font_style_combo_box = MyFontStyleComboBox()
-        self.wgt_font_size_label = MyLabel("Font size:")
+        self.wgt_font_size_label = TPrimaryColorAwareLabel("Font size:")
         self.wgt_font_size_spin_box = MyFontSizeSpinBox()
-        self.wgt_base_size_label = MyLabel("Base size:")
+        self.wgt_base_size_label = TPrimaryColorAwareLabel("Base size:")
         self.wgt_base_size_spin_box = MyBaseHeightSpinBox()
 
         # self.wgt_font_tree_widget = FontTreeWidget()

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget
 from common.widget.combo_box import EditableComboBox
 
 
-class MyFontComboBox(EditableComboBox):
+class TFontComboBox(EditableComboBox):
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -16,7 +16,7 @@ class MyFontComboBox(EditableComboBox):
         ])
 
 
-class MyFontFamilyComboBox(EditableComboBox):
+class TFontFamilyComboBox(EditableComboBox):
 
     def __init__(self, parent: QWidget = None):
         super().__init__(parent)
@@ -24,6 +24,6 @@ class MyFontFamilyComboBox(EditableComboBox):
         self.addItems([family for family in QFontDatabase().families()])
 
 
-class MyFontStyleComboBox(EditableComboBox):
+class TFontStyleComboBox(EditableComboBox):
 
     pass

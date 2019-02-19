@@ -2,16 +2,65 @@ import re
 from pathlib import Path
 from threading import Thread
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
+from PyQt5.QtGui import QFont, QFontDatabase
 
-from common.sip_singleton import SipSingleton
-from logger import logged, logger
+from src.common.logger import logdata, logged
+from src.common.sip_singleton import SipSingleton
+
+
+class TFontStatus(QObject):
+    """Provides signal(s) for the font (loading) task."""
+
+    loaded = pyqtSignal(int)
+
+
+class TFontTask(QRunnable):
+    """Loads additional fonts asynchronously."""
+
+    def __init__(self, path, **kwargs):
+        super().__init__(**kwargs)
+
+        self.status = TFontStatus()
+
+        self.path = path
+
+    def run(self):
+        font_database = QFontDatabase()
+
+        if self.path is None:
+            self.path = Path(Path(__file__).parent.parent, 'asset')
+
+        if not self.path.exists():
+            logdata.warning(f'{self.__class__.__name__} cannot find asset folder')
+
+            return
+
+        msg = 'Font {} is in application font db with id {}'
+
+        must_visit = [self.path]
+
+        while must_visit:
+            path = must_visit.pop()
+
+            for entry in path.iterdir():
+                name = str(entry)
+
+                if entry.name.endswith('.ttf'):
+                    font_id = font_database.addApplicationFont(name)
+                    logdata.debug(msg.format(name, font_id))
+                elif entry.name.endswith('.otf'):
+                    font_id = font_database.addApplicationFont(name)
+                    logdata.debug(msg.format(name, font_id))
+                elif entry.is_dir():
+                    must_visit.append(entry)
 
 
 class TFontService(QObject, metaclass=SipSingleton):
 
     base_height_changed = pyqtSignal()
+
+    font_loaded = pyqtSignal()
 
     font_serif_changed = pyqtSignal()
     font_sans_serif_changed = pyqtSignal()
@@ -51,7 +100,17 @@ class TFontService(QObject, metaclass=SipSingleton):
         font.setStyleName(self.font_monospace_style_name)
         self.font_monospace = font
 
+        self.threadpool = QThreadPool.globalInstance()
+
         self.kickstarted = True
+
+    def load_more_fonts(self):
+        task = TFontTask(path=Path(Path(__file__).parent.parent, 'asset'))
+        task.status.loaded.connect(self._handle_font_task_loaded)
+        self.threadpool.start(task)
+
+    def _handle_font_task_loaded(self):
+        self.font_loaded.emit()
 
     def __setattr__(self, key, val):
         super().__setattr__(key, val)

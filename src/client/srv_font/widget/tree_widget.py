@@ -2,7 +2,7 @@ from PyQt5.QtGui import QFontDatabase
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QWidget
 
 
-class FontTreeWidget(QTreeWidget):
+class TFontTreeWidget(QTreeWidget):
 
     def __init__(self, parent: QWidget = None):
 

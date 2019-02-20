@@ -51,7 +51,7 @@ class TTimerPushButton(TIconAwarePushButton):
             raise RuntimeError("Failed to determine timer push button state")
 
 
-class TTimerNukeButton(TIconAwarePushButton):
+class TTimerNukeButton(TIconAwarePushButton, TFailureColorAwarePushButton):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

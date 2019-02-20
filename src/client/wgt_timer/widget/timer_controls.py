@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 
 import pendulum
 from src.client.common.widget import TWidget
+from src.client.wgt_timer.widget.line_edit import TTimerLineEdit
 from src.client.wgt_timer.widget.push_button import *
 from src.client.wgt_timer.widget.timer import TTimerWidget
 from src.common.dto.base import TResponse
@@ -23,7 +24,7 @@ class TTimerControlsWidget(TWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.task_ldt = QLineEdit()
+        self.task_ldt = TTimerLineEdit()
         self.timer_wgt = TTimerWidget()
         self.push_btn = TTimerPushButton()
         self.nuke_btn = TTimerNukeButton()
@@ -40,8 +41,6 @@ class TTimerControlsWidget(TWidget):
         self.layout.addWidget(self.timer_wgt)
 
         self.setLayout(self.layout)
-
-        self.task_ldt.setPlaceholderText('Type task/project')
 
         self.push_btn.clicked.connect(self.toggle_timer)
 

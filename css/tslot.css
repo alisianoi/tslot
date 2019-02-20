@@ -6,17 +6,6 @@ TTimerWidget QLabel {
     margin-right: 20px;
 }
 
-TTimerControlsWidget QLineEdit {
-    margin: 0px;
-    font-family: quicksand;
-    font-weight: 800;
-    font-size: 28px;
-    border: 0px;
-    height: 64px;
-    min-height: 64px;
-    max-height: 64px;
-}
-
 THomeScrollArea {
     border: none;
 }

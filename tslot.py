@@ -17,7 +17,6 @@ from src.client.wgt_demo_label import TLabelDemo
 from src.client.wgt_timer import TTimerControlsDockWidget
 from src.client.wgt_timer_table import THomeScrollArea
 from src.db.broker import TVaultBroker
-from src.style import StyleBroker
 
 
 class TDefaults:
@@ -161,10 +160,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     TFontService().load_more_fonts()
-
-    style = StyleBroker(path=Path(Path.cwd(), Path('css'), Path('tslot.css')))
-
-    app.setStyleSheet(style.styles['tslot'])
 
     main_window = TMainWindow()
     main_window.show()

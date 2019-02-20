@@ -4,12 +4,14 @@ from PyQt5.QtCore import QAbstractItemModel, Qt
 from PyQt5.QtWidgets import QSizePolicy
 
 from src.client.common.widget.table_view import TTableView
+from src.client.common.widget.table_view.font_aware_table_view import \
+    TFontAwareTableView
 from src.client.wgt_timer_table.widget.header_view import THeaderView
 from src.client.wgt_timer_table.widget.styled_item_delegate import *
 from src.common.logger import logged
 
 
-class THomeTableView(TTableView):
+class THomeTableView(TTableView, TFontAwareTableView):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -29,6 +31,13 @@ class THomeTableView(TTableView):
 
         self.setShowGrid(False)
         self.setAlternatingRowColors(True)
+
+    def _handle_font_loaded(self):
+        self.setFont(
+            QFontDatabase().font(
+                'Quicksand', 'Regular', self._font_service.font_serif_size
+            )
+        )
 
     @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def sizeHint(self):

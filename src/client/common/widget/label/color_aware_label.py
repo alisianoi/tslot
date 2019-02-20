@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QLabel
 
-from src.client.common.widget import *
+from src.client.common.widget.common.color_aware_widget import *
 
 
 class TColorAwareLabel(QLabel, TColorAwareWidget):

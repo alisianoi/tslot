@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QPushButton
 
-from src.client.common.widget import *
-from src.client.srv_color.service.color import TColorService
+from src.client.common.widget.common.color_aware_widget import *
 
 
 class TColorAwarePushButton(QPushButton, TColorAwareWidget):

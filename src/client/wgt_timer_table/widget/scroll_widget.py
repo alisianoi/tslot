@@ -37,7 +37,6 @@ class TScrollWidget(TWidget):
         self.setLayout(self.layout)
 
     def kickstart(self):
-
         self.request(0, 1)
 
     @logged(logger=logging.getLogger("tslot-main"), disabled=True)
@@ -45,7 +44,6 @@ class TScrollWidget(TWidget):
         self.request(self.slice_lst, self.slice_lst + 1)
 
     def request(self, slice_fst: int, slice_lst: int):
-
         request = TRaySlotWithTagFetchRequest(
               dt_offset = self.dt_offset
             , direction = self.direction

@@ -1,18 +1,19 @@
 import re
+import time
 from pathlib import Path
 from threading import Thread
 
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from PyQt5.QtGui import QFont, QFontDatabase
 
-from src.common.logger import logdata, logged
+from src.common.logger import logdata, logged, logmain
 from src.common.sip_singleton import SipSingleton
 
 
 class TFontStatus(QObject):
     """Provides signal(s) for the font (loading) task."""
 
-    loaded = pyqtSignal(int)
+    loaded = pyqtSignal()
 
 
 class TFontTask(QRunnable):
@@ -25,6 +26,7 @@ class TFontTask(QRunnable):
 
         self.path = path
 
+    @logged(logger=logdata, disabled=True)
     def run(self):
         font_database = QFontDatabase()
 
@@ -54,6 +56,8 @@ class TFontTask(QRunnable):
                     logdata.debug(msg.format(name, font_id))
                 elif entry.is_dir():
                     must_visit.append(entry)
+
+        self.status.loaded.emit()
 
 
 class TFontService(QObject, metaclass=SipSingleton):
@@ -112,6 +116,7 @@ class TFontService(QObject, metaclass=SipSingleton):
     def default_font_path(self):
         return Path(Path(__file__).parent.parent, 'asset')
 
+    @logged(logger=logmain, disabled=True)
     def _handle_font_task_loaded(self):
         self.font_loaded.emit()
 

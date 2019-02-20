@@ -32,14 +32,14 @@ class TFontAwareLabel(QLabel):
     @logged(disabled=True)
     def sizeHint(self) -> QSize:
         size_hint = super().sizeHint()
-        return QSize(size_hint.width(), self._font_service.base_height)
+        return QSize(size_hint.width(), 2 * self._font_service.base_height)
 
     @logged(disabled=True)
     def minimumSizeHint(self) -> QSize:
         size_hint = super().sizeHint()
-        return QSize(size_hint.width(), self._font_service.base_height)
+        return QSize(size_hint.width(), 2 * self._font_service.base_height)
 
     @logged(disabled=True)
     def maximumSizeHint(self) -> QSize:
         size_hint = super().maximumSizeHint()
-        return QSize(size_hint.width(), self._font_service.base_height)
+        return QSize(size_hint.width(), 2 * self._font_service.base_height)

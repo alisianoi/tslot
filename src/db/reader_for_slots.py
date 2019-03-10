@@ -9,9 +9,11 @@ import pendulum
 from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
-from src.common.dto.base import *
-from src.common.dto.slot_fetch_request import *
-from src.common.dto.slot_fetch_response import *
+from src.common.failure import TFailure
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.request.fetch.slot_fetch_request import *
+from src.common.response.fetch.slot_fetch_response import *
 from src.common.logger import logged
 
 

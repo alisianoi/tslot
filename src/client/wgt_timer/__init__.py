@@ -1,7 +1,10 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.common.dto.base import TRequest, TResponse, TFailure
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
+
 from src.client.common.widget import TWidget
 from src.client.common.widget.dock_widget import TDockWidget
 from src.client.wgt_timer.widget.timer_controls import TTimerControlsWidget

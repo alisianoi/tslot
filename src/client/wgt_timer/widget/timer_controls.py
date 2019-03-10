@@ -10,11 +10,11 @@ from src.client.common.widget import TWidget
 from src.client.wgt_timer.widget.line_edit import TTimerLineEdit
 from src.client.wgt_timer.widget.push_button import *
 from src.client.wgt_timer.widget.timer import TTimerWidget
-from src.common.dto.base import TResponse
+from src.common.response import TResponse
 from src.common.dto.model import TEntryModel, TSlotModel
-from src.common.dto.timer import TTimerStashRequest
-from src.common.dto.timer_fetch_request import (TTimerFetchRequest,
-                                                TTimerFetchResponse)
+from src.common.request.stash.timer_stash_request import TTimerStashRequest
+from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
+from src.common.response.fetch.timer_fetch_response import TTimerFetchResponse
 from src.common.logger import logged, logmain
 
 

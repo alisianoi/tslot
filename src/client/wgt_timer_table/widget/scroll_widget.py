@@ -7,8 +7,10 @@ import pendulum
 from src.client.common.widget import TWidget
 from src.client.wgt_timer_table.model.table_model import TTableModel
 from src.client.wgt_timer_table.widget.home_table_view import THomeTableView
-from src.common.dto.base import TFailure, TResponse
-from src.common.dto.slot_fetch_response import *
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
+from src.common.response.fetch.slot_fetch_response import *
 from src.common.logger import logged
 
 

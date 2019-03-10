@@ -1,4 +1,4 @@
-from src.common.dto.fetch import TFetchRequest
+from src.common.request.fetch import TFetchRequest
 
 
 class TTagFetchRequest(TFetchRequest):
@@ -8,6 +8,5 @@ class TTagFetchRequest(TFetchRequest):
 
 class TTagsByNameFetchRequest(TTagFetchRequest):
 
-    def __init__(self, name: str, exact: bool=False) -> None:
-
+    def __init__(self, name: str, exact: bool=False):
         self.name, self.exact = name, exact

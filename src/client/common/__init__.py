@@ -2,7 +2,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from src.common.dto.base import TRequest, TResponse, TFailure
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
 
 
 class TObject(QObject):

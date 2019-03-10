@@ -1,9 +1,9 @@
 import pendulum
-
 from pendulum import Date
+from src.common.request.fetch import TFetchRequest
 
-from src.common.dto.fetch import TFetchRequest
-from src.common.dto.utils import LOAD_DIRECTIONS
+
+LOAD_DIRECTIONS = ['past_to_future', 'future_to_past']
 
 
 class TSlotFetchRequest(TFetchRequest):

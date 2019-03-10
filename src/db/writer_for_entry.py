@@ -4,10 +4,10 @@ from typing import List
 from PyQt5.QtCore import QObject
 
 from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
+from src.common.request.stash.entry_stash_request import TEntryStashRequest
+from src.common.response.stash.entry_stash_response import TEntryStashResponse
 from src.db.model import Base, SlotModel, TagModel, TaskModel
 from src.db.worker import TWriter
-from src.common.dto.entry_stash_request import TEntryStashRequest
-from src.common.dto.entry_stash_response import TEntryStashResponse
 
 
 class TEntryWriter(TWriter):

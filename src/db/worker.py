@@ -9,9 +9,13 @@ from PyQt5.QtWidgets import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from src.common.dto.base import TFailure, TRequest, TResponse
-from src.common.dto.fetch import TFetchRequest, TFetchResponse
-from src.common.dto.stash import TStashRequest, TStashResponse
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
+from src.common.request.fetch import TFetchRequest
+from src.common.response.fetch import TFetchResponse
+from src.common.request.stash import TStashRequest
+from src.common.response.stash import TStashResponse
 from src.common.logger import logged
 
 

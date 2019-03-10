@@ -4,12 +4,12 @@ from pathlib import Path
 from PyQt5.QtCore import QObject
 from sqlalchemy.orm.exc import NoResultFound
 
+from src.common.request.stash.timer_stash_request import TTimerStashRequest
+from src.common.failure import TFailure
+from src.common.logger import logged
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.reader_for_timer import TSlotModel, TTaskModel
 from src.db.worker import TWriter
-from src.common.dto.base import TFailure
-from src.common.dto.timer import TTimerStashRequest
-from src.common.logger import logged
 
 
 class TTimerWriter(TWriter):

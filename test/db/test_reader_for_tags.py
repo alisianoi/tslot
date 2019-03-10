@@ -1,10 +1,12 @@
-import pytest
 import pprint
 
+import pytest
+
+from src.common.request.fetch.tag_fetch_request import TTagsByNameFetchRequest
+from src.common.response.fetch.tag_fetch_response import \
+    TTagsByNameFetchResponse
 from src.db.model import TagModel, TaskModel
 from src.db.reader_for_tags import TTagReader, TTagsByNameReader
-from src.common.dto.tag_fetch_request import TTagsByNameFetchRequest
-from src.common.dto.tag_fetch_response import TTagsByNameFetchResponse
 
 
 def setup_one_tag_one_task(session):

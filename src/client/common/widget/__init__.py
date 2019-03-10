@@ -2,8 +2,10 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget
 
 from src.client.srv_color.service.color import TColorService
-from src.common.dto.base import TFailure, TRequest, TResponse
 
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
 
 class TWidget(QWidget):
     """Base class for all widgets."""

@@ -1,14 +1,13 @@
 import pytest
 
+from test.db.test_reader import (setup_four_slots_two_dates,
+                                 setup_one_slot_one_date,
+                                 setup_one_slot_whole_date,
+                                 setup_two_slots_one_date,
+                                 setup_two_slots_two_dates)
+
+from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest
 from src.db.reader_for_slots import TRaySlotReader
-from src.common.dto.slot_fetch_request import TRaySlotFetchRequest
-
-from test.db.test_reader import setup_one_slot_one_date
-from test.db.test_reader import setup_one_slot_whole_date
-from test.db.test_reader import setup_two_slots_one_date
-from test.db.test_reader import setup_two_slots_two_dates
-from test.db.test_reader import setup_four_slots_two_dates
-
 
 DEFAULT_DATES_DIR = 'future_to_past'
 DEFAULT_TIMES_DIR = 'past_to_future'

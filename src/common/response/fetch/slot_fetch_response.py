@@ -5,8 +5,8 @@ from pendulum.tz.timezone import Timezone
 
 from typing import List, Tuple
 
-from src.common.dto.fetch import TFetchResponse
-from src.common.dto.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.common.response.fetch import TFetchResponse
+from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
 
 from src.common.dto.model import TEntryModel
 

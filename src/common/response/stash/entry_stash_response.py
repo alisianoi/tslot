@@ -1,10 +1,10 @@
 from typing import List
 
 from src.common.dto.model import TEntryModel
-from src.common.dto.stash import TStashRequest
+from src.common.response.stash import TStashResponse
 
 
-class TEntryStashRequest(TStashRequest):
+class TEntryStashResponse(TStashResponse):
 
     def __init__(self, items: List[TEntryModel]):
 

@@ -7,7 +7,8 @@ from src.client.common import TObject
 from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.db.model import SlotModel, TagModel, TaskModel
 from src.db.worker import TReader
-from src.common.dto.timer_fetch_request import *
+from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
+from src.common.response.fetch.timer_fetch_response import TTimerFetchResponse
 from src.common.logger import logged
 
 

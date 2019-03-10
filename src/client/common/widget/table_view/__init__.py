@@ -1,7 +1,9 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QTableView
 
-from src.common.dto.base import TFailure, TRequest, TResponse
+from src.common.request import TRequest
+from src.common.response import TResponse
+from src.common.failure import TFailure
 
 
 class TTableView(QTableView):

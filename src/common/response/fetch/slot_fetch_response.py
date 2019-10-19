@@ -6,7 +6,10 @@ from pendulum.tz.timezone import Timezone
 from typing import List, Tuple
 
 from src.common.response.fetch import TFetchResponse
-from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest, TRaySlotWithTagFetchRequest
+from src.common.request.fetch.slot_fetch_request import (
+    TRaySlotFetchRequest,
+    TRaySlotWithTagFetchRequest,
+)
 
 from src.common.dto.model import TEntryModel
 
@@ -28,12 +31,12 @@ class TSlotFetchResponse(TFetchResponse):
     """
 
     def __init__(
-        self
-        , items: List[TEntryModel]
-        , dates_dir: str
-        , times_dir: str
-        , slice_fst: int
-        , slice_lst: int
+        self,
+        items: List[TEntryModel],
+        dates_dir: str,
+        times_dir: str,
+        slice_fst: int,
+        slice_lst: int,
     ) -> None:
 
         self.items = items
@@ -46,7 +49,7 @@ class TSlotFetchResponse(TFetchResponse):
     def is_empty(self) -> bool:
         return True if not self.items else False
 
-    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+    def in_timezone(self, tz: Timezone = pendulum.local_timezone()):
         """
         Convert all the time slots into the supplied timezone
 
@@ -61,7 +64,7 @@ class TSlotFetchResponse(TFetchResponse):
 
             self.items[i] = item
 
-    def in_times_dir(self, times_dir: str='past_to_future'):
+    def in_times_dir(self, times_dir: str = "past_to_future"):
         """Make the response use the specified times direction"""
 
         if self.times_dir == times_dir:
@@ -74,12 +77,12 @@ class TSlotFetchResponse(TFetchResponse):
         for (fst, lst) in self.break_by_date():
             self.items[fst:lst] = self.items[fst:lst][::-1]
 
-        if self.times_dir == 'past_to_future':
-            self.times_dir = 'future_to_past'
+        if self.times_dir == "past_to_future":
+            self.times_dir = "future_to_past"
         else:
-            self.times_dir = 'past_to_future'
+            self.times_dir = "past_to_future"
 
-    def in_dates_dir(self, dates_dir: str='past_to_future'):
+    def in_dates_dir(self, dates_dir: str = "past_to_future"):
         """Make the response use the specified dates direction"""
 
         if self.dates_dir == dates_dir:
@@ -135,14 +138,14 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
     """
 
     def __init__(
-        self
-        , items: List[TEntryModel]
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , slice_fst: int
-        , slice_lst: int
+        self,
+        items: List[TEntryModel],
+        dt_offset: Date,
+        direction: str,
+        dates_dir: str,
+        times_dir: str,
+        slice_fst: int,
+        slice_lst: int,
     ) -> None:
 
         super().__init__(items, dates_dir, times_dir, slice_fst, slice_lst)
@@ -150,7 +153,7 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
         self.dt_offset = dt_offset
         self.direction = direction
 
-    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+    def in_timezone(self, tz: Timezone = pendulum.local_timezone()):
         """
         Convert all the time slots into the supplied timezone
 
@@ -163,39 +166,29 @@ class TRaySlotFetchResponse(TSlotFetchResponse):
 
     @classmethod
     def from_params(
-        cls
-        , items: List[TEntryModel]
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , slice_fst: int
-        , slice_lst: int
+        cls,
+        items: List[TEntryModel],
+        dt_offset: Date,
+        direction: str,
+        dates_dir: str,
+        times_dir: str,
+        slice_fst: int,
+        slice_lst: int,
     ):
         return cls(
-            items
-            , dt_offset
-            , direction
-            , dates_dir
-            , times_dir
-            , slice_fst
-            , slice_lst
+            items, dt_offset, direction, dates_dir, times_dir, slice_fst, slice_lst
         )
 
     @classmethod
-    def from_request(
-        cls
-        , items: List[TEntryModel]
-        , request: TRaySlotFetchRequest
-    ):
+    def from_request(cls, items: List[TEntryModel], request: TRaySlotFetchRequest):
         return cls(
-            items
-            , request.dt_offset
-            , request.direction
-            , request.dates_dir
-            , request.times_dir
-            , request.slice_fst
-            , request.slice_lst
+            items,
+            request.dt_offset,
+            request.direction,
+            request.dates_dir,
+            request.times_dir,
+            request.slice_fst,
+            request.slice_lst,
         )
 
 
@@ -203,15 +196,15 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
     """Return time slots for a ray slot fetch with tags request"""
 
     def __init__(
-        self
-        , items: List[TEntryModel]
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , flat_tags: bool
-        , slice_fst: int
-        , slice_lst: int
+        self,
+        items: List[TEntryModel],
+        dt_offset: Date,
+        direction: str,
+        dates_dir: str,
+        times_dir: str,
+        flat_tags: bool,
+        slice_fst: int,
+        slice_lst: int,
     ) -> None:
 
         self.dt_offset = dt_offset
@@ -223,7 +216,7 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
         if not self.flat_tags:
             self.condense_tags()
 
-    def in_timezone(self, tz: Timezone=pendulum.local_timezone()):
+    def in_timezone(self, tz: Timezone = pendulum.local_timezone()):
         """
         Convert all the time slots into the supplied timezone
 
@@ -236,44 +229,42 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
     @classmethod
     def from_params(
-        cls
-        , items: List[TEntryModel]
-        , dt_offset: Date
-        , direction: str
-        , dates_dir: str
-        , times_dir: str
-        , flat_tags: bool
-        , slice_fst: int
-        , slice_lst: int
+        cls,
+        items: List[TEntryModel],
+        dt_offset: Date,
+        direction: str,
+        dates_dir: str,
+        times_dir: str,
+        flat_tags: bool,
+        slice_fst: int,
+        slice_lst: int,
     ):
 
         return cls(
-            items
-            , dt_offset
-            , direction
-            , dates_dir
-            , times_dir
-            , flat_tags
-            , slice_fst
-            , slice_lst
+            items,
+            dt_offset,
+            direction,
+            dates_dir,
+            times_dir,
+            flat_tags,
+            slice_fst,
+            slice_lst,
         )
 
     @classmethod
     def from_request(
-        cls
-        , items: List[TEntryModel]
-        , request: TRaySlotWithTagFetchRequest
+        cls, items: List[TEntryModel], request: TRaySlotWithTagFetchRequest
     ):
 
         return cls(
-            items
-            , request.dt_offset
-            , request.direction
-            , request.dates_dir
-            , request.times_dir
-            , request.flat_tags
-            , request.slice_fst
-            , request.slice_lst
+            items,
+            request.dt_offset,
+            request.direction,
+            request.dates_dir,
+            request.times_dir,
+            request.flat_tags,
+            request.slice_fst,
+            request.slice_lst,
         )
 
     def condense_tags(self):
@@ -299,9 +290,9 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
             self.items.append(
                 TEntryModel(
-                    items[fst].slot
-                    , items[fst].task
-                    , [tag for item in items[fst : lst] for tag in item.tags]
+                    items[fst].slot,
+                    items[fst].task,
+                    [tag for item in items[fst:lst] for tag in item.tags],
                 )
             )
 
@@ -311,7 +302,7 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
         """Find the next entry with a different task or slot"""
 
         if not (0 <= fst and fst < len(items)):
-            raise RuntimeError('Expecting index to be within [0, len(items))')
+            raise RuntimeError("Expecting index to be within [0, len(items))")
 
         for i in range(fst, len(items)):
             if items[i].slot != items[fst].slot:
@@ -319,12 +310,7 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         return len(items)
 
-    def check_entry_segment(
-        self
-        , items: List[TEntryModel]
-        , fst: int
-        , lst: int
-    ) -> None:
+    def check_entry_segment(self, items: List[TEntryModel], fst: int, lst: int) -> None:
         """
         Check that the segments meets certain expectations
 
@@ -336,11 +322,11 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         for i in range(fst, lst):
             if items[i].slot != items[fst].slot:
-                raise RuntimeError('Expecting all slots to be equal')
+                raise RuntimeError("Expecting all slots to be equal")
             if items[i].task != items[fst].task:
-                raise RuntimeError('Expecting all tasks to be equal')
+                raise RuntimeError("Expecting all tasks to be equal")
             if len(items[i].tags) > 1:
-                raise RuntimeError('Expecting no more than one tag per entry')
+                raise RuntimeError("Expecting no more than one tag per entry")
 
             tags.extend(items[i].tags)
 
@@ -348,6 +334,6 @@ class TRaySlotWithTagFetchResponse(TSlotFetchResponse):
 
         for i in range(1, len(tags)):
             if tags[i] == tags[i - 1]:
-                raise RuntimeError('Expecting no tag duplicates')
+                raise RuntimeError("Expecting no tag duplicates")
 
         # All checks have passed

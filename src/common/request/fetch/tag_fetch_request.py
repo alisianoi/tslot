@@ -7,6 +7,5 @@ class TTagFetchRequest(TFetchRequest):
 
 
 class TTagsByNameFetchRequest(TTagFetchRequest):
-
-    def __init__(self, name: str, exact: bool=False):
+    def __init__(self, name: str, exact: bool = False):
         self.name, self.exact = name, exact

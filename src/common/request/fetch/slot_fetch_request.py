@@ -1,9 +1,11 @@
 import pendulum
+
 from pendulum import Date
+
 from src.common.request.fetch import TFetchRequest
 
 
-LOAD_DIRECTIONS = ['past_to_future', 'future_to_past']
+LOAD_DIRECTIONS = ["past_to_future", "future_to_past"]
 
 
 class TSlotFetchRequest(TFetchRequest):
@@ -25,27 +27,25 @@ class TSlotFetchRequest(TFetchRequest):
     """
 
     def __init__(
-        self
-        , dates_dir: str='past_to_future'
-        , times_dir: str='past_to_future'
-        , slice_fst: int=0
-        , slice_lst: int=128
+        self,
+        dates_dir: str = "past_to_future",
+        times_dir: str = "past_to_future",
+        slice_fst: int = 0,
+        slice_lst: int = 128,
     ) -> None:
-
-        msg = 'Expected {} from {}, was {}'
 
         if dates_dir not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                msg.format('dates_dir', LOAD_DIRECTIONS, dates_dir)
+                f"Expected dates_dir from {LOAD_DIRECTIONS}, was {dates_dir}"
             )
 
         if times_dir not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                msg.format('times_dir', LOAD_DIRECTIONS, times_dir)
+                f"Expected times_dir from {LOAD_DIRECTIONS}, was {times_dir}"
             )
 
         if slice_fst > slice_lst:
-            raise RuntimeError('Expected slice_fst <= slice_lst, but was >')
+            raise RuntimeError("Expected slice_fst <= slice_lst, but was >")
 
         self.dates_dir = dates_dir
         self.times_dir = times_dir
@@ -77,20 +77,20 @@ class TRaySlotFetchRequest(TSlotFetchRequest):
     """
 
     def __init__(
-        self
-        , dt_offset: Date=pendulum.today()
-        , direction: str='future_to_past'
-        , dates_dir: str='future_to_past'
-        , times_dir: str='past_to_future'
-        , slice_fst: int=0
-        , slice_lst: int=128
+        self,
+        dt_offset: Date = pendulum.today(),
+        direction: str = "future_to_past",
+        dates_dir: str = "future_to_past",
+        times_dir: str = "past_to_future",
+        slice_fst: int = 0,
+        slice_lst: int = 128,
     ) -> None:
 
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                f'Expected direction from {LOAD_DIRECTION}, was {direction}'
+                f"Expected direction from {LOAD_DIRECTION}, was {direction}"
             )
 
         self.dt_offset = dt_offset
@@ -120,21 +120,21 @@ class TRaySlotWithTagFetchRequest(TSlotFetchRequest):
     """
 
     def __init__(
-        self
-        , dt_offset: Date=pendulum.today()
-        , direction: str='future_to_past'
-        , dates_dir: str='future_to_past'
-        , times_dir: str='past_to_future'
-        , flat_tags: bool=False
-        , slice_fst: int=0
-        , slice_lst: int=128
+        self,
+        dt_offset: Date = pendulum.today(),
+        direction: str = "future_to_past",
+        dates_dir: str = "future_to_past",
+        times_dir: str = "past_to_future",
+        flat_tags: bool = False,
+        slice_fst: int = 0,
+        slice_lst: int = 128,
     ) -> None:
 
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                f'Expected direction from {LOAD_DIRECTION}, was {direction}'
+                f"Expected direction from {LOAD_DIRECTION}, was {direction}"
             )
 
         self.dt_offset = dt_offset

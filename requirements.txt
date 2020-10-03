@@ -8,4 +8,4 @@ pytest-xvfb==1.1.0
 pytest-repeat==0.6.0
 pytest-xdist==1.22.5
 sphinx==1.8.1
-sphinxcontrib-tikz==0.4.6
+sphinxcontrib-tikz==0.4.9

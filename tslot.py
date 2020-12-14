@@ -1,24 +1,27 @@
 #!/usr/bin/env python
 
 import errno
-import logging
 import signal
 import sys
-
 from argparse import ArgumentParser
-from multiprocessing.queues import Queue
+from multiprocessing import Process
+from multiprocessing import Queue
 from pathlib import Path
 
-from src import client, server
+from PyQt5.QtWidgets import QApplication
+
+from src.client import client
+from src.server import server
 
 
 def exit_on_sigint(number, stack_frame):
     """
     Custom handler that just exits the process if there is a SIGINT
 
-    There are several processes/threads that will be spawned, so install this handler
-    as early as possible so that others inherit it. Otherwise, each thread/process will
-    produce their own traceback output which will all be dumped together to console.
+    There are several processes/threads that will be spawned, so install this
+    handler as early as possible so that others inherit it. Otherwise, each
+    thread/process will produce their own traceback output which will all be
+    dumped together to console.
     """
     QApplication.quit()
     sys.exit(errno.EOWNERDEAD)  # 130
@@ -84,10 +87,10 @@ if __name__ == "__main__":
     )
     server_process.start()
 
-    # Start the client process right in the main process because Qt expects it this way.
-    # This blocks the main process until the client is terminated.
+    # Start the client process here, in the main process, because Qt expects
+    # it this way. This blocks the main process until the client terminates
     client(server_to_client_messages, client_to_server_messages)
 
-    # Client process was terminated, so terminate the server as well
+    # Client process terminated, so terminate the server as well
     server_process.terminate()
     server_process.join()

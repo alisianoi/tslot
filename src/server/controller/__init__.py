@@ -7,13 +7,12 @@ from src.common.failure import TFailure
 from src.common.logger import logged
 from src.common.request import TRequest
 from src.common.request.fetch.slot_fetch_request import (
-    TRaySlotFetchRequest,
-    TRaySlotWithTagFetchRequest,
-)
+    TRaySlotFetchRequest, TRaySlotWithTagFetchRequest)
 from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
 from src.common.request.stash.timer_stash_request import TTimerStashRequest
 from src.common.response.fetch import TFetchResponse
 from src.common.response.stash import TStashResponse
+from src.db.worker import TReader, TWorker, TWriter
 
 
 class TServerController:

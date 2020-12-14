@@ -4,9 +4,13 @@ import operator
 # TODO: this could be the wrong func
 from sqlalchemy.sql.functions import func
 
+from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
 from src.common.logger import logged
-from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest
-from src.db.model import SlotModel, TaskModel
+from src.common.request.fetch.slot_fetch_request import (
+    TRaySlotFetchRequest, TRaySlotWithTagFetchRequest)
+from src.common.response.fetch.slot_fetch_response import (
+    TRaySlotFetchResponse, TRaySlotWithTagFetchResponse)
+from src.db.model import SlotModel, TagModel, TaskModel
 from src.server.repository import TRepository
 
 
@@ -73,7 +77,7 @@ class TSlotRepository(TRepository):
         return TRaySlotFetchResponse.from_request(items, self.request)
 
     @logged(logger=logging.getLogger("tslot-data"), disabled=True)
-    def fetch_ray_slot_with_tag(self, request: TRaysSlotWithTagFetchRequest):
+    def fetch_ray_slot_with_tag(self, request: TRaySlotWithTagFetchRequest):
         if self.direction == "past_to_future":
             key = operator.ge
         else:

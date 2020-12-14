@@ -1,6 +1,8 @@
-from src.common.request.fetch.slot_fetch_request import TSlotFetchRequest
+from multiprocessing.queues import Queue
+
 from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest
-from src.common.request.fetch.slot_fetch_request import TRaySlotWithTagFetchRequest
+from src.common.request.fetch.slot_fetch_request import TRaySlotWithTagFetchRequest  # NOQA
+from src.common.request.fetch.slot_fetch_request import TSlotFetchRequest
 from src.server.service.slot_service import TSlotService
 
 

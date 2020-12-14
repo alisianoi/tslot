@@ -1,5 +1,5 @@
-import logging, logging.config
-
+import logging
+import logging.config
 from functools import wraps
 
 
@@ -47,7 +47,7 @@ logging.config.dictConfig({
     'version': 1,
     'formatters': {
         'verbose': {
-            'format': '%(asctime)22s %(levelname)7s %(module)20s %(process)6d %(thread)15d %(message)s'
+            'format': '%(asctime)22s %(levelname)7s %(module)20s %(process)6d %(thread)15d %(message)s'  # NOQA
         }
         , 'simple': {
             'format': '%(levelname)s %(message)s'

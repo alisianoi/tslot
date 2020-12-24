@@ -1,4 +1,5 @@
-from multiprocessing import Pool, Process, Queue
+from multiprocessing import Pool
+from multiprocessing import Queue
 
 from src.common.request.fetch.slot_fetch_request import TSlotFetchRequest
 from src.server.controller.slot_controller import TSlotController

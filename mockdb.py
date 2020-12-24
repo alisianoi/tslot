@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+from datetime import timedelta
 from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.db.model import Base, SlotModel, TaskModel, TagModel
+from src.db.model import Base
+from src.db.model import SlotModel
+from src.db.model import TagModel
+from src.db.model import TaskModel
 
 
 def create_a_day(session, delta):

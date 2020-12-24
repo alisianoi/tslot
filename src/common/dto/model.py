@@ -5,8 +5,8 @@ from typing import List
 from pendulum import DateTime
 from pendulum.tz.timezone import Timezone
 
-
 from src.db.model import SlotModel, TaskModel, TagModel
+
 
 # Q: Why do these models (almost) replicate the ones from src/db/models.py?
 # A: Currently, connecting to the database works roughly like this:
@@ -22,7 +22,7 @@ from src.db.model import SlotModel, TaskModel, TagModel
 #    instance in src/db/models.py because they are a higher-level data unit.
 #
 #    Finally, it would be possible to make all workers use the same session and
-#    never close that session. This would require explicit syncronization for
+#    never close that session. This would require explicit synchronization for
 #    that session and remove *some* duplicating classes from here.
 #
 # Q: Why do classes have `from_xxx` methods that are the same as `__init__`?
@@ -34,7 +34,6 @@ from src.db.model import SlotModel, TaskModel, TagModel
 
 class TTagModel:
     def __init__(self, name: str, id: int = None) -> None:
-
         self.id, self.name = id, name
 
     @classmethod
@@ -46,7 +45,6 @@ class TTagModel:
         return cls(model.name, model.id)
 
     def __eq__(self, other):
-
         if not isinstance(other, TTagModel):
             return False
 
@@ -58,7 +56,6 @@ class TTagModel:
         return True
 
     def __lt__(self, other):
-
         if not isinstance(other, TTagModel):
             raise RuntimeError("Must compare against another tag model")
 
@@ -68,7 +65,6 @@ class TTagModel:
         return False
 
     def __le__(self, other):
-
         if not isinstance(other, TTagModel):
             raise RuntimeError("Must compare against another tag model")
 
@@ -86,7 +82,6 @@ class TTaskModel:
     """
 
     def __init__(self, name: str = None, id: int = None) -> None:
-
         self.id, self.name = id, name
 
     @classmethod
@@ -98,7 +93,6 @@ class TTaskModel:
         return cls(model.name, model.id)
 
     def __eq__(self, other):
-
         if not isinstance(other, TTaskModel):
             return False
 
@@ -110,7 +104,6 @@ class TTaskModel:
         return True
 
     def __lt__(self, other):
-
         if not isinstance(other, TTaskModel):
             raise RuntimeError("Must compare against another task model")
 
@@ -120,7 +113,6 @@ class TTaskModel:
         return False
 
     def __le__(self, other):
-
         if not isinstance(other, TTaskModel):
             raise RuntimeError("Must compare against another task model")
 
@@ -140,7 +132,6 @@ class TSlotModel:
     """
 
     def __init__(self, fst: DateTime, lst: DateTime = None, id: int = None):
-
         name = self.__class__.__name__
 
         if not isinstance(fst, DateTime):
@@ -161,7 +152,6 @@ class TSlotModel:
             raise ValueError(f"{name} expects `fst` to be earlier than `lst`")
 
     def in_timezone(self, tz: Timezone = pendulum.tz.UTC):
-
         self.fst = self.fst.in_timezone(tz)
 
         if self.lst:
@@ -181,7 +171,6 @@ class TSlotModel:
         return cls(fst, lst, model.id)
 
     def __eq__(self, other):
-
         if not isinstance(other, TSlotModel):
             raise RuntimeError("Must compare against another slot model")
 
@@ -199,12 +188,11 @@ class TEntryModel:
     """Holds together a slot model, a task model and its corresponding tags."""
 
     def __init__(
-        self,
-        slot: TSlotModel,
-        task: TTaskModel = TTaskModel(),
-        tags: List[TTagModel] = None,
+            self,
+            slot: TSlotModel,
+            task: TTaskModel = TTaskModel(),
+            tags: List[TTagModel] = None,
     ) -> None:
-
         self.slot = slot
         self.task = task
         self.tags = [] if tags is None else tags

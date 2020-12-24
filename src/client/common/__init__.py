@@ -1,10 +1,8 @@
-from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 
+from src.common.failure import TFailure
 from src.common.request import TRequest
 from src.common.response import TResponse
-from src.common.failure import TFailure
 
 
 class TObject(QObject):
@@ -22,7 +20,7 @@ class TObject(QObject):
     responded = pyqtSignal(TResponse)
     triggered = pyqtSignal(TFailure)
 
-    def __init__(self, parent: QObject=None) -> None:
+    def __init__(self, parent: QObject = None) -> None:
         super().__init__(parent)
 
     def kickstart(self) -> None:

@@ -1,18 +1,18 @@
 from pathlib import Path
 
-from PyQt5.QtCore import QObject, QThreadPool, pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 
-from src.client.common import TObject
-from src.common.failure import TFailure
 from src.common.logger import logged
 from src.common.request import TRequest
-from src.common.request.fetch.slot_fetch_request import (
-    TRaySlotFetchRequest, TRaySlotWithTagFetchRequest)
+from src.common.request.fetch.slot_fetch_request import TRaySlotFetchRequest
+from src.common.request.fetch.slot_fetch_request import TRaySlotWithTagFetchRequest  # NOQA
 from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
 from src.common.request.stash.timer_stash_request import TTimerStashRequest
-from src.common.response.fetch import TFetchResponse
-from src.common.response.stash import TStashResponse
-from src.db.worker import TReader, TWorker, TWriter
+from src.db.reader_for_timer import TTimerReader
+from src.db.worker import TReader
+from src.db.worker import TWorker
+from src.db.worker import TWriter
+from src.db.writer_for_timer import TTimerWriter
 
 
 class TServerController:

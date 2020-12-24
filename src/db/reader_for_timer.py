@@ -1,21 +1,22 @@
 import logging
-import pendulum
-
 from pathlib import Path
 
 from src.client.common import TObject
-from src.common.dto.model import TEntryModel, TSlotModel, TTagModel, TTaskModel
-from src.db.model import SlotModel, TagModel, TaskModel
-from src.db.worker import TReader
+from src.common.dto.model import TEntryModel
+from src.common.dto.model import TSlotModel
+from src.common.dto.model import TTagModel
+from src.common.dto.model import TTaskModel
+from src.common.logger import logged
 from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
 from src.common.response.fetch.timer_fetch_response import TTimerFetchResponse
-from src.common.logger import logged
+from src.db.model import SlotModel
+from src.db.worker import TReader
 
 
 class TTimerReader(TReader):
 
     def __init__(
-        self, request: TTimerFetchRequest, path: Path = None, parent: TObject = None
+            self, request: TTimerFetchRequest, path: Path = None, parent: TObject = None
     ):
         super().__init__(request, path, parent)
 
@@ -39,9 +40,9 @@ class TTimerReader(TReader):
             task = slot.task
 
             timer = TEntryModel(
-                slot = TSlotModel.from_model(slot),
-                task = TTaskModel.from_model(task),
-                tags = [TTagModel.from_model(tag) for tag in task.tags]
+                slot=TSlotModel.from_model(slot),
+                task=TTaskModel.from_model(task),
+                tags=[TTagModel.from_model(tag) for tag in task.tags]
             )
 
             self.logger.debug(f"One timer found:\n{timer}")

@@ -161,5 +161,5 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 
 #
-tikz_latex_preamble = '\usepackage{tikz-uml}'
-tikz_tikzlibraries = 'positioning'
+tikz_latex_preamble = r"\usepackage{tikz-uml}"
+tikz_tikzlibraries = "positioning"

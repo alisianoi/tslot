@@ -37,9 +37,9 @@ class TDefaults:
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, exit_on_sigint)
 
-    ap = ArgumentParser(description="Make time-driven decision")
+    parser = ArgumentParser(description="Make time-driven decision")
 
-    ap.add_argument(
+    parser.add_argument(
         "--profile",
         type=str,
         nargs="?",
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         """,
     )
 
-    ap.add_argument(
+    parser.add_argument(
         "--config",
         "--config-file",
         type=str,
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         help="Path to your configuration file.",
     )
 
-    ap.add_argument(
+    parser.add_argument(
         "-v",
         "--verbose",
         action="count",
@@ -69,14 +69,14 @@ if __name__ == "__main__":
         help="Write more output to console.",
     )
 
-    ap.add_argument(
+    parser.add_argument(
         "--silent",
         action="store_true",
         default=False,
         help="Silence all console output.",
     )
 
-    args = ap.parse_args()
+    args = parser.parse_args()
 
     client_to_server_messages = Queue()
     server_to_client_messages = Queue()

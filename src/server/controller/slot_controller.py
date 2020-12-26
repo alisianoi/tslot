@@ -16,6 +16,6 @@ class TSlotController:
         if isinstance(request, TRaySlotFetchRequest):
             self.outgoing_messages.put(self.service.fetch_ray_slot(request))
         elif isinstance(request, TRaySlotWithTagFetchRequest):
-            self.outgoing_messages.put(service.fetch_ray_slot_with_tag(request))
+            self.outgoing_messages.put(self.service.fetch_ray_slot_with_tag(request))
         else:
             raise RuntimeError(f"{__class__.__name__} failed to identify request")

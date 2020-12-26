@@ -509,6 +509,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pyqt5-stubs"
+version = "5.14.2.2"
+description = "PEP561 stub files for the PyQt5 framework"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pytest"
 version = "6.2.1"
 description = "pytest: simple powerful testing with Python"
@@ -989,7 +997,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e9e4ad5e6665101b982bd87d90f74d7d0263d0b1c5809cd39f54276e4e26ebe8"
+content-hash = "f72e4e43c2bca91e31bc8f8ad6c29565f2623f0a075fc0e38458c1df6daca24d"
 
 [metadata.files]
 alabaster = [
@@ -1322,6 +1330,9 @@ pyqt5-sip = [
     {file = "PyQt5_sip-12.8.1-cp39-cp39-win32.whl", hash = "sha256:5a011aeff89660622a6d5c3388d55a9d76932f3b82c95e82fc31abd8b1d2990d"},
     {file = "PyQt5_sip-12.8.1-cp39-cp39-win_amd64.whl", hash = "sha256:f168f0a7f32b81bfeffdf003c36f25d81c97dee5eb67072a5183e761fe250f13"},
     {file = "PyQt5_sip-12.8.1.tar.gz", hash = "sha256:30e944db9abee9cc757aea16906d4198129558533eb7fadbe48c5da2bd18e0bd"},
+]
+pyqt5-stubs = [
+    {file = "PyQt5-stubs-5.14.2.2.tar.gz", hash = "sha256:b1a84b12bbeed74d95cc7fb4fd2df0a6711bd43e9a2651e552c83930c7b81638"},
 ]
 pytest = [
     {file = "pytest-6.2.1-py3-none-any.whl", hash = "sha256:1969f797a1a0dbd8ccf0fecc80262312729afea9c17f1d70ebf85c5e76c6f7c8"},

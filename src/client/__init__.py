@@ -12,7 +12,6 @@ class Client:
         self.outgoing_messages = outgoing_messages
 
     def start(self):
-        print("client: here we go")
         app = QApplication(sys.argv)
 
         main_window = TMainWindow()

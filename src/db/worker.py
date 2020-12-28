@@ -1,22 +1,16 @@
-import datetime
 import logging
-import operator
 from pathlib import Path
 
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-from src.common.request import TRequest
-from src.common.response import TResponse
 from src.common.failure import TFailure
-from src.common.request.fetch import TFetchRequest
-from src.common.response.fetch import TFetchResponse
-from src.common.request.stash import TStashRequest
-from src.common.response.stash import TStashResponse
 from src.common.logger import logged
+from src.common.request.fetch import TFetchRequest
+from src.common.request.stash import TStashRequest
+from src.common.response.fetch import TFetchResponse
+from src.common.response.stash import TStashResponse
 
 
 class TWorker(QObject):
@@ -83,7 +77,7 @@ class TReader(TWorker):
     fetched = pyqtSignal(TFetchResponse)
 
     def __init__(
-        self, request: TFetchRequest, path: Path = None, parent: QObject = None
+            self, request: TFetchRequest, path: Path = None, parent: QObject = None
     ) -> None:
         """
         Initialize a database reader
@@ -105,9 +99,8 @@ class TWriter(TWorker):
     stashed = pyqtSignal(TStashResponse)
 
     def __init__(
-        self, request: TStashRequest, path: Path = None, parent: QObject = None
+            self, request: TStashRequest, path: Path = None, parent: QObject = None
     ):
-
         super().__init__(path, parent)
 
         self.request = request

@@ -1,12 +1,9 @@
 import datetime
-import logging.config
-from functools import wraps
 from typing import List
 
+import pendulum
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QStyleOption
-
-import pendulum
 
 
 def item_flags_as_str(flags: Qt.ItemFlags) -> str:
@@ -38,8 +35,8 @@ def item_flags_as_str(flags: Qt.ItemFlags) -> str:
 
     return message.strip()
 
-def style_option_as_str(option: QStyleOption) -> str:
 
+def style_option_as_str(option: QStyleOption) -> str:
     if option == 1:
         return 'SO_FocusRect'
     elif option == 2:
@@ -49,13 +46,15 @@ def style_option_as_str(option: QStyleOption) -> str:
 
     raise RuntimeError(f'Unknown style option type {type}')
 
+
 def orient2str(orientation: Qt.Orientation):
     if orientation == 0x1 and orientation == Qt.Horizontal:
-        return 'Qt.Hhttp://doc.qt.io/qt-5/qsize.html#detailsorizontal'
+        return 'Qt.Horizontal'
     elif orientation == 0x2 and orientation == Qt.Vertical:
         return 'Qt.Vertical'
 
     return f'Unknown Orientation (wrong number?): {orientation}'
+
 
 def role2str(role: Qt.ItemDataRole):
     if role == 0 and role == Qt.DisplayRole:
@@ -114,8 +113,10 @@ def seconds_to_str(seconds: int) -> str:
 def timedelta2str(delta: datetime.timedelta) -> str:
     return seconds_to_str(int(delta.total_seconds()))
 
+
 def period_to_str(prd: pendulum.Period) -> str:
     return seconds_to_str(prd.seconds)
+
 
 def pendulum2str(pnd: pendulum.DateTime) -> str:
 

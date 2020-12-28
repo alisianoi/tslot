@@ -8,21 +8,21 @@ class TColorAwarePushButton(QPushButton, TColorAwareWidget):
     pass
 
 
-class TPrimaryColorAwarePushButton(QPushButton, TPrimaryColorAwareWidget):
+class TPrimaryColorAwarePushButton(QPushButton, TColorAwareWidgetMain):
 
     pass
 
 
-class TAlternateColorAwarePushButton(QPushButton, TAlternateColorAwareWidget):
+class TAlternateColorAwarePushButton(QPushButton, TColorAwareWidgetNext):
 
     pass
 
 
-class TSuccessColorAwarePushButton(QPushButton, TSuccessColorAwareWidget):
+class TSuccessColorAwarePushButton(QPushButton, TColorAwareWidgetSuccess):
 
     pass
 
 
-class TFailureColorAwarePushButton(QPushButton, TFailureColorAwareWidget):
+class TFailureColorAwarePushButton(QPushButton, TColorAwareWidgetFailure):
 
     pass

@@ -33,6 +33,7 @@ class TSlotFetchRequest(TFetchRequest):
         slice_fst: int = 0,
         slice_lst: int = 128,
     ) -> None:
+        super().__init__()
 
         if dates_dir not in LOAD_DIRECTIONS:
             raise RuntimeError(
@@ -85,12 +86,11 @@ class TRaySlotFetchRequest(TSlotFetchRequest):
         slice_fst: int = 0,
         slice_lst: int = 128,
     ) -> None:
-
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                f"Expected direction from {LOAD_DIRECTION}, was {direction}"
+                f"Expected direction from {LOAD_DIRECTIONS}, was {direction}"
             )
 
         self.dt_offset = dt_offset
@@ -129,12 +129,11 @@ class TRaySlotWithTagFetchRequest(TSlotFetchRequest):
         slice_fst: int = 0,
         slice_lst: int = 128,
     ) -> None:
-
         super().__init__(dates_dir, times_dir, slice_fst, slice_lst)
 
         if direction not in LOAD_DIRECTIONS:
             raise RuntimeError(
-                f"Expected direction from {LOAD_DIRECTION}, was {direction}"
+                f"Expected direction from {LOAD_DIRECTIONS}, was {direction}"
             )
 
         self.dt_offset = dt_offset

@@ -19,7 +19,8 @@ class TColorAwareWidget(QWidget):
         )
 
 
-class TPrimaryColorAwareWidget(TColorAwareWidget):
+class TColorAwareWidgetMain(TColorAwareWidget):
+    """Color aware widget: primary colors used"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -41,7 +42,8 @@ class TPrimaryColorAwareWidget(TColorAwareWidget):
         )
 
 
-class TAlternateColorAwareWidget(TColorAwareWidget):
+class TColorAwareWidgetNext(TColorAwareWidget):
+    """Color aware widget: secondary colors used"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -63,12 +65,13 @@ class TAlternateColorAwareWidget(TColorAwareWidget):
         )
 
 
-class TSuccessColorAwareWidget(TAlternateColorAwareWidget):
-
+class TColorAwareWidgetSuccess(TColorAwareWidgetNext):
+    """Color aware widget: colors indicate positive outcome"""
     pass
 
 
-class TFailureColorAwareWidget(TColorAwareWidget):
+class TColorAwareWidgetFailure(TColorAwareWidget):
+    """Color aware widget: colors indicate negative outcome"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

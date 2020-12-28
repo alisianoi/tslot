@@ -6,6 +6,7 @@ from src.client.common.widget import TWidget
 from src.client.wgt_demo_label import TLabelDemo
 from src.client.wgt_timer import TTimerControlsDockWidget
 from src.client.wgt_timer_table import THomeScrollArea
+from src.common.logger import logmain
 
 
 class TCentralWidget(TWidget):
@@ -31,13 +32,12 @@ class TCentralWidget(TWidget):
 
     @pyqtSlot()
     def handle_show_next_shortcut(self):
-        self.logger.info("enter handle_show_next_shortcut")
+        logmain.info("enter handle_show_next_shortcut")
 
 
 class TMainWindow(QMainWindow):
-    def __init__(self, parent: QWidget = None):
-
-        super().__init__(parent)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # self.vault = TVaultBroker(parent=self)
         # self.cache = TCacheBroker(parent=self)
@@ -68,6 +68,5 @@ class TMainWindow(QMainWindow):
         # self.kickstart()
 
     def kickstart(self):
-
         self.widget.scroll.widget().kickstart()
         self.timer.kickstart()

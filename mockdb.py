@@ -14,19 +14,19 @@ from src.db.model import TaskModel
 
 
 def create_a_day(session, delta):
-    '''
-    Create a single smiple day of tasks
+    """
+    Create a single simple day of tasks
 
     Note:
         Function attempts to create non-overlapping tasks. However, if
         the date changes while this function is being called several
         times, then overlapping tasks can be created. Pay attention!
-    '''
+    """
 
     chores_tag = TagModel(name='Chores')
     health_tag = TagModel(name='Health')
     workout_tag = TagModel(name='Workout')
-    freetime_tag = TagModel(name='Freetime')
+    free_time_tag = TagModel(name='Free Time')
 
     cook_task = TaskModel(name='Cook breakfast/dinner/supper')
     shop_task = TaskModel(name='Buy groceries')
@@ -41,7 +41,7 @@ def create_a_day(session, delta):
     chores_tag.tasks = [cook_task, shop_task, wash_task]
     health_tag.tasks = [aerobic_task, anaerobic_task]
     workout_tag.tasks = [aerobic_task, anaerobic_task]
-    freetime_tag.tasks = [movies_task, internet_task]
+    free_time_tag.tasks = [movies_task, internet_task]
 
     base = datetime.utcnow() - delta
 
@@ -99,7 +99,7 @@ def create_a_day(session, delta):
         , lst=base.replace(hour=21, minute=10, second=1)
     )
 
-    session.add_all([chores_tag, workout_tag, freetime_tag])
+    session.add_all([chores_tag, workout_tag, free_time_tag])
     session.add_all([
         cook_task, shop_task, wash_task, aerobic_task, anaerobic_task,
         movies_task, internet_task

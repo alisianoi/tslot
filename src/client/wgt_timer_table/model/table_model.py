@@ -14,10 +14,10 @@ class TTableModel(QAbstractTableModel):
         super().__init__(**kwargs)
         self.items = items
 
-    def rowCount(self, parent: QModelIndex=QModelIndex()):
+    def rowCount(self, parent: QModelIndex = QModelIndex()):
         return len(self.items)
 
-    def columnCount(self, parent: QModelIndex=QModelIndex()):
+    def columnCount(self, parent: QModelIndex = QModelIndex()):
         return 6
 
     @logged(logger=logging.getLogger("tslot-main"), disabled=True)
@@ -26,10 +26,10 @@ class TTableModel(QAbstractTableModel):
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def headerData(
-        self
-        , section    : int
-        , orientation: Qt.Orientation
-        , role       : Qt.ItemDataRole=Qt.DisplayRole
+            self
+            , section: int
+            , orientation: Qt.Orientation
+            , role: Qt.ItemDataRole = Qt.DisplayRole
     ) -> QVariant:
 
         if orientation == Qt.Vertical:
@@ -58,7 +58,7 @@ class TTableModel(QAbstractTableModel):
 
     @logged(logger=logging.getLogger('tslot-main'), disabled=True)
     def data(
-        self, index: QModelIndex=QModelIndex(), role: Qt.ItemDataRole=Qt.DisplayRole
+            self, index: QModelIndex = QModelIndex(), role: Qt.ItemDataRole = Qt.DisplayRole
     ):
         if not self.check_index(index):
             raise RuntimeError('data expects an index that makes sense')

@@ -1,31 +1,29 @@
-import logging
 from pathlib import Path
 
 from PyQt5.QtCore import *
 
 from src.client.common import TObject
-from src.db.reader_for_slots import TRaySlotReader, TRaySlotWithTagReader
-from src.db.reader_for_timer import TTimerReader
-from src.db.worker import TReader, TWorker, TWriter
-from src.db.writer_for_timer import TTimerWriter
 from src.common.failure import TFailure
+from src.common.logger import logged
 from src.common.request import TRequest
-from src.common.response import TResponse
-from src.common.request.fetch import TFetchRequest
-from src.common.response.fetch import TFetchResponse
 from src.common.request.fetch.slot_fetch_request import *
-from src.common.request.stash import TStashRequest
-from src.common.response.stash import TStashResponse
 from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
 from src.common.request.stash.timer_stash_request import TTimerStashRequest
-from src.common.logger import logged
+from src.common.response.fetch import TFetchResponse
+from src.common.response.stash import TStashResponse
+from src.db.reader_for_slots import TRaySlotReader
+from src.db.reader_for_slots import TRaySlotWithTagReader
+from src.db.reader_for_timer import TTimerReader
+from src.db.worker import TReader
+from src.db.worker import TWorker
+from src.db.worker import TWriter
+from src.db.writer_for_timer import TTimerWriter
 
 
 class DataRunnable(QRunnable):
     """Wrap an instance of a TWorker and later run it in another thread"""
 
     def __init__(self, worker: TWorker):
-
         super().__init__()
 
         self.worker = worker
@@ -49,8 +47,7 @@ class TVaultBroker(TObject):
         parent: if Qt ownership is required, provides parent object
     """
 
-    def __init__(self, path: Path=None, parent: QObject=None):
-
+    def __init__(self, path: Path = None, parent: QObject = None):
         super().__init__(parent)
 
         if path is None:
@@ -75,10 +72,10 @@ class TVaultBroker(TObject):
         """Find a suitable handler for the request to the database"""
 
         if isinstance(request, TTimerFetchRequest):
-            return self.handle_timer_fetch_request(request)
+            return self.handle_timer_fetch(request)
 
         if isinstance(request, TTimerStashRequest):
-            return self.handle_timer_stash_request(request)
+            return self.handle_timer_stash(request)
 
         if isinstance(request, TRaySlotFetchRequest):
             return self.handle_ray_slot_fetch(request)
@@ -106,21 +103,17 @@ class TVaultBroker(TObject):
 
         self.triggered.emit(failure)
 
-    def handle_timer_fetch_request(self, request: TTimerFetchRequest):
+    def handle_timer_fetch(self, request: TTimerFetchRequest):
         self.dispatch_reader(TTimerReader(request, self.path, parent=self))
 
-    def handle_timer_stash_request(self, request: TTimerStashRequest):
+    def handle_timer_stash(self, request: TTimerStashRequest):
         self.dispatch_writer(TTimerWriter(request, self.path, parent=self))
 
     def handle_ray_slot_fetch(self, request: TRaySlotFetchRequest):
-
         self.dispatch_reader(TRaySlotReader(request, self.path, parent=self))
 
     def handle_ray_slot_with_tag_fetch(self, request: TRaySlotWithTagFetchRequest):
-
-        self.dispatch_reader(
-            TRaySlotWithTagReader(request, self.path, parent=self)
-        )
+        self.dispatch_reader(TRaySlotWithTagReader(request, self.path, parent=self))
 
     @logged(disabled=True)
     def dispatch_reader(self, reader: TReader):
@@ -162,7 +155,7 @@ class TVaultBroker(TObject):
     def fn_started(self):
         self.logger.debug('Default fn_started')
 
-    @logged
+    @logged(disabled=True)
     @pyqtSlot()
     def fn_stopped(self):
         self.logger.debug('Default fn_stopped')

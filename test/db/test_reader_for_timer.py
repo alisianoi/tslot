@@ -1,6 +1,7 @@
 from test.db.test_reader import put_one_date
 
 import pendulum
+
 from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
 from src.db.reader_for_timer import TTimerReader
 
@@ -13,11 +14,9 @@ def test_single_timer_0(session, qtbot):
     worker.session = session
 
     def handle_fetched(response):
-
         assert response.timer is None
 
-    def handle_alerted(response):
-
+    def handle_alerted(_):
         assert False
 
     worker.fetched.connect(handle_fetched)

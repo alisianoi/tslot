@@ -8,21 +8,21 @@ class TColorAwareLineEdit(QLineEdit, TColorAwareWidget):
     pass
 
 
-class TPrimaryColorAwareLineEdit(QLineEdit, TPrimaryColorAwareWidget):
+class TPrimaryColorAwareLineEdit(QLineEdit, TColorAwareWidgetMain):
 
     pass
 
 
-class TAlternateColorAwareLineEdit(QLineEdit, TAlternateColorAwareWidget):
+class TAlternateColorAwareLineEdit(QLineEdit, TColorAwareWidgetNext):
 
     pass
 
 
-class TSuccessColorAwareLineEdit(QLineEdit, TSuccessColorAwareWidget):
+class TSuccessColorAwareLineEdit(QLineEdit, TColorAwareWidgetSuccess):
 
     pass
 
 
-class TFailureColorAwareLineEdit(QLineEdit, TFailureColorAwareWidget):
+class TFailureColorAwareLineEdit(QLineEdit, TColorAwareWidgetFailure):
 
     pass

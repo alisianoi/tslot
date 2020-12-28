@@ -1,9 +1,10 @@
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QDockWidget, QWidget
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QDockWidget
 
+from src.common.failure import TFailure
 from src.common.request import TRequest
 from src.common.response import TResponse
-from src.common.failure import TFailure
 
 
 class TDockWidget(QDockWidget):

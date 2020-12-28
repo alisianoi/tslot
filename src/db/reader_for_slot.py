@@ -2,20 +2,15 @@ import logging
 from pathlib import Path
 
 from src.client.common import TObject
-from src.common.dto.model import TEntryModel
-from src.common.dto.model import TSlotModel
-from src.common.dto.model import TTagModel
-from src.common.dto.model import TTaskModel
 from src.common.logger import logged
-from src.common.request.fetch.timer_fetch_request import TTimerFetchRequest
-from src.common.response.fetch.timer_fetch_response import TTimerFetchResponse
-from src.db.model import SlotModel
+from src.common.request.fetch.slot_fetch_request import TSlotFetchRequest
+
 from src.db.worker import TReader
 
 
-class TTimerReader(TReader):
+class TSlotReader(TReader):
     def __init__(
-            self, request: TTimerFetchRequest, path: Path = None, parent: TObject = None
+            self, request: TSlotFetchRequest, path: Path = None, parent: TObject = None
     ):
         super().__init__(request, path, parent)
 

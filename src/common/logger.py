@@ -1,5 +1,5 @@
-import logging
 import logging.config
+
 from functools import wraps
 
 
@@ -23,7 +23,6 @@ def logged(logger=logging.getLogger('tslot-main'), disabled=True):
 
         @wraps(foo)
         def wrapper(*args, **kwargs):
-
             was_disabled = logger.disabled
 
             logger.disabled = disabled
@@ -69,7 +68,7 @@ logging.config.dictConfig({
             , 'class': 'logging.handlers.RotatingFileHandler'
             , 'formatter': 'verbose'
             , 'filename': 'tslot.log'
-            , 'maxBytes': 10485760 # 10 MiB
+            , 'maxBytes': 10485760  # 10 MiB
             , 'backupCount': 3
         }
     },
